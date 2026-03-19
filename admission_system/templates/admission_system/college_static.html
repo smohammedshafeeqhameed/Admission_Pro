@@ -1,0 +1,242 @@
+{% extends 'admission_system/college_base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative h-[500px] flex items-center justify-center overflow-hidden">
+    <div class="absolute inset-0 z-0 bg-cover bg-center"
+        style="background-image: linear-gradient(rgba(17, 82, 212, 0.4), rgba(16, 22, 34, 0.8)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+    </div>
+    <div class="relative z-10 text-center px-4 max-w-4xl">
+        <span
+            class="inline-block bg-primary/20 text-white border border-primary/30 font-semibold px-4 py-1.5 rounded-full text-sm mb-6 uppercase tracking-wider">Admissions
+            Open 2026-27</span>
+        <h1 class="text-white text-5xl md:text-7xl font-black leading-tight tracking-tight mb-6">
+            Future Starts at <span class="text-primary">{{ college.name }}</span>
+        </h1>
+        <p class="text-slate-200 text-lg md:text-xl max-w-2xl mx-auto mb-10 leading-relaxed font-light">
+            {{ college.description|truncatewords:30 }}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a class="bg-primary text-white font-bold py-4 px-10 rounded-lg text-lg hover:shadow-xl hover:shadow-primary/20 transition-all"
+                href="#apply">Start Application</a>
+            <a class="bg-white/10 backdrop-blur text-white border border-white/20 font-bold py-4 px-10 rounded-lg text-lg hover:bg-white/20 transition-all"
+                href="#about">Learn More</a>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="py-24 px-6 md:px-20 lg:px-40 bg-white dark:bg-background-dark" id="about">
+    <div class="grid lg:grid-cols-2 gap-16 items-center max-w-7xl mx-auto">
+        <div>
+            <h2 class="text-primary font-bold tracking-widest uppercase text-sm mb-4">Why Choose Us?</h2>
+            <h3 class="text-4xl font-bold mb-6">Academic Excellence and Innovation</h3>
+            <div class="text-slate-600 dark:text-slate-400 text-lg mb-8 leading-relaxed">
+                {{ college.website_content|safe }}
+            </div>
+            <ul class="space-y-4">
+                <li class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary">check_circle</span>
+                    <span class="font-medium text-slate-800 dark:text-slate-200">Global Recognition and
+                        Accreditation</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="material-symbols-outlined text-primary">check_circle</span>
+                    <span class="font-medium text-slate-800 dark:text-slate-200">Expert Faculty with Industry
+                        Experience</span>
+                </li>
+            </ul>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+            <div class="space-y-4">
+                <img class="rounded-xl w-full h-64 object-cover"
+                    src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                    alt="Campus Life">
+                <img class="rounded-xl w-full h-48 object-cover"
+                    src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                    alt="Collaboration">
+            </div>
+            <div class="space-y-4 pt-8">
+                <img class="rounded-xl w-full h-48 object-cover"
+                    src="https://images.unsplash.com/photo-1498243639359-2cee70f5e714?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                    alt="Library">
+                <img class="rounded-xl w-full h-64 object-cover"
+                    src="https://images.unsplash.com/photo-1517486808906-6ca8b3f04846?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                    alt="Building">
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Course Highlights Section -->
+<section class="py-24 px-6 md:px-20 lg:px-40 bg-slate-50 dark:bg-slate-900/50" id="courses">
+    <div class="max-w-7xl mx-auto">
+        <div class="text-center mb-16">
+            <h2 class="text-primary font-bold tracking-widest uppercase text-sm mb-4">Our Programs</h2>
+            <h3 class="text-4xl font-bold">Featured Courses</h3>
+        </div>
+        <div class="grid md:grid-cols-3 gap-8">
+            {% for course in courses %}
+            <div
+                class="bg-white dark:bg-slate-800 p-8 rounded-xl border border-slate-100 dark:border-slate-700 hover:shadow-xl transition-all group">
+                <div
+                    class="w-14 h-14 bg-primary/10 rounded-lg flex items-center justify-center text-primary mb-6 group-hover:bg-primary group-hover:text-white transition-all">
+                    <span class="material-symbols-outlined text-3xl">school</span>
+                </div>
+                <h4 class="text-xl font-bold mb-3">{{ course.name }}</h4>
+                <p class="text-slate-500 dark:text-slate-400 mb-6">{{ course.description|default:"Specialized program
+                    designed for future leaders." }}</p>
+                <a href="#apply" class="text-primary font-semibold text-sm flex items-center gap-1">Apply Now <span
+                        class="material-symbols-outlined text-xs">arrow_forward</span></a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Admission Form Section -->
+<section class="py-24 px-6 md:px-20 lg:px-40 bg-white dark:bg-background-dark" id="apply">
+    <div
+        class="max-w-5xl mx-auto flex flex-col lg:flex-row items-stretch border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
+        <div class="lg:w-1/2 p-12 bg-primary text-white flex flex-col justify-center">
+            <h2 class="text-3xl font-bold mb-6">Begin Your Journey</h2>
+            <p class="text-primary-100 mb-8 leading-relaxed">Fill out the application form to secure your place. Once
+                submitted, our admissions counselor will reach out to you to guide you through the next steps.</p>
+            <div class="space-y-6">
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/20 p-2 rounded-lg">
+                        <span class="material-symbols-outlined">schedule</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold">Limited Seats Available</p>
+                        <p class="text-xs text-primary-100">Apply early for priority processing</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-4">
+                    <div class="bg-white/20 p-2 rounded-lg">
+                        <span class="material-symbols-outlined">help</span>
+                    </div>
+                    <div>
+                        <p class="text-sm font-semibold">Need Assistance?</p>
+                        <p class="text-xs text-primary-100">{{ college.email|default:"admissions@example.com" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="lg:w-1/2 p-12 bg-white dark:bg-slate-800">
+            <div class="mb-8">
+                <h3 class="text-2xl font-bold mb-2">Application Form</h3>
+                {% if messages %}
+                {% for message in messages %}
+                <div
+                    class="flex items-center gap-2 {% if message.tags == 'success' %}text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20{% else %}text-red-500 bg-red-50 dark:bg-red-900/20{% endif %} p-3 rounded border {% if message.tags == 'success' %}border-emerald-100 dark:border-emerald-900/30{% else %}border-red-100 dark:border-red-900/30{% endif %} mb-4 text-sm font-medium">
+                    <span class="material-symbols-outlined text-sm">{% if message.tags == 'success' %}check_circle{%
+                        else %}warning{% endif %}</span>
+                    <span>{{ message }}</span>
+                </div>
+                {% endfor %}
+                {% endif %}
+                <div
+                    class="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-slate-900/50 p-2 rounded border border-slate-100 dark:border-slate-800">
+                    <span class="material-symbols-outlined text-sm">info</span>
+                    <span>Note: One application per course allowed.</span>
+                </div>
+            </div>
+            <form method="post" action="{% url 'apply_admission' college.slug cre_id %}" class="space-y-4">
+                {% csrf_token %}
+                <div>
+                    <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Full Name</label>
+                    <input name="name"
+                        class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                        placeholder="John Doe" required type="text" />
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Email
+                            Address</label>
+                        <input name="email"
+                            class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            placeholder="john@example.com" required type="email" />
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Phone
+                            Number</label>
+                        <input name="phone"
+                            class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
+                            placeholder="+91 00000 00000" required type="tel" />
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Course
+                        Selection</label>
+                    <select name="course" required
+                        class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+                        <option disabled selected value="">Choose a program</option>
+                        {% for course in courses %}
+                        <option value="{{ course.id }}">{{ course.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1.5 text-slate-400">Referral Context</label>
+                    <input
+                        class="w-full px-4 py-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-400 cursor-not-allowed outline-none font-mono text-xs"
+                        readonly type="text" value="Partner ID: {{ cre_id }}" />
+                </div>
+                <button
+                    class="w-full bg-primary text-white font-bold py-4 rounded-lg hover:opacity-90 shadow-lg shadow-primary/20 mt-6 transition-all"
+                    type="submit">
+                    Submit Application
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section class="py-24 px-6 md:px-20 lg:px-40 bg-slate-50 dark:bg-slate-900/50" id="contact">
+    <div class="max-w-7xl mx-auto">
+        <div class="grid lg:grid-cols-2 gap-16 text-slate-800 dark:text-slate-200">
+            <div>
+                <h2 class="text-3xl font-bold mb-8">Contact Our Office</h2>
+                <div class="space-y-8">
+                    <div class="flex items-start gap-4">
+                        <div class="text-primary mt-1">
+                            <span class="material-symbols-outlined">location_on</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Campus Address</h4>
+                            <p class="text-slate-600 dark:text-slate-400">University Main Road, Tech Hub<br />Admissions
+                                Wing, Block A</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="text-primary mt-1">
+                            <span class="material-symbols-outlined">mail</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Email Us</h4>
+                            <p class="text-slate-600 dark:text-slate-400">info@{{ college.slug }}.edu<br />admissions@{{
+                                college.slug }}.edu</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4">
+                        <div class="text-primary mt-1">
+                            <span class="material-symbols-outlined">call</span>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-lg mb-1">Helpline</h4>
+                            <p class="text-slate-600 dark:text-slate-400">+91 1800-COLLEGE-1<br />+91 999 000 1111</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="rounded-2xl overflow-hidden h-[400px] border border-slate-200 dark:border-slate-800">
+                <img class="w-full h-full object-cover grayscale contrast-125"
+                    src="https://images.unsplash.com/photo-1522071823912-3408605330e2?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
+                    alt="Map Placeholder">
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

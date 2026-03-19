@@ -1,0 +1,258 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}Executive Hub - AdmissionPro CRE{% endblock %}
+
+{% block extra_css %}
+<style>
+    .stats-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .dark .stats-card {
+        background: linear-gradient(135deg, rgba(30, 41, 59, 0.8), rgba(15, 23, 42, 0.8));
+        border: 1px solid rgba(51, 65, 85, 0.3);
+    }
+
+    .metric-blue {
+        border-left: 4px solid #1152d4;
+    }
+
+    .metric-emerald {
+        border-left: 4px solid #10b981;
+    }
+
+    .metric-amber {
+        border-left: 4px solid #f59e0b;
+    }
+
+    .table-row-hover:hover {
+        background: rgba(17, 82, 212, 0.03);
+    }
+
+    .dark .table-row-hover:hover {
+        background: rgba(17, 82, 212, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Dashboard Header -->
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
+        <div class="flex flex-col gap-2">
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+                Executive <span class="text-primary italic">Hub</span>
+            </h1>
+            <p class="text-slate-500 dark:text-slate-400 font-medium text-lg">
+                Welcome back, <span class="text-slate-900 dark:text-white font-bold">{{ user.username }}</span>. Your
+                pipeline is looking strong.
+            </p>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <div
+                class="glass-card px-6 py-3 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
+                <span class="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5">Partner
+                    Level</span>
+                <span class="text-sm font-black text-primary">Certified Executive</span>
+            </div>
+            <div
+                class="glass-card px-6 py-3 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
+                <span class="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5">Joining
+                    Date</span>
+                <span class="text-sm font-black text-slate-900 dark:text-white">{{ user.date_joined|date:"M d, Y"
+                    }}</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Metric Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div
+            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-blue transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Total Referrals</span>
+                <div
+                    class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-lg">group</span>
+                </div>
+            </div>
+            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">{{ total_referrals }}</div>
+            <div class="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
+                <span class="material-symbols-outlined text-xs">trending_up</span>
+                Live Sync Active
+            </div>
+        </div>
+
+        <div
+            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-emerald transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Partner Institutions</span>
+                <div
+                    class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-lg">school</span>
+                </div>
+            </div>
+            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">{{ colleges.count }}</div>
+            <div class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Institutions</div>
+        </div>
+
+        <div
+            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-amber transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-4">
+                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Projected Value</span>
+                <div
+                    class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <span class="material-symbols-outlined text-lg">payments</span>
+                </div>
+            </div>
+            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">--</div>
+            <div class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Monthly Forecast</div>
+        </div>
+
+        <!-- Quick Action Card -->
+        <div class="bg-primary p-8 rounded-3xl shadow-2xl flex flex-col justify-center gap-4 text-white">
+            <h3 class="font-black text-xl leading-tight">Need Support?</h3>
+            <p class="text-sm text-blue-100 font-medium">Chat with your account manager for pipeline optimization.</p>
+            <a href="mailto:support@admissionpro.com"
+                class="h-12 w-full bg-white text-primary rounded-xl font-black text-sm flex items-center justify-center hover:bg-blue-50 transition-all">
+                Contact Now
+            </a>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
+        <!-- Main Activity Feed (8 cols) -->
+        <div class="lg:col-span-8 flex flex-col gap-8">
+            <div
+                class="glass-card rounded-[40px] shadow-sm border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
+                <div class="p-8 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
+                    <div>
+                        <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Recent Activity
+                        </h3>
+                        <p class="text-sm text-slate-400 font-semibold tracking-wide uppercase mt-1">Enrollment Pipeline
+                        </p>
+                    </div>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead>
+                            <tr
+                                class="bg-slate-50/50 dark:bg-slate-800/20 text-slate-400 font-black text-[10px] uppercase tracking-[0.2em]">
+                                <th class="px-8 py-5">Student / Contact</th>
+                                <th class="px-8 py-5">Institution</th>
+                                <th class="px-8 py-5">Program</th>
+                                <th class="px-8 py-5">Applied On</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+                            {% for referral in referrals %}
+                            <tr class="table-row-hover transition-colors">
+                                <td class="px-8 py-6">
+                                    <div class="flex flex-col gap-0.5">
+                                        <div class="font-black text-slate-900 dark:text-white">{{ referral.student.name
+                                            }}</div>
+                                        <div class="text-xs text-slate-400">{{ referral.student.email }}</div>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex items-center gap-2">
+                                        <div class="w-2 h-2 rounded-full"
+                                            style="background: {{ referral.college.theme_color|default:'#1152d4' }}">
+                                        </div>
+                                        <span class="text-sm text-slate-600 dark:text-slate-300 font-bold">{{
+                                            referral.college.name }}</span>
+                                    </div>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <span
+                                        class="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
+                                        {{ referral.course.name }}
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6 text-sm text-slate-400 font-bold uppercase">{{
+                                    referral.applied_at|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="px-8 py-24 text-center">
+                                    <div class="flex flex-col items-center gap-4 text-slate-300">
+                                        <span class="material-symbols-outlined text-6xl opacity-20">inventory_2</span>
+                                        <p class="text-lg font-bold">No active applications in your pipeline.</p>
+                                        <p class="text-sm font-medium">Start sharing your referral links to see activity
+                                            here.</p>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Links Sidebar (4 cols) -->
+        <div class="lg:col-span-4 flex flex-col gap-8">
+            <div class="glass-card rounded-[40px] shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-8">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Referral Engine</h3>
+                    <p class="text-sm text-slate-400 font-semibold tracking-wide mt-2">Unique tracking links for your
+                        assigned partners.</p>
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    {% for college in colleges %}
+                    <div
+                        class="p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 hover:border-primary/30 transition-all group">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xl"
+                                style="background: {{ college.theme_color|default:'#1152d4' }}">
+                                <span class="material-symbols-outlined text-sm">school</span>
+                            </div>
+                            <span
+                                class="text-base font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">{{
+                                college.name }}</span>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <div class="relative">
+                                <div class="w-full text-[10px] font-black font-mono text-primary truncate bg-primary/5 px-4 py-3 rounded-xl border border-primary/10 select-all scrollbar-hide"
+                                    id="link-{{ college.id }}">
+                                    {{ base_url }}{% url 'apply_admission' college.slug cre_profile.cre_id %}
+                                </div>
+                            </div>
+                            <button
+                                class="w-full h-12 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white"
+                                onclick="copyLink('link-{{ college.id }}', this)">
+                                <span class="material-symbols-outlined text-sm">content_copy</span>
+                                Copy ID Link
+                            </button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function copyLink(elementId, btn) {
+        const linkText = document.getElementById(elementId).innerText.trim();
+        navigator.clipboard.writeText(linkText).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Copied to Clipboard';
+            btn.classList.remove('bg-slate-900', 'dark:bg-slate-100', 'group-hover:bg-primary');
+            btn.classList.add('bg-emerald-600', 'text-white');
+
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.add('bg-slate-900', 'dark:bg-slate-100', 'group-hover:bg-primary');
+                btn.classList.remove('bg-emerald-600', 'text-white');
+            }, 2500);
+        });
+    }
+</script>
+{% endblock %}

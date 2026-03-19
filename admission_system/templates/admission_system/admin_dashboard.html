@@ -1,0 +1,224 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}Admin Control Center - AdmissionPro{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-8 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-8">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div>
+                <h1 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">Admin Control Center</h1>
+                <p class="text-slate-500 dark:text-slate-400 mt-1">Platform-wide overview and partner management</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="{% url 'admin_export_csv' %}?type=students"
+                    class="h-10 px-4 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-sm font-bold flex items-center gap-2 hover:bg-slate-50 transition-colors shadow-sm">
+                    <span class="material-symbols-outlined text-sm text-green-500 rotate-180">upload</span> Export
+                    Students
+                </a>
+                <a href="/admin/"
+                    class="h-10 px-4 rounded-lg bg-orange-100 text-orange-700 text-sm font-bold flex items-center gap-2 hover:bg-orange-200 transition-colors">
+                    <span class="material-symbols-outlined text-sm">settings</span> Advanced Django Admin
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined">group</span>
+                    </div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Total CREs</span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_cres }}</div>
+            </div>
+            <div
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined">school</span>
+                    </div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Total Students</span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_students }}</div>
+            </div>
+            <div
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined">account_balance</span>
+                    </div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Colleges</span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_colleges }}</div>
+            </div>
+            <div
+                class="bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm transition-all hover:shadow-md">
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-10 h-10 rounded-lg bg-purple-100 text-purple-600 flex items-center justify-center">
+                        <span class="material-symbols-outlined">description</span>
+                    </div>
+                    <span class="text-sm font-bold uppercase tracking-wider text-slate-400">Applications</span>
+                </div>
+                <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_applications }}</div>
+            </div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-8">
+            <!-- CRE Management Section -->
+            <div class="lg:col-span-2 space-y-6">
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div
+                        class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/10 flex items-center justify-between">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            CRE Partner Management
+                        </h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead
+                                class="bg-slate-50 dark:bg-slate-900/20 text-slate-500 dark:text-slate-400 text-xs font-bold uppercase tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">CRE Partner</th>
+                                    <th class="px-6 py-4">Phone</th>
+                                    <th class="px-6 py-4">Allocated Colleges</th>
+                                    <th class="px-6 py-4">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                                {% for cre in all_cres %}
+                                <tr class="hover:bg-slate-50 dark:hover:bg-slate-900/10 transition-colors">
+                                    <td class="px-6 py-4">
+                                        <div class="font-bold text-slate-900 dark:text-white">{{ cre.user.username }}
+                                        </div>
+                                        <div class="text-xs text-slate-400">{{ cre.user.email }}</div>
+                                    </td>
+                                    <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">{{ cre.phone|default:"-" }}</td>
+                                    <td class="px-6 py-4">
+                                        <div class="flex flex-wrap gap-1">
+                                            {% for col in cre.allocated_colleges.all %}
+                                            <span
+                                                class="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold">{{
+                                                col.name }}</span>
+                                            {% empty %}
+                                            <span class="text-xs text-slate-400 italic">No colleges allocated</span>
+                                            {% endfor %}
+                                        </div>
+                                    </td>
+                                    <td class="px-6 py-4">
+                                        <button onclick="document.getElementById('modal-{{ cre.id }}').showModal()"
+                                            class="text-primary hover:text-primary-600 font-bold text-sm">Allocate</button>
+
+                                        <!-- Allocation Modal -->
+                                        <dialog id="modal-{{ cre.id }}"
+                                            class="modal rounded-2xl bg-white dark:bg-slate-800 p-0 shadow-2xl border border-slate-200 dark:border-slate-700 max-w-md w-full">
+                                            <div class="p-6">
+                                                <div class="flex items-center justify-between mb-6">
+                                                    <h3 class="text-xl font-black">Allocate Colleges</h3>
+                                                    <button
+                                                        onclick="document.getElementById('modal-{{ cre.id }}').close()"
+                                                        class="text-slate-400 hover:text-slate-600">
+                                                        <span class="material-symbols-outlined">close</span>
+                                                    </button>
+                                                </div>
+                                                <form action="{% url 'admin_allocate_college' %}" method="post"
+                                                    class="space-y-4">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="cre_id" value="{{ cre.id }}">
+                                                    <div class="space-y-2 max-h-60 overflow-y-auto px-1">
+                                                        {% for college in all_colleges %}
+                                                        <label
+                                                            class="flex items-center gap-3 p-3 rounded-xl border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900/50 cursor-pointer transition-colors">
+                                                            <input type="checkbox" name="colleges"
+                                                                value="{{ college.id }}" {% if college in cre.allocated_colleges.all %}checked{% endif %}
+                                                                class="w-5 h-5 rounded border-slate-300 text-primary focus:ring-primary">
+                                                            <span
+                                                                class="text-sm font-semibold tracking-tight">{{college.name}}</span>
+                                                        </label>
+                                                        {% endfor %}
+                                                    </div>
+                                                    <button type="submit"
+                                                        class="w-full bg-primary text-white font-bold py-3 rounded-xl hover:opacity-90 shadow-lg shadow-primary/20 transition-all mt-4">
+                                                        Save Allocations
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </dialog>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="space-y-6">
+                <div
+                    class="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+                    <div class="p-6 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/10">
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <span class="material-symbols-outlined text-primary">history</span>
+                            Recent Applications
+                        </h2>
+                    </div>
+                    <div class="p-6">
+                        <div class="space-y-6">
+                            {% for app in recent_applications %}
+                            <div
+                                class="flex gap-4 relative {% if not forloop.last %}pb-6 after:absolute after:left-[19px] after:top-10 after:bottom-0 after:w-px after:bg-slate-100 dark:after:bg-slate-700{% endif %}">
+                                <div
+                                    class="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-700 flex items-center justify-center shrink-0 z-10">
+                                    <span class="material-symbols-outlined text-sm text-slate-500">description</span>
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold text-slate-900 dark:text-white">{{ app.student.name }}
+                                    </div>
+                                    <div class="text-xs text-slate-500 mt-0.5">Applied for <span
+                                            class="text-primary font-medium">{{ app.course.name }}</span></div>
+                                    <div class="text-[10px] text-slate-400 mt-1 uppercase tracking-wider font-bold">Via
+                                        {{ app.referred_by.user.username|default:"Direct" }} • {{ app.applied_at|date:"M
+                                        d, H:i" }}</div>
+                                </div>
+                            </div>
+                            {% empty %}
+                            <div class="text-center py-8 text-slate-400 italic text-sm">No recent applications found.
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .modal::backdrop {
+        background: rgba(15, 23, 42, 0.4);
+        backdrop-filter: blur(8px);
+    }
+
+    .modal[open] {
+        animation: modal-in 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modal-in {
+        from {
+            transform: translateY(20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>
+{% endblock %}

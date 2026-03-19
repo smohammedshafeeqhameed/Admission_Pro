@@ -1,0 +1,305 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}AdmissionPro CRE - The Future of Education Recruitment{% endblock %}
+
+{% block extra_css %}
+<style>
+    @keyframes float {
+        0% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-20px) rotate(2deg);
+        }
+
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+    }
+
+    .animate-float {
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .glass-card {
+        background: rgba(255, 255, 255, 0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .dark .glass-card {
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(51, 65, 85, 0.3);
+    }
+
+    .gradient-text {
+        background: linear-gradient(135deg, #1152d4 0%, #6366f1 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .hero-gradient {
+        background: radial-gradient(circle at top right, rgba(17, 82, 212, 0.08), transparent 40%),
+            radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.08), transparent 40%);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<main class="hero-gradient min-h-screen">
+    <!-- Hero Section -->
+    <section class="relative pt-20 pb-24 lg:pt-32 lg:pb-40 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div
+                class="grid lg:grid-cols-2 gap-16 items-center border-b border-slate-200/50 dark:border-slate-800/50 pb-20">
+                <div class="flex flex-col gap-10">
+                    <div class="flex flex-col gap-6">
+                        <div
+                            class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-extra-bold uppercase tracking-widest w-fit border border-primary/20">
+                            <span class="relative flex h-2 w-2">
+                                <span
+                                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                                <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+                            </span>
+                            Professional Executive Network
+                        </div>
+                        <h1
+                            class="text-5xl md:text-7xl font-black leading-[1.1] tracking-tight text-slate-900 dark:text-white">
+                            The Hub for Modern <span class="gradient-text">Admission</span> Talent
+                        </h1>
+                        <p class="text-xl text-slate-600 dark:text-slate-400 max-w-xl leading-relaxed font-medium">
+                            The most advanced platform for Certified Relationship Executives to manage institutional
+                            pipelines, maximize conversions, and scale their influence.
+                        </p>
+                    </div>
+
+                    <div class="flex flex-wrap gap-5">
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'register_cre' %}"
+                            class="group h-14 px-10 rounded-2xl bg-primary text-white font-bold text-lg flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:-translate-y-1">
+                            Join the Network
+                            <span
+                                class="material-symbols-outlined group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </a>
+                        <a href="#how-it-works"
+                            class="h-14 px-8 rounded-2xl bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-lg flex items-center justify-center border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all">
+                            Learn More
+                        </a>
+                        {% else %}
+                        <a href="{% url 'cre_dashboard' %}"
+                            class="group h-14 px-10 rounded-2xl bg-primary text-white font-bold text-lg flex items-center justify-center gap-3 hover:shadow-2xl hover:shadow-primary/40 transition-all hover:-translate-y-1">
+                            Manage Dashboard
+                            <span
+                                class="material-symbols-outlined group-hover:translate-x-1 transition-transform">dashboard</span>
+                        </a>
+                        {% endif %}
+                    </div>
+
+                    <div class="flex items-center gap-6 pt-4">
+                        <div class="flex -space-x-3">
+                            <img class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover"
+                                src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&q=80"
+                                alt="CRE User">
+                            <img class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover"
+                                src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=100&q=80"
+                                alt="CRE User">
+                            <img class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 object-cover"
+                                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=100&q=80"
+                                alt="CRE User">
+                            <div
+                                class="w-10 h-10 rounded-full border-2 border-white dark:border-slate-900 bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[10px] font-black">
+                                +4k</div>
+                        </div>
+                        <p class="text-sm text-slate-500 font-semibold">Join 4,000+ top-tier executives already scaling.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="relative group">
+                    <div
+                        class="absolute -inset-10 bg-primary/10 rounded-full blur-[100px] group-hover:bg-primary/20 transition-all duration-700">
+                    </div>
+                    <div class="relative animate-float">
+                        <div
+                            class="glass-card p-4 rounded-[40px] shadow-3xl transform rotate-3 hover:rotate-0 transition-transform duration-700 overflow-hidden">
+                            <div
+                                class="rounded-[30px] overflow-hidden aspect-[4/3] shadow-inner border border-white/20">
+                                <img class="w-full h-full object-cover scale-110 group-hover:scale-100 transition-transform duration-1000"
+                                    src="https://images.unsplash.com/photo-1551434678-e076c223a692?ixlib=rb-1.2.1&auto=format&fit=crop&w=1200&q=80"
+                                    alt="Modern Office Setup">
+                            </div>
+                        </div>
+                        <!-- Floating Badge 1 -->
+                        <div class="absolute -top-6 -right-6 glass-card p-5 rounded-2xl shadow-xl animate-bounce">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-emerald-500 text-white flex items-center justify-center shadow-lg">
+                                    <span class="material-symbols-outlined">payments</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Earnings
+                                        Scale</p>
+                                    <p class="text-xl font-black text-slate-900 dark:text-white">$14.2k+</p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Floating Badge 2 -->
+                        <div class="absolute -bottom-10 -left-6 glass-card p-5 rounded-2xl shadow-xl">
+                            <div class="flex items-center gap-4">
+                                <div
+                                    class="w-12 h-12 rounded-xl bg-blue-500 text-white flex items-center justify-center shadow-lg">
+                                    <span class="material-symbols-outlined">analytics</span>
+                                </div>
+                                <div>
+                                    <p class="text-[10px] text-slate-500 uppercase font-black tracking-widest">Growth
+                                        Rate</p>
+                                    <p class="text-xl font-black text-slate-900 dark:text-white">+84%</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Partners & Stats -->
+    <section
+        class="py-12 bg-white/30 dark:bg-slate-900/30 backdrop-blur-sm border-y border-slate-200/50 dark:border-slate-800/50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div
+                class="grid grid-cols-2 md:grid-cols-4 gap-12 text-center items-center opacity-70 hover:opacity-100 transition-opacity">
+                <!-- Stat 1 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-4xl font-black gradient-text">1.2k+</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Trusted Partners</span>
+                </div>
+                <!-- Stat 2 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-4xl font-black gradient-text">200+</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Global Colleges</span>
+                </div>
+                <!-- Stat 3 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-4xl font-black gradient-text">50k+</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Successful Apps</span>
+                </div>
+                <!-- Stat 4 -->
+                <div class="flex flex-col gap-1">
+                    <span class="text-4xl font-black gradient-text">24/7</span>
+                    <span class="text-xs font-bold uppercase tracking-widest text-slate-400">Expert Support</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features / Steps -->
+    <section class="py-32 bg-slate-50/50 dark:bg-slate-900/50" id="how-it-works">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-24">
+                <h2 class="text-4xl md:text-5xl font-black mb-6 tracking-tight">Built for Professional Performance</h2>
+                <p class="text-lg text-slate-500 font-medium">We've engineered every feature to optimize your workflow
+                    and increase your conversion capability.</p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-10">
+                <!-- Card 1 -->
+                <div
+                    class="group glass-card p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-b-primary/40">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center mb-8 shadow-lg shadow-primary/20 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">hub</span>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">Centralized Link Engine</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Generate and manage institutional tracking links with cryptographic precision. One dashboard for
+                        every referral.
+                    </p>
+                    <div class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs font-black uppercase tracking-widest text-primary">Precision
+                            Tracking</span>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div
+                    class="group glass-card p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-b-emerald-500/40">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-8 shadow-lg shadow-emerald-500/20 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">insights</span>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">Real-time Analytics</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Track every click, application, and enrollment stage as it happens. Knowledge is your primary
+                        competitive edge.
+                    </p>
+                    <div class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs font-black uppercase tracking-widest text-emerald-500">Live Data
+                            Feed</span>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div
+                    class="group glass-card p-10 rounded-[40px] shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 border-b-4 border-b-amber-500/40">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-8 shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform">
+                        <span class="material-symbols-outlined text-3xl">security</span>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4">Verified Payouts</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Industry-certified commission structures with automated monthly payouts directly to your
+                        accounts.
+                    </p>
+                    <div class="mt-8 pt-8 border-t border-slate-100 dark:border-slate-800">
+                        <span class="text-xs font-black uppercase tracking-widest text-amber-500">Secure
+                            Settlement</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- High Impact CTA -->
+    <section class="py-32 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative bg-slate-900 rounded-[60px] p-12 md:p-24 overflow-hidden shadow-3xl text-center">
+                <div
+                    class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 brightness-200">
+                </div>
+                <div class="absolute -top-20 -right-20 w-80 h-80 bg-primary/20 rounded-full blur-[100px]"></div>
+                <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-blue-500/10 rounded-full blur-[100px]"></div>
+
+                <div class="relative z-10 flex flex-col items-center gap-10">
+                    <h2 class="text-5xl md:text-7xl font-black text-white tracking-tight max-w-4xl mx-auto">
+                        Ready to Join the Next <span class="gradient-text">Generation</span> of Sales?
+                    </h2>
+                    <p class="text-xl text-slate-400 max-w-2xl font-medium">
+                        Stop manual tracking. Start professional scaling. Join 4,000+ executives today on the
+                        AdmissionPro Network.
+                    </p>
+                    <div class="flex flex-col sm:flex-row gap-5">
+                        {% if not user.is_authenticated %}
+                        <a href="{% url 'register_cre' %}"
+                            class="h-16 px-12 rounded-2xl bg-primary text-white font-black text-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/40">
+                            Apply for Partnership
+                        </a>
+                        {% else %}
+                        <a href="{% url 'cre_dashboard' %}"
+                            class="h-16 px-12 rounded-2xl bg-white text-slate-900 font-black text-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-2xl">
+                            Go to Dashboard
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="flex items-center gap-2 text-slate-500 text-sm font-bold uppercase tracking-[0.2em]">
+                        <span class="material-symbols-outlined text-emerald-500">bolt</span>
+                        Instant Approval for Certified Candidates
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

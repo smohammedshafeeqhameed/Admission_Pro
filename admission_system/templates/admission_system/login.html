@@ -1,0 +1,81 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}CRE Login - AdmissionPro{% endblock %}
+
+{% block content %}
+<div class="flex items-center justify-center min-h-[80vh] px-4 py-12">
+    <div
+        class="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 p-8">
+        <div class="text-center mb-10">
+            <h2 class="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+                CRE <span class="text-primary">Login</span>
+            </h2>
+            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">
+                Welcome back to your partner portal
+            </p>
+        </div>
+
+        <form method="post" class="space-y-6">
+            {% csrf_token %}
+
+            {% if form.errors %}
+            <div
+                class="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-100 dark:border-red-900/30 text-red-600 dark:text-red-400 text-sm font-medium">
+                Invalid username or password. Please try again.
+            </div>
+            {% endif %}
+
+            <div>
+                <label for="id_username"
+                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Username</label>
+                <div class="relative">
+                    <input type="text" name="username" id="id_username" required
+                        class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        placeholder="Enter your username">
+                </div>
+            </div>
+
+            <div>
+                <label for="id_password"
+                    class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Password</label>
+                <div class="relative">
+                    <input type="password" name="password" id="id_password" required
+                        class="block w-full px-4 py-3 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                        placeholder="••••••••">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between">
+                <div class="flex items-center">
+                    <input type="checkbox" name="remember_me" id="remember_me"
+                        class="h-4 w-4 text-primary focus:ring-primary border-slate-300 rounded cursor-pointer">
+                    <label for="remember_me"
+                        class="ml-2 block text-sm text-slate-500 dark:text-slate-400 cursor-pointer">
+                        Remember me
+                    </label>
+                </div>
+                <div class="text-sm">
+                    <a href="#" class="font-semibold text-primary hover:opacity-80 transition-opacity">
+                        Forgot password?
+                    </a>
+                </div>
+            </div>
+
+            <button type="submit"
+                class="w-full flex justify-center items-center gap-2 py-4 px-6 border border-transparent rounded-xl shadow-lg shadow-primary/20 text-lg font-bold text-white bg-primary hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all">
+                Sign In
+                <span class="material-symbols-outlined">login</span>
+            </button>
+        </form>
+
+        <div class="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800 text-center">
+            <p class="text-sm text-slate-500 dark:text-slate-400">
+                New CRE partner?
+                <a href="{% url 'register_cre' %}" class="font-bold text-primary hover:opacity-80 transition-opacity">
+                    Join us now
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
