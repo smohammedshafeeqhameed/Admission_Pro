@@ -1,0 +1,84 @@
+{% extends 'admission_system/college_base.html' %}
+
+{% block content %}
+<div class="min-h-[70vh] flex flex-col items-center justify-center py-20 px-6">
+    <div
+        class="max-w-lg w-full bg-white dark:bg-slate-900 p-12 rounded-[3rem] shadow-3xl border border-slate-100 dark:border-slate-800 text-center">
+        <div class="mb-10">
+            <div class="w-20 h-20 bg-primary/10 text-primary rounded-3xl flex items-center justify-center mx-auto mb-6">
+                <i data-lucide="credit-card" class="w-10 h-10"></i>
+            </div>
+            <h1 class="text-3xl font-black mb-2">Final Step: Payment</h1>
+            <p class="text-slate-500 font-medium italic">Application Fee for {{ college.name }}</p>
+        </div>
+
+        <div class="bg-slate-50 dark:bg-slate-800/50 p-8 rounded-2xl mb-10 text-left space-y-4">
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Student</span>
+                <span class="font-bold text-slate-900 dark:text-white leading-none">{{ student.name }}</span>
+            </div>
+            <div class="h-px bg-slate-200 dark:bg-slate-700"></div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm font-black uppercase tracking-[0.2em] text-slate-400">Amount to Pay</span>
+                <span class="text-2xl font-black text-primary">₹1,500.00</span>
+            </div>
+        </div>
+
+        <button id="rzp-button1"
+            class="w-full h-16 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-3">
+            <span>Pay Securely with Razorpay</span>
+            <i data-lucide="shield-check" class="w-5 h-5"></i>
+        </button>
+
+        <p class="mt-8 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Secure 256-bit encrypted
+            transaction</p>
+    </div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    var options = {
+        "key": "{{ key_id }}",
+        "amount": "{{ amount }}",
+        "currency": "INR",
+        "name": "AdmissionPro",
+        "description": "Application Fee for {{ college.name }}",
+        "order_id": "{{ order_id }}",
+        "handler": function (response) {
+            var form = document.createElement("form");
+            form.method = "POST";
+            form.action = "{% url 'payment_callback' %}";
+
+            var fields = {
+                'razorpay_payment_id': response.razorpay_payment_id,
+                'razorpay_order_id': response.razorpay_order_id,
+                'razorpay_signature': response.razorpay_signature
+            };
+
+            for (var key in fields) {
+                var input = document.createElement("input");
+                input.type = "hidden";
+                input.name = key;
+                input.value = fields[key];
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        },
+        "prefill": {
+            "name": "{{ student.name }}",
+            "email": "{{ student.email }}",
+            "contact": "{{ student.phone }}"
+        },
+        "theme": {
+            "color": "{{ college.theme_color|default:'#1152d4' }}"
+        }
+    };
+    var rzp1 = new Razorpay(options);
+    document.getElementById('rzp-button1').onclick = function (e) {
+        rzp1.open();
+        e.preventDefault();
+    }
+</script>
+{% endblock %}

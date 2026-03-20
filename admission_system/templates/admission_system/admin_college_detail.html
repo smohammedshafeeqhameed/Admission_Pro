@@ -1,0 +1,117 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}{{ college.name }} - Institution Details{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <!-- Header -->
+        <div class="space-y-6">
+            <nav class="flex text-sm font-bold uppercase tracking-widest text-slate-400">
+                <a href="{% url 'admin_dashboard' %}" class="hover:text-primary transition-colors">Admin Dashboard</a>
+                <span class="mx-2">/</span>
+                <a href="{% url 'admin_college_list' %}" class="hover:text-primary transition-colors">Institutions</a>
+                <span class="mx-2">/</span>
+                <span class="text-slate-900 dark:text-white">Institution Profile</span>
+            </nav>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div class="flex items-center gap-8">
+                    <div
+                        class="w-24 h-24 rounded-3xl bg-white dark:bg-slate-800 p-4 border border-slate-200 dark:border-slate-700 shadow-xl flex items-center justify-center">
+                        {% if college.logo_url %}
+                        <img src="{{ college.logo_url }}" alt="{{ college.name }}" class="w-full h-full object-contain">
+                        {% else %}
+                        <i data-lucide="school" class="w-12 h-12 text-primary/20"></i>
+                        {% endif %}
+                    </div>
+                    <div>
+                        <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-none mb-3">
+                            {{ college.name }}
+                        </h1>
+                        <p class="text-slate-500 font-medium max-w-2xl text-lg leading-relaxed">{{
+                            college.description|truncatewords:40 }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metrics Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div class="glass-card p-10 rounded-[2.5rem] relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-bl-full -z-0"></div>
+                <div class="relative z-10 flex items-center gap-6">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+                        <i data-lucide="users" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_students }}</div>
+                        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Total Student
+                            Enrollments</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card p-10 rounded-[2.5rem] relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-32 h-32 bg-secondary/5 rounded-bl-full -z-0"></div>
+                <div class="relative z-10 flex items-center gap-6">
+                    <div
+                        class="w-16 h-16 rounded-2xl bg-secondary text-primary flex items-center justify-center shadow-lg shadow-secondary/20">
+                        <i data-lucide="book-open" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <div class="text-4xl font-black text-slate-900 dark:text-white">{{ courses.count }}</div>
+                        <div class="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mt-1">Academic
+                            Programs Offered</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course List -->
+        <div
+            class="bg-white dark:bg-slate-800 rounded-[2.5rem] border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div
+                class="p-10 border-b border-slate-100 dark:border-slate-700 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div>
+                    <h2 class="text-2xl font-black">Academic Catalog</h2>
+                    <p class="text-slate-500 font-medium text-sm mt-1">All undergraduate and postgraduate courses listed
+                        for this institution.</p>
+                </div>
+            </div>
+
+            <div class="p-4 overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead
+                        class="text-slate-400 text-[10px] font-black uppercase tracking-widest border-b border-slate-50 dark:border-slate-700">
+                        <tr>
+                            <th class="px-8 py-6">Course Title</th>
+                            <th class="px-8 py-6">Description</th>
+                            <th class="px-8 py-6 text-center">Enrollments</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-50 dark:divide-slate-700/50">
+                        {% for course in courses %}
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/5 transition-colors">
+                            <td class="px-8 py-8">
+                                <span class="font-black text-slate-900 dark:text-white text-lg">{{ course.name }}</span>
+                            </td>
+                            <td class="px-8 py-8 max-w-lg">
+                                <p class="text-slate-500 text-sm leading-relaxed">{{ course.description }}</p>
+                            </td>
+                            <td class="px-8 py-8 text-center">
+                                <span
+                                    class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-50 dark:bg-slate-900/50 text-slate-900 dark:text-white font-black">
+                                    {{ course.applicant_count }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

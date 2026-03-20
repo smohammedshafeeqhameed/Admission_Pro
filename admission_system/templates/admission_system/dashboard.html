@@ -16,7 +16,7 @@
     }
 
     .metric-blue {
-        border-left: 4px solid #1152d4;
+        border-left: 4px solid #800000;
     }
 
     .metric-emerald {
@@ -28,42 +28,53 @@
     }
 
     .table-row-hover:hover {
-        background: rgba(17, 82, 212, 0.03);
+        background: rgba(128, 0, 0, 0.03);
     }
 
     .dark .table-row-hover:hover {
-        background: rgba(17, 82, 212, 0.05);
+        background: rgba(128, 0, 0, 0.05);
+    }
+
+    /* Hide scrollbar but keep functionality */
+    .scrollbar-hide::-webkit-scrollbar {
+        display: none;
+    }
+
+    .scrollbar-hide {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
     }
 </style>
 {% endblock %}
 
 {% block content %}
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
     <!-- Dashboard Header -->
-    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-8 mb-12">
-        <div class="flex flex-col gap-2">
-            <h1 class="text-4xl md:text-5xl font-black tracking-tight text-slate-900 dark:text-white leading-tight">
-                Executive <span class="text-primary italic">Hub</span>
+    <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-8 mb-12">
+        <div class="flex flex-col gap-3">
+            <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 dark:text-white leading-none">
+                Executive <span class="gradient-text">Hub</span>
             </h1>
             <p class="text-slate-500 dark:text-slate-400 font-medium text-lg">
-                Welcome back, <span class="text-slate-900 dark:text-white font-bold">{{ user.username }}</span>. Your
-                pipeline is looking strong.
+                Welcome, <span class="text-slate-900 dark:text-white font-bold">{{ user.username }}</span>. Your
+                pipeline is active.
             </p>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-4">
             <div
-                class="glass-card px-6 py-3 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
-                <span class="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5">Partner
+                class="glass-card px-5 py-2.5 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
+                <span
+                    class="text-[9px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5 whitespace-nowrap">Partner
                     Level</span>
-                <span class="text-sm font-black text-primary">Certified Executive</span>
+                <span class="text-xs font-black text-primary uppercase">Certified Associate</span>
             </div>
             <div
-                class="glass-card px-6 py-3 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
-                <span class="text-[10px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5">Joining
-                    Date</span>
-                <span class="text-sm font-black text-slate-900 dark:text-white">{{ user.date_joined|date:"M d, Y"
-                    }}</span>
+                class="glass-card px-5 py-2.5 rounded-2xl shadow-sm border border-slate-200/50 dark:border-slate-800/50 flex flex-col">
+                <span
+                    class="text-[9px] uppercase font-black tracking-[0.2em] text-slate-400 mb-0.5 whitespace-nowrap">Member
+                    Since</span>
+                <span class="text-xs font-black text-slate-900 dark:text-white">{{ user.date_joined|date:"M Y" }}</span>
             </div>
         </div>
     </div>
@@ -71,118 +82,127 @@
     <!-- Metric Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <div
-            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-blue transition-all hover:shadow-xl group">
-            <div class="flex items-center justify-between mb-4">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Total Referrals</span>
+            class="stats-card p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between metric-blue transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Total
+                    Referrals</span>
                 <div
                     class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-lg">group</span>
+                    <i data-lucide="users" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">{{ total_referrals }}</div>
-            <div class="flex items-center gap-2 text-emerald-600 text-[10px] font-black uppercase tracking-widest">
-                <span class="material-symbols-outlined text-xs">trending_up</span>
-                Live Sync Active
+            <div class="flex items-end gap-2 mb-2">
+                <div class="text-5xl font-black text-slate-900 dark:text-white leading-none">{{ total_referrals }}</div>
+                <div
+                    class="flex items-center gap-1 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">
+                    <i data-lucide="trending-up" class="w-3 h-3"></i> Sync
+                </div>
             </div>
         </div>
 
         <div
-            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-emerald transition-all hover:shadow-xl group">
-            <div class="flex items-center justify-between mb-4">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Partner Institutions</span>
+            class="stats-card p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between metric-emerald transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-6">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Active
+                    Partners</span>
                 <div
                     class="w-10 h-10 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-lg">school</span>
+                    <i data-lucide="school" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">{{ colleges.count }}</div>
-            <div class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Institutions</div>
+            <div class="text-5xl font-black text-slate-900 dark:text-white leading-none">{{ colleges.count }}</div>
         </div>
 
         <div
-            class="stats-card p-8 rounded-3xl shadow-sm flex flex-col justify-between metric-amber transition-all hover:shadow-xl group">
-            <div class="flex items-center justify-between mb-4">
-                <span class="text-xs font-black uppercase tracking-widest text-slate-400">Projected Value</span>
+            class="stats-card p-8 rounded-[2.5rem] shadow-sm flex flex-col justify-between metric-amber transition-all hover:shadow-xl group">
+            <div class="flex items-center justify-between mb-6">
+                <span
+                    class="text-[10px] font-black uppercase tracking-widest text-slate-400 leading-none">Forecast</span>
                 <div
                     class="w-10 h-10 rounded-xl bg-amber-500/10 text-amber-600 flex items-center justify-center group-hover:scale-110 transition-transform">
-                    <span class="material-symbols-outlined text-lg">payments</span>
+                    <i data-lucide="line-chart" class="w-5 h-5"></i>
                 </div>
             </div>
-            <div class="text-5xl font-black text-slate-900 dark:text-white mb-2">--</div>
-            <div class="text-slate-400 text-[10px] font-black uppercase tracking-widest">Monthly Forecast</div>
+            <div class="text-5xl font-black text-slate-900 dark:text-white leading-none">--</div>
         </div>
 
-        <!-- Quick Action Card -->
-        <div class="bg-primary p-8 rounded-3xl shadow-2xl flex flex-col justify-center gap-4 text-white">
-            <h3 class="font-black text-xl leading-tight">Need Support?</h3>
-            <p class="text-sm text-blue-100 font-medium">Chat with your account manager for pipeline optimization.</p>
+        <div
+            class="bg-primary p-8 rounded-[2.5rem] shadow-2xl flex flex-col justify-center gap-4 text-white relative overflow-hidden group">
+            <div class="absolute -right-4 -bottom-4 opacity-10 group-hover:scale-125 transition-transform">
+                <i data-lucide="help-circle" class="w-32 h-32"></i>
+            </div>
+            <h3 class="font-black text-2xl leading-none">Support</h3>
+            <p class="text-sm text-blue-100 font-medium leading-relaxed">Talk to your success manager.</p>
             <a href="mailto:support@admissionpro.com"
-                class="h-12 w-full bg-white text-primary rounded-xl font-black text-sm flex items-center justify-center hover:bg-blue-50 transition-all">
-                Contact Now
+                class="h-12 w-full bg-white text-primary rounded-xl font-black text-sm flex items-center justify-center hover:shadow-lg transition-all relative z-10">
+                Contact Hub
             </a>
         </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        <!-- Main Activity Feed (8 cols) -->
-        <div class="lg:col-span-8 flex flex-col gap-8">
+        <!-- Activity Feed (8 cols) -->
+        <div class="lg:col-span-8">
             <div
-                class="glass-card rounded-[40px] shadow-sm border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
-                <div class="p-8 border-b border-slate-100 dark:border-slate-800/50 flex items-center justify-between">
-                    <div>
-                        <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Recent Activity
-                        </h3>
-                        <p class="text-sm text-slate-400 font-semibold tracking-wide uppercase mt-1">Enrollment Pipeline
-                        </p>
-                    </div>
+                class="glass-card rounded-[3rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 overflow-hidden">
+                <div class="p-8 lg:p-10 border-b border-slate-100 dark:border-slate-800/50">
+                    <h3 class="text-2xl lg:text-3xl font-black text-slate-900 dark:text-white tracking-tight">Enrollment
+                        Stream</h3>
+                    <p class="text-[10px] text-slate-400 font-black uppercase tracking-[0.2em] mt-2">Live Application
+                        Pipeline</p>
                 </div>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left">
+
+                <div class="overflow-x-auto scrollbar-hide">
+                    <table class="w-full text-left min-w-[600px]">
                         <thead>
                             <tr
                                 class="bg-slate-50/50 dark:bg-slate-800/20 text-slate-400 font-black text-[10px] uppercase tracking-[0.2em]">
-                                <th class="px-8 py-5">Student / Contact</th>
-                                <th class="px-8 py-5">Institution</th>
-                                <th class="px-8 py-5">Program</th>
-                                <th class="px-8 py-5">Applied On</th>
+                                <th class="px-8 lg:px-10 py-6">Candidate</th>
+                                <th class="px-8 lg:px-10 py-6">Institution</th>
+                                <th class="px-8 lg:px-10 py-6">Program</th>
+                                <th class="px-8 lg:px-10 py-6">Timeline</th>
                             </tr>
                         </thead>
-                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50 font-medium">
+                        <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
                             {% for referral in referrals %}
-                            <tr class="table-row-hover transition-colors">
-                                <td class="px-8 py-6">
-                                    <div class="flex flex-col gap-0.5">
-                                        <div class="font-black text-slate-900 dark:text-white">{{ referral.student.name
-                                            }}</div>
-                                        <div class="text-xs text-slate-400">{{ referral.student.email }}</div>
-                                    </div>
-                                </td>
-                                <td class="px-8 py-6">
-                                    <div class="flex items-center gap-2">
-                                        <div class="w-2 h-2 rounded-full"
-                                            style="background: {{ referral.college.theme_color|default:'#1152d4' }}">
+                            <tr class="table-row-hover transition-colors group">
+                                <td class="px-8 lg:px-10 py-8">
+                                    <div class="flex flex-col">
+                                        <div
+                                            class="font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors text-base">
+                                            {{ referral.student.name }}</div>
+                                        <div class="text-xs text-slate-400 font-medium">{{ referral.student.email }}
                                         </div>
-                                        <span class="text-sm text-slate-600 dark:text-slate-300 font-bold">{{
-                                            referral.college.name }}</span>
                                     </div>
                                 </td>
-                                <td class="px-8 py-6">
+                                <td class="px-8 lg:px-10 py-8">
+                                    <div
+                                        class="flex items-center gap-3 font-bold text-sm text-slate-600 dark:text-slate-300">
+                                        <div class="w-2.5 h-2.5 rounded-full shadow-sm"
+                                            style="background: {{ referral.college.theme_color|default:'#800000' }}">
+                                        </div>
+                                        {{ referral.college.name }}
+                                    </div>
+                                </td>
+                                <td class="px-8 lg:px-10 py-8">
                                     <span
-                                        class="inline-flex items-center px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
+                                        class="inline-flex px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
                                         {{ referral.course.name }}
                                     </span>
                                 </td>
-                                <td class="px-8 py-6 text-sm text-slate-400 font-bold uppercase">{{
+                                <td class="px-8 lg:px-10 py-8 text-xs text-slate-400 font-black uppercase">{{
                                     referral.applied_at|date:"M d, Y" }}</td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="px-8 py-24 text-center">
-                                    <div class="flex flex-col items-center gap-4 text-slate-300">
-                                        <span class="material-symbols-outlined text-6xl opacity-20">inventory_2</span>
-                                        <p class="text-lg font-bold">No active applications in your pipeline.</p>
-                                        <p class="text-sm font-medium">Start sharing your referral links to see activity
-                                            here.</p>
+                                <td colspan="4" class="px-8 py-32 text-center">
+                                    <div class="flex flex-col items-center gap-6 text-slate-300">
+                                        <i data-lucide="package-search" class="w-16 h-16 opacity-20"></i>
+                                        <div>
+                                            <p class="text-xl font-black text-slate-400">Stream Empty</p>
+                                            <p class="text-sm font-medium mt-1">Start sharing your unique partner links.
+                                            </p>
+                                        </div>
                                     </div>
                                 </td>
                             </tr>
@@ -194,39 +214,40 @@
         </div>
 
         <!-- Links Sidebar (4 cols) -->
-        <div class="lg:col-span-4 flex flex-col gap-8">
-            <div class="glass-card rounded-[40px] shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-8">
-                <div class="mb-8">
+        <div class="lg:col-span-4">
+            <div
+                class="glass-card rounded-[3rem] shadow-sm border border-slate-200/50 dark:border-slate-800/50 p-8 lg:p-10 sticky top-28">
+                <div class="mb-10">
                     <h3 class="text-2xl font-black text-slate-900 dark:text-white tracking-tight">Referral Engine</h3>
-                    <p class="text-sm text-slate-400 font-semibold tracking-wide mt-2">Unique tracking links for your
-                        assigned partners.</p>
+                    <p class="text-sm text-slate-500 font-medium mt-2 leading-relaxed">Unique tracking identifiers for
+                        your assigned institutions.</p>
                 </div>
 
                 <div class="flex flex-col gap-6">
                     {% for college in colleges %}
                     <div
-                        class="p-6 rounded-3xl border border-slate-100 dark:border-slate-800/50 bg-white/50 dark:bg-slate-900/50 hover:border-primary/30 transition-all group">
-                        <div class="flex items-center gap-3 mb-4">
-                            <div class="w-10 h-10 rounded-xl flex items-center justify-center text-white shadow-xl"
-                                style="background: {{ college.theme_color|default:'#1152d4' }}">
-                                <span class="material-symbols-outlined text-sm">school</span>
+                        class="group flex flex-col gap-4 p-6 rounded-[2rem] border border-slate-100 dark:border-slate-800 bg-white/50 dark:bg-slate-900/50 hover:border-primary/30 transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl flex items-center justify-center text-white shadow-xl flex-shrink-0"
+                                style="background: {{ college.theme_color|default:'#800000' }}">
+                                <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                             </div>
                             <span
-                                class="text-base font-black text-slate-900 dark:text-white group-hover:text-primary transition-colors">{{
+                                class="text-base font-black text-slate-900 dark:text-white tracking-tight leading-tight">{{
                                 college.name }}</span>
                         </div>
 
                         <div class="flex flex-col gap-3">
                             <div class="relative">
-                                <div class="w-full text-[10px] font-black font-mono text-primary truncate bg-primary/5 px-4 py-3 rounded-xl border border-primary/10 select-all scrollbar-hide"
+                                <div class="w-full text-[11px] font-black font-mono text-primary truncate bg-primary/5 px-4 py-4 rounded-2xl border border-primary/10 select-all scrollbar-hide"
                                     id="link-{{ college.id }}">
                                     {{ base_url }}{% url 'apply_admission' college.slug cre_profile.cre_id %}
                                 </div>
                             </div>
                             <button
-                                class="w-full h-12 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white"
+                                class="w-full h-14 rounded-2xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-[0.15em] hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white"
                                 onclick="copyLink('link-{{ college.id }}', this)">
-                                <span class="material-symbols-outlined text-sm">content_copy</span>
+                                <i data-lucide="copy" class="w-4 h-4"></i>
                                 Copy ID Link
                             </button>
                         </div>
@@ -243,14 +264,17 @@
         const linkText = document.getElementById(elementId).innerText.trim();
         navigator.clipboard.writeText(linkText).then(() => {
             const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<span class="material-symbols-outlined text-sm">check_circle</span> Copied to Clipboard';
-            btn.classList.remove('bg-slate-900', 'dark:bg-slate-100', 'group-hover:bg-primary');
+            btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Copied';
+            lucide.createIcons(); // Re-initialize icons for the new HTML
+
             btn.classList.add('bg-emerald-600', 'text-white');
+            btn.classList.remove('bg-slate-900', 'dark:bg-slate-100');
 
             setTimeout(() => {
                 btn.innerHTML = originalHTML;
-                btn.classList.add('bg-slate-900', 'dark:bg-slate-100', 'group-hover:bg-primary');
+                lucide.createIcons();
                 btn.classList.remove('bg-emerald-600', 'text-white');
+                btn.classList.add('bg-slate-900', 'dark:bg-slate-100');
             }, 2500);
         });
     }

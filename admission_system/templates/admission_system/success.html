@@ -1,28 +1,33 @@
 {% extends 'admission_system/college_base.html' %}
 
 {% block content %}
-<div class="glass" style="text-align: center; padding: 4rem 2rem; max-width: 600px; margin: 4rem auto;">
+<div class="min-h-[80vh] flex items-center justify-center px-4">
     <div
-        style="width: 80px; height: 80px; background: rgba(34, 197, 94, 0.1); color: #22c55e; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem;">
-        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12" />
-        </svg>
-    </div>
+        class="max-w-md w-full bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] shadow-3xl text-center border border-slate-100 dark:border-slate-800">
+        <div
+            class="w-24 h-24 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-500 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
+            <i data-lucide="check-circle" class="w-12 h-12"></i>
+        </div>
+        <h1 class="text-3xl font-black mb-4">Application Success!</h1>
+        <p class="text-slate-500 dark:text-slate-400 font-medium mb-8">Your admission request for <strong>{{
+                app.course.name }}</strong> at <strong>{{ college.name }}</strong> has been received and payment is
+            verified.</p>
 
-    <h1 style="font-size: 2.5rem; margin-bottom: 1rem;">Application Submitted!</h1>
-    <p style="color: var(--text-dim); font-size: 1.125rem; margin-bottom: 2.5rem;">
-        Thank you for applying to <strong>{{ college.name }}</strong>. Your application has been successfully recorded
-        and our admissions team will contact you soon.
-    </p>
+        <div class="bg-slate-50 dark:bg-slate-800/50 p-6 rounded-2xl mb-8 text-left space-y-3">
+            <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                <span>Payment ID</span>
+                <span class="text-slate-900 dark:text-white">{{ app.razorpay_payment_id }}</span>
+            </div>
+            <div class="flex justify-between text-xs font-bold uppercase tracking-widest text-slate-400">
+                <span>Amount Paid</span>
+                <span class="text-slate-900 dark:text-white">₹1,500.00</span>
+            </div>
+        </div>
 
-    <div style="display: flex; flex-direction: column; gap: 1rem;">
-        <a href="{{ college.logo_url|default:'#' }}" class="btn" style="width: 100%;">
-            Visit College Website
+        <a href="{% url 'home' %}"
+            class="block w-full py-4 bg-primary text-white font-black rounded-xl hover:opacity-90 shadow-xl shadow-primary/20 transition-all">
+            Back to Home
         </a>
-        <p style="font-size: 0.875rem; color: var(--text-dim);">
-            Reference ID: #{{ application_id|default:"AMS-2026-X" }}
-        </p>
     </div>
 </div>
 {% endblock %}

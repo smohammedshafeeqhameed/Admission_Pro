@@ -22,24 +22,42 @@ class CRERegistrationForm(forms.ModelForm):
 import re
 from django.core.validators import RegexValidator
 
-class StudentAdmissionForm(forms.Form):
-    name = forms.CharField(max_length=255, required=True, label="Full Name")
-    email = forms.EmailField(required=True, label="Email Address")
-    phone = forms.CharField(
-        max_length=15, 
-        required=True, 
-        label="Phone Number",
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$', "Enter a valid phone number. E.g. +91 9999999999")]
-    )
-    course = forms.ModelChoiceField(queryset=Course.objects.none(), required=True, label="Course Selection")
+from .models import CREProfile, Application, Course, Student
+
+class StudentAdmissionForm(forms.ModelForm):
+    # Additional fields from Application model or custom ones
+    addon_course = forms.CharField(max_length=255, required=False, label="Add-on Course")
+    course = forms.ModelChoiceField(queryset=Course.objects.none(), required=True, label="Main Course")
+    
+    # Documents (to be handled in Application model)
+    doc_10th = forms.FileField(required=True, label="10th Marksheet")
+    doc_11th = forms.FileField(required=False, label="11th Marksheet")
+    doc_12th = forms.FileField(required=True, label="12th Marksheet")
+    doc_aadhar = forms.FileField(required=True, label="Aadhar Card Copy")
+
+    class Meta:
+        model = Student
+        fields = [
+            'name', 'dob', 'gender', 'aadhar_number', 'phone', 'email',
+            'blood_group', 'category', 'permanent_address', 'correspondence_address',
+            'state', 'city', 'father_name', 'father_mobile', 'father_occupation',
+            'mother_name', 'mother_mobile', 'mother_occupation',
+            'guardian_name', 'guardian_mobile', 'preferred_contact'
+        ]
+        widgets = {
+            'dob': forms.DateInput(attrs={'type': 'date'}),
+            'permanent_address': forms.Textarea(attrs={'rows': 2}),
+            'correspondence_address': forms.Textarea(attrs={'rows': 2}),
+        }
 
     def __init__(self, *args, **kwargs):
         college = kwargs.pop('college', None)
         super().__init__(*args, **kwargs)
         if college:
             self.fields['course'].queryset = college.courses.all()
-
-class AdmissionForm(forms.ModelForm):
-    class Meta:
-        model = Application
-        fields = ['course']
+        
+        # Add Tailwind classes to all fields
+        for field in self.fields.values():
+            field.widget.attrs.update({
+                'class': 'w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all font-medium placeholder-slate-400'
+            })

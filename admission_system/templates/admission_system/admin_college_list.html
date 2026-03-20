@@ -1,0 +1,130 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}Institutions Management - Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+            <div>
+                <nav class="flex text-sm font-bold uppercase tracking-widest text-slate-400 mb-4">
+                    <a href="{% url 'admin_dashboard' %}" class="hover:text-primary transition-colors">Admin
+                        Dashboard</a>
+                    <span class="mx-2">/</span>
+                    <span class="text-slate-900 dark:text-white">Institutions</span>
+                </nav>
+                <h1 class="text-4xl font-black text-slate-900 dark:text-white leading-none">Registered Institutions</h1>
+                <p class="text-slate-500 font-medium mt-2">Manage all integrated colleges and their academic catalogs.
+                </p>
+            </div>
+        </div>
+
+        <!-- College Table -->
+        <div
+            class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div
+                class="p-8 border-b border-slate-100 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/10 flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center">
+                        <i data-lucide="school" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-black">Institutional Directory</h2>
+                        <p class="text-xs text-slate-400 font-bold uppercase tracking-widest mt-1">{{ colleges.count }}
+                            Institutions Integrated</p>
+                    </div>
+                </div>
+
+                <div class="relative group w-full md:w-72">
+                    <i data-lucide="search"
+                        class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-primary transition-colors"></i>
+                    <input type="text" id="collegeSearch" placeholder="Search institutions..."
+                        class="h-11 pl-11 pr-4 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all w-full">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left" id="collegeTable">
+                    <thead
+                        class="bg-slate-50 dark:bg-slate-900/10 text-slate-400 text-[10px] font-black uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-5">Institution</th>
+                            <th class="px-8 py-5">Academic Programs</th>
+                            <th class="px-8 py-5">Active Enrollments</th>
+                            <th class="px-8 py-5">Last Activity</th>
+                            <th class="px-8 py-5 text-right">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for college in colleges %}
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/5 transition-colors group">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-4">
+                                    <div
+                                        class="w-12 h-12 rounded-xl bg-slate-50 dark:bg-slate-950 p-2 border border-slate-100 dark:border-slate-800 flex items-center justify-center shrink-0">
+                                        {% if college.logo_url %}
+                                        <img src="{{ college.logo_url }}" alt="{{ college.name }}"
+                                            class="w-full h-full object-contain">
+                                        {% else %}
+                                        <i data-lucide="school" class="w-5 h-5 text-slate-300"></i>
+                                        {% endif %}
+                                    </div>
+                                    <div>
+                                        <div
+                                            class="text-base font-black text-slate-900 dark:text-white leading-none mb-1">
+                                            {{ college.name }}</div>
+                                        <div class="text-xs text-slate-400 font-medium">Global Network Partner</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <span class="text-lg font-black text-slate-900 dark:text-white">{{
+                                        college.course_count }}</span>
+                                    <span
+                                        class="text-[10px] font-black uppercase tracking-wider text-slate-400">Courses</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-2 h-2 rounded-full bg-emerald-500"></div>
+                                    <span class="text-lg font-black text-slate-900 dark:text-white">{{
+                                        college.student_count }}</span>
+                                    <span
+                                        class="text-[10px] font-black uppercase tracking-wider text-slate-400">Admissions</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="text-sm font-bold text-slate-500">{{ college.created_at|date:"M d, Y" }}
+                                </div>
+                                <div class="text-[10px] font-black uppercase tracking-widest text-slate-300 mt-0.5">
+                                    Integration Date</div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <a href="{% url 'admin_college_detail' pk=college.id %}"
+                                    class="inline-flex items-center justify-center w-10 h-10 rounded-xl bg-primary/5 text-primary hover:bg-primary hover:text-white transition-all">
+                                    <i data-lucide="external-link" class="w-4 h-4"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <script>
+            document.getElementById('collegeSearch').addEventListener('keyup', function () {
+                const query = this.value.toLowerCase();
+                const rows = document.querySelectorAll('#collegeTable tbody tr');
+
+                rows.forEach(row => {
+                    const text = row.innerText.toLowerCase();
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+        </script>
+    </div>
+</div>
+{% endblock %}

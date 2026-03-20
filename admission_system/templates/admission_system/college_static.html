@@ -4,7 +4,7 @@
 <!-- Hero Section -->
 <section class="relative h-[500px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0 bg-cover bg-center"
-        style="background-image: linear-gradient(rgba(17, 82, 212, 0.4), rgba(16, 22, 34, 0.8)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+        style="background-image: linear-gradient(rgba(128, 0, 0, 0.4), rgba(28, 25, 23, 0.8)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
     </div>
     <div class="relative z-10 text-center px-4 max-w-4xl">
         <span
@@ -97,101 +97,367 @@
 <!-- Admission Form Section -->
 <section class="py-24 px-6 md:px-20 lg:px-40 bg-white dark:bg-background-dark" id="apply">
     <div
-        class="max-w-5xl mx-auto flex flex-col lg:flex-row items-stretch border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xl">
-        <div class="lg:w-1/2 p-12 bg-primary text-white flex flex-col justify-center">
-            <h2 class="text-3xl font-bold mb-6">Begin Your Journey</h2>
-            <p class="text-primary-100 mb-8 leading-relaxed">Fill out the application form to secure your place. Once
-                submitted, our admissions counselor will reach out to you to guide you through the next steps.</p>
-            <div class="space-y-6">
-                <div class="flex items-center gap-4">
-                    <div class="bg-white/20 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">schedule</span>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold">Limited Seats Available</p>
-                        <p class="text-xs text-primary-100">Apply early for priority processing</p>
-                    </div>
-                </div>
-                <div class="flex items-center gap-4">
-                    <div class="bg-white/20 p-2 rounded-lg">
-                        <span class="material-symbols-outlined">help</span>
-                    </div>
-                    <div>
-                        <p class="text-sm font-semibold">Need Assistance?</p>
-                        <p class="text-xs text-primary-100">{{ college.email|default:"admissions@example.com" }}</p>
-                    </div>
-                </div>
+        class="max-w-5xl mx-auto border border-slate-200 dark:border-slate-800 rounded-[3rem] overflow-hidden shadow-3xl bg-white dark:bg-slate-900">
+        <!-- Progress Bar -->
+        <div
+            class="flex items-center justify-between p-8 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/20">
+            <div class="flex items-center gap-4 flex-1">
+                <div id="step-1-btn" class="step-badge active">1<span class="step-label">Personal</span></div>
+                <div class="step-connector" id="connector-1"></div>
+                <div id="step-2-btn" class="step-badge">2<span class="step-label">Family</span></div>
+                <div class="step-connector" id="connector-2"></div>
+                <div id="step-3-btn" class="step-badge">3<span class="step-label">Docs</span></div>
             </div>
+            <div class="text-xs font-black uppercase tracking-widest text-slate-400">Step <span
+                    id="current-step-num">1</span> of 3</div>
         </div>
-        <div class="lg:w-1/2 p-12 bg-white dark:bg-slate-800">
-            <div class="mb-8">
-                <h3 class="text-2xl font-bold mb-2">Application Form</h3>
-                {% if messages %}
-                {% for message in messages %}
-                <div
-                    class="flex items-center gap-2 {% if message.tags == 'success' %}text-emerald-500 bg-emerald-50 dark:bg-emerald-900/20{% else %}text-red-500 bg-red-50 dark:bg-red-900/20{% endif %} p-3 rounded border {% if message.tags == 'success' %}border-emerald-100 dark:border-emerald-900/30{% else %}border-red-100 dark:border-red-900/30{% endif %} mb-4 text-sm font-medium">
-                    <span class="material-symbols-outlined text-sm">{% if message.tags == 'success' %}check_circle{%
-                        else %}warning{% endif %}</span>
-                    <span>{{ message }}</span>
-                </div>
-                {% endfor %}
-                {% endif %}
-                <div
-                    class="flex items-center gap-2 text-slate-500 text-xs font-medium bg-slate-50 dark:bg-slate-900/50 p-2 rounded border border-slate-100 dark:border-slate-800">
-                    <span class="material-symbols-outlined text-sm">info</span>
-                    <span>Note: One application per course allowed.</span>
-                </div>
+
+        <form method="post" action="{% url 'apply_admission' college.slug cre_id %}" enctype="multipart/form-data"
+            class="p-8 lg:p-12" id="multi-step-form">
+            {% csrf_token %}
+
+            {% if messages %}
+            {% for message in messages %}
+            <div
+                class="p-4 rounded-xl {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border-emerald-100{% else %}bg-red-50 text-red-700 border-red-100{% endif %} border mb-8 font-bold flex items-center gap-3">
+                <i data-lucide="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}"
+                    class="w-5 h-5"></i>
+                {{ message }}
             </div>
-            <form method="post" action="{% url 'apply_admission' college.slug cre_id %}" class="space-y-4">
-                {% csrf_token %}
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Full Name</label>
-                    <input name="name"
-                        class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                        placeholder="John Doe" required type="text" />
-                </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Email
-                            Address</label>
-                        <input name="email"
-                            class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            placeholder="john@example.com" required type="email" />
+            {% endfor %}
+            {% endif %}
+
+            <!-- Step 1: Personal & Course -->
+            <div id="step-1" class="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <h3 class="text-2xl font-black mb-6">Personal <span class="gradient-text">Details</span></h3>
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="md:col-span-2 space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Academic
+                            Program</label>
+                        {{ form.course }}
+                        {{ form.addon_course }}
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Phone
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Full
+                            Name</label>
+                        {{ form.name }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Date
+                            of Birth</label>
+                        {{ form.dob }}
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Gender</label>
+                        {{ form.gender }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Aadhar
                             Number</label>
-                        <input name="phone"
-                            class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all"
-                            placeholder="+91 00000 00000" required type="tel" />
+                        {{ form.aadhar_number }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Phone
+                            Number</label>
+                        {{ form.phone }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Email
+                            ID</label>
+                        {{ form.email }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Blood
+                            Group</label>
+                        {{ form.blood_group }}
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Category</label>
+                        {{ form.category }}
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Permanent
+                            Address</label>
+                        {{ form.permanent_address }}
+                    </div>
+                    <div class="md:col-span-2 space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">Correspondence
+                            Address</label>
+                        {{ form.correspondence_address }}
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">State</label>
+                        {{ form.state }}
+                    </div>
+                    <div class="space-y-2">
+                        <label
+                            class="block text-[10px] font-black uppercase tracking-widest text-slate-400 ml-1">City</label>
+                        {{ form.city }}
                     </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Course
-                        Selection</label>
-                    <select name="course" required
-                        class="w-full px-4 py-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
-                        <option disabled selected value="">Choose a program</option>
-                        {% for course in courses %}
-                        <option value="{{ course.id }}">{{ course.name }}</option>
-                        {% endfor %}
-                    </select>
+                <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex justify-end">
+                    <button type="button" onclick="nextStep(2)"
+                        class="h-14 px-10 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+                        Next: Family <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
                 </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1.5 text-slate-400">Referral Context</label>
-                    <input
-                        class="w-full px-4 py-3 rounded-lg border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50 text-slate-400 cursor-not-allowed outline-none font-mono text-xs"
-                        readonly type="text" value="Partner ID: {{ cre_id }}" />
+            </div>
+
+            <!-- Step 2: Family Information -->
+            <div id="step-2" class="hidden space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <h3 class="text-2xl font-black mb-6">Family <span class="gradient-text">Information</span></h3>
+                <div class="grid md:grid-cols-2 gap-x-8 gap-y-10">
+                    <!-- Father -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3 text-primary">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span class="font-black text-xs uppercase tracking-widest">Father's Details</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="space-y-2">{{ form.father_name }}</div>
+                            <div class="space-y-2">{{ form.father_mobile }}</div>
+                            <div class="space-y-2">{{ form.father_occupation }}</div>
+                        </div>
+                    </div>
+                    <!-- Mother -->
+                    <div class="space-y-6">
+                        <div class="flex items-center gap-3 text-primary">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            <span class="font-black text-xs uppercase tracking-widest">Mother's Details</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="space-y-2">{{ form.mother_name }}</div>
+                            <div class="space-y-2">{{ form.mother_mobile }}</div>
+                            <div class="space-y-2">{{ form.mother_occupation }}</div>
+                        </div>
+                    </div>
+                    <!-- Guardian -->
+                    <div class="md:col-span-2 space-y-6 pt-4 border-t border-slate-50 dark:border-slate-800">
+                        <div class="flex items-center gap-3 text-primary">
+                            <i data-lucide="shield" class="w-5 h-5"></i>
+                            <span class="font-black text-xs uppercase tracking-widest">Guardian & Contact
+                                preference</span>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-6">
+                            <div class="space-y-2">{{ form.guardian_name }}</div>
+                            <div class="space-y-2">{{ form.guardian_mobile }}</div>
+                            <div class="space-y-2">{{ form.preferred_contact }}</div>
+                        </div>
+                    </div>
                 </div>
-                <button
-                    class="w-full bg-primary text-white font-bold py-4 rounded-lg hover:opacity-90 shadow-lg shadow-primary/20 mt-6 transition-all"
-                    type="submit">
-                    Submit Application
-                </button>
-            </form>
-        </div>
+                <div class="pt-10 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <button type="button" onclick="nextStep(1)"
+                        class="text-slate-400 font-black uppercase text-xs tracking-widest hover:text-slate-600 transition-colors">Previous</button>
+                    <button type="button" onclick="nextStep(3)"
+                        class="h-14 px-10 bg-primary text-white font-black rounded-2xl shadow-xl shadow-primary/20 hover:scale-105 transition-all flex items-center gap-2">
+                        Next: Documents <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Step 3: Documents Upload -->
+            <div id="step-3" class="hidden space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+                <h3 class="text-2xl font-black mb-6">Document <span class="gradient-text">Uploads</span></h3>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div class="doc-upload-card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <span class="font-black text-xs uppercase tracking-widest">10th Marksheet</span>
+                        </div>
+                        {{ form.doc_10th }}
+                    </div>
+                    <div class="doc-upload-card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <span class="font-black text-xs uppercase tracking-widest">11th Marksheet</span>
+                        </div>
+                        {{ form.doc_11th }}
+                    </div>
+                    <div class="doc-upload-card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                                <i data-lucide="file-text" class="w-5 h-5"></i>
+                            </div>
+                            <span class="font-black text-xs uppercase tracking-widest">12th Marksheet</span>
+                        </div>
+                        {{ form.doc_12th }}
+                    </div>
+                    <div class="doc-upload-card">
+                        <div class="flex items-center gap-4 mb-4">
+                            <div
+                                class="w-10 h-10 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center">
+                                <i data-lucide="credit-card" class="w-5 h-5"></i>
+                            </div>
+                            <span class="font-black text-xs uppercase tracking-widest">Aadhar Card Copy</span>
+                        </div>
+                        {{ form.doc_aadhar }}
+                    </div>
+                </div>
+
+                <div
+                    class="bg-amber-50 dark:bg-amber-900/10 p-6 rounded-2xl border border-amber-100 dark:border-amber-900/20 flex gap-4">
+                    <i data-lucide="alert-triangle" class="w-6 h-6 text-amber-500 shrink-0"></i>
+                    <p class="text-sm font-bold text-amber-800 dark:text-amber-300">Proceeding to next step will
+                        initialize a mandatory application fee payment of <span class="text-lg">₹1,500</span>. Please
+                        ensure all details are correct.</p>
+                </div>
+
+                <div class="pt-10 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
+                    <button type="button" onclick="nextStep(2)"
+                        class="text-slate-400 font-black uppercase text-xs tracking-widest hover:text-slate-600 transition-colors">Previous</button>
+                    <button type="submit"
+                        class="h-16 px-12 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-3">
+                        Submit & Pay Registration Fee <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 </section>
+
+<style>
+    .step-badge {
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 900;
+        font-size: 0.875rem;
+        position: relative;
+        transition: all 0.5s;
+        background-color: #f1f5f9;
+        color: #94a3b8;
+    }
+
+    .dark .step-badge {
+        background-color: #1e293b;
+    }
+
+    .step-badge.active {
+        background-color: #800000;
+        color: white;
+        box-shadow: 0 10px 15px -3px rgba(128, 0, 0, 0.2);
+        transform: scale(1.1);
+    }
+
+    .step-badge.completed {
+        background-color: #10b981;
+        color: white;
+    }
+
+    .step-label {
+        position: absolute;
+        bottom: -1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 10px;
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+        display: none;
+    }
+
+    @media (min-width: 768px) {
+        .step-label {
+            display: block;
+        }
+    }
+
+    .step-connector {
+        height: 0.4rem;
+        flex: 1 1 0%;
+        margin-left: 1rem;
+        margin-right: 1rem;
+        background-color: #f1f5f9;
+        border-radius: 9999px;
+        overflow: hidden;
+        position: relative;
+    }
+
+    .dark .step-connector {
+        background-color: #1e293b;
+    }
+
+    .step-connector::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-color: #800000;
+        transform: translateX(-100%);
+        transition: transform 0.7s;
+    }
+
+    .step-connector.active::after {
+        transform: translateX(0);
+    }
+
+    .doc-upload-card {
+        padding: 1.5rem;
+        border-radius: 2rem;
+        border-width: 2px;
+        border-style: dashed;
+        border-color: #f1f5f9;
+        transition: all 0.3s;
+        background-color: rgba(241, 245, 249, 0.3);
+    }
+
+    .dark .doc-upload-card {
+        border-color: #1e293b;
+        background-color: rgba(30, 41, 59, 0.2);
+    }
+
+    .doc-upload-card:hover {
+        border-color: rgba(17, 82, 212, 0.5);
+    }
+</style>
+
+<script>
+    function nextStep(step) {
+        document.getElementById('step-1').classList.add('hidden');
+        document.getElementById('step-2').classList.add('hidden');
+        document.getElementById('step-3').classList.add('hidden');
+        document.getElementById('step-' + step).classList.remove('hidden');
+        document.getElementById('current-step-num').innerText = step;
+
+        [1, 2, 3].forEach(b => {
+            const badge = document.getElementById('step-' + b + '-btn');
+            badge.classList.remove('active', 'completed');
+            if (b < step) badge.classList.add('completed');
+            if (b === step) badge.classList.add('active');
+
+            if (b < 3) {
+                const conn = document.getElementById('connector-' + b);
+                if (b < step) conn.classList.add('active');
+                else conn.classList.remove('active');
+            }
+        });
+
+        document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // Initialize Lucide icons
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
 
 <!-- Contact Section -->
 <section class="py-24 px-6 md:px-20 lg:px-40 bg-slate-50 dark:bg-slate-900/50" id="contact">

@@ -1,0 +1,156 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}{{ cre.user.username }} - Partner Details{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+        <!-- Breadcrumbs & Header -->
+        <div class="space-y-6">
+            <nav class="flex text-sm font-bold uppercase tracking-widest text-slate-400">
+                <a href="{% url 'admin_dashboard' %}" class="hover:text-primary transition-colors">Admin Dashboard</a>
+                <span class="mx-2">/</span>
+                <span class="text-slate-900 dark:text-white">Partner Details</span>
+            </nav>
+
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
+                <div class="flex items-center gap-6">
+                    <div
+                        class="w-20 h-20 rounded-3xl bg-primary/10 text-primary flex items-center justify-center text-3xl font-black shadow-inner shadow-primary/5">
+                        {{ cre.user.username|make_list|first|upper }}
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <h1 class="text-4xl font-black text-slate-900 dark:text-white leading-none">
+                                {{ cre.user.username }}
+                            </h1>
+                            {% if cre.is_approved %}
+                            <span
+                                class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-[10px] font-black bg-emerald-100 text-emerald-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                                Approved
+                            </span>
+                            {% else %}
+                            <span
+                                class="inline-flex items-center gap-1.5 py-1 px-3 rounded-full text-[10px] font-black bg-amber-100 text-amber-700">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
+                                Pending
+                            </span>
+                            {% endif %}
+                        </div>
+                        <p class="text-slate-500 font-medium">{{ cre.user.email }} • Joined {{
+                            cre.user.date_joined|date:"M Y" }}</p>
+                    </div>
+                </div>
+
+                <div class="flex gap-4">
+                    <form action="{% url 'admin_approve_cre' %}" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="cre_id" value="{{ cre.id }}">
+                        {% if cre.is_approved %}
+                        <input type="hidden" name="action" value="suspend">
+                        <button type="submit"
+                            class="h-12 px-6 rounded-xl bg-amber-100 text-amber-700 font-bold hover:bg-amber-200 transition-all text-sm">Suspend
+                            Partner</button>
+                        {% else %}
+                        <input type="hidden" name="action" value="approve">
+                        <button type="submit"
+                            class="h-12 px-6 rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 transition-all text-sm shadow-lg shadow-emerald-500/20">Approve
+                            Partner</button>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div class="glass-card p-8 rounded-[2rem] border-l-4 border-primary">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-4">Total
+                    Referrals</span>
+                <div class="text-4xl font-black text-slate-900 dark:text-white">{{ total_referrals }}</div>
+            </div>
+            <div class="glass-card p-8 rounded-[2rem] border-l-4 border-emerald-500">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-4">Success
+                    Admissions</span>
+                <div class="text-4xl font-black text-emerald-600">{{ successful_referrals }}</div>
+            </div>
+            <div class="glass-card p-8 rounded-[2rem] border-l-4 border-amber-500">
+                <span class="text-[10px] font-black uppercase tracking-widest text-slate-400 block mb-4">Pending
+                    Payments</span>
+                <div class="text-4xl font-black text-amber-600">{{ pending_referrals }}</div>
+            </div>
+        </div>
+
+        <!-- Student Referrals Table -->
+        <div
+            class="bg-white dark:bg-slate-800 rounded-3xl border border-slate-200 dark:border-slate-700 shadow-sm overflow-hidden">
+            <div class="p-8 border-b border-slate-100 dark:border-slate-700 flex items-center justify-between">
+                <h2 class="text-xl font-black">Student Referral Log</h2>
+                <div class="text-xs font-black text-slate-400 uppercase tracking-widest">Tracking {{ referrals.count }}
+                    entries</div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead
+                        class="bg-slate-50 dark:bg-slate-900/10 text-slate-400 text-xs font-black uppercase tracking-wider">
+                        <tr>
+                            <th class="px-8 py-5">Student Details</th>
+                            <th class="px-8 py-5">Institution</th>
+                            <th class="px-8 py-5">Course</th>
+                            <th class="px-8 py-5">Status</th>
+                            <th class="px-8 py-5">Applied Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for app in referrals %}
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-900/5 transition-colors">
+                            <td class="px-8 py-6">
+                                <div class="font-bold text-slate-900 dark:text-white text-lg leading-none mb-1">{{
+                                    app.student.name }}</div>
+                                <div class="text-xs text-slate-500 font-medium">{{ app.student.email }} • {{
+                                    app.student.phone }}</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="px-3 py-1 rounded-lg bg-primary/10 text-primary text-xs font-black">{{
+                                    app.college.name }}</span>
+                            </td>
+                            <td class="px-8 py-6 text-sm font-bold text-slate-600 dark:text-slate-300">
+                                {{ app.course.name }}
+                            </td>
+                            <td class="px-8 py-6">
+                                {% if app.payment_status == 'Success' %}
+                                <span
+                                    class="inline-flex items-center gap-1 text-emerald-600 font-black text-[10px] uppercase tracking-widest">
+                                    <i data-lucide="check-circle" class="w-3 h-3"></i> Confirmed
+                                </span>
+                                {% else %}
+                                <span
+                                    class="inline-flex items-center gap-1 text-amber-500 font-black text-[10px] uppercase tracking-widest">
+                                    <i data-lucide="clock" class="w-3 h-3"></i> {{ app.payment_status }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-sm font-medium text-slate-400">
+                                {{ app.applied_at|date:"d M, Y" }}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-16 text-center">
+                                <div class="flex flex-col items-center opacity-30">
+                                    <i data-lucide="users" class="w-12 h-12 mb-4"></i>
+                                    <p class="font-black uppercase tracking-widest text-sm">No referrals recorded yet
+                                    </p>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
