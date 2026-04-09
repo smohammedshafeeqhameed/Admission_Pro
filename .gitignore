@@ -1,13 +1,17 @@
 venv
 venv_fixed
 # Python
+admission_system/__pycache__/views.cpython-38.pyc
+admission_system/__pycache__/
+admission_system/__pycache__/
+ams_project/__pycache__/
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
 # Django
-# db.sqlite3
+db.sqlite3
 
 # Environment
 .env
@@ -17,3 +21,9 @@ __pycache__/
 
 # Mac/Linux
 .DS_Store
+
+.req.txt
+
+settings.py
+
+staticfiles/
