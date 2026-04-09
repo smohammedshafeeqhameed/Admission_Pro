@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, Count
+from django.db.models import Q, Count, Sum
 from django.views import View
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
@@ -220,19 +220,46 @@ class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        # Fetch pending apps
+        college_id = self.request.GET.get('college')
+        
+        # All pending apps
         pending_apps = Application.objects.filter(payment_status='Pending Verification').select_related('student', 'college', 'course')
         
         # History
-        history_apps = Application.objects.exclude(payment_status__in=['Pending', 'Pending Verification']).select_related('student', 'college', 'course').order_by('-applied_at')[:50]
+        history_apps = Application.objects.exclude(payment_status__in=['Pending', 'Pending Verification']).select_related('student', 'college', 'course').order_by('-applied_at')
         
+        # Filtering logic
+        if college_id:
+            pending_apps = pending_apps.filter(college_id=college_id)
+            history_apps = history_apps.filter(college_id=college_id)
+            context['active_college'] = get_object_or_404(College, id=college_id)
+            
+        # Global Stats
+        success_apps = Application.objects.filter(payment_status='Success')
+        total_revenue = success_apps.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        total_verified = success_apps.count()
+        
+        # College Breakdown
+        colleges_data = []
+        for college in College.objects.all():
+            college_success = success_apps.filter(college=college)
+            revenue = college_success.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+            count = college_success.count()
+            colleges_data.append({
+                'college': college,
+                'revenue': revenue,
+                'count': count
+            })
+            
         context.update({
             'pending_apps': pending_apps,
-            'history_apps': history_apps,
+            'history_apps': history_apps[:50],
             'pending_count': pending_apps.count(),
             'is_dashboard': True,
-            'total_verified': Application.objects.filter(payment_status='Success').count(),
-            'total_revenue': sum(app.amount_paid for app in Application.objects.filter(payment_status='Success'))
+            'total_verified': total_verified,
+            'total_revenue': total_revenue,
+            'colleges_data': colleges_data,
+            'all_colleges': College.objects.order_by('name'),
         })
         return context
 
