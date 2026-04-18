@@ -561,4 +561,4 @@ def manual_payment(request, app_id):
 def home(request):
     if request.user.is_authenticated and hasattr(request.user, 'cre_profile'):
         return redirect('cre_dashboard')
-    return render(request, 'admission_system/home.html')
+    return render(request, 'admission_system/homee.html')

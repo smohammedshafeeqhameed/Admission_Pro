@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
@@ -19,9 +19,27 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
+
           script: |
+            set -e   # stop if any error
+
+            echo "Go to project folder"
             cd ~/Admission_Pro
+
+            echo "Pull latest code"
             git fetch origin
             git reset --hard origin/prod
+
+            echo "Stop old containers"
             sudo docker-compose down
+
+            echo "Build & start containers"
             sudo docker-compose up -d --build
+
+            echo "Run migrations"
+            sudo docker exec admission_pro_web_1 python manage.py migrate
+
+            echo "Collect static files"
+            sudo docker exec admission_pro_web_1 python manage.py collectstatic --noinput
+
+            echo "Deployment completed successfully 🚀"

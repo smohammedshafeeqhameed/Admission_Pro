@@ -28,10 +28,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-local-dev')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DEBUG', 'False') == 'True'
+DEBUG = False
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '127.0.0.1,localhost').split(',')
+# Fix proxy + HTTPS issues
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+# CSRF Fix
+CSRF_TRUSTED_ORIGINS = os.getenv(
+    'CSRF_TRUSTED_ORIGINS',
+    ''
+).split(',')
+
+# Cookies (important for login/admin)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = "Lax"
+SESSION_COOKIE_SAMESITE = "Lax"
 
 # Application definition
 
@@ -80,18 +94,14 @@ WSGI_APPLICATION = 'ams_project.wsgi.application'
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
 if os.getenv("USE_RDS") == "True":
-    from .db_utils import get_rds_iam_token
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql',
-            'NAME': os.getenv("RDS_DB_NAME", "postgres"),
-            'USER': os.getenv("RDS_USER", "postgres"),
-            'PASSWORD': get_rds_iam_token(),
+            'NAME': os.getenv("RDS_DB_NAME"),
+            'USER': os.getenv("RDS_USER"),
+            'PASSWORD': os.getenv("RDS_PASSWORD"),
             'HOST': os.getenv("RDS_HOST"),
-            'PORT': os.getenv("RDS_PORT", "5432"),
-            'OPTIONS': {
-                'sslmode': 'require',
-            },
+            'PORT': os.getenv("RDS_PORT"),
         }
     }
 else:
