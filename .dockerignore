@@ -1,0 +1,7 @@
+venv
+__pycache__
+*.pyc
+*.sock
+*.ctl
+db.sqlite3
+staticfiles
