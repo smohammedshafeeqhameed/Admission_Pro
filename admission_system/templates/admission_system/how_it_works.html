@@ -1,0 +1,159 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}How it Works - AdmissionPro CRE{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-slate-50 dark:bg-background-dark">
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-32 overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-[10px] font-black uppercase tracking-widest mb-8 border border-primary/20">
+                System Overview
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tighter text-slate-900 dark:text-white leading-[1.1]">
+                Revolutionizing <span class="gradient-text">Recruitment</span> <br>Step by Step
+            </h1>
+            <p class="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-medium leading-relaxed">
+                AdmissionPro CRE is designed to eliminate the friction of manual tracking and disjointed communication. 
+                Our platform provides a seamless bridge between institutions and elite relationship executives.
+            </p>
+        </div>
+        <!-- Abstract Decoration -->
+        <div class="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 w-[600px] h-[600px] bg-primary/5 rounded-full blur-3xl"></div>
+    </section>
+
+    <!-- Deep Dive Sections -->
+    <section class="py-24 space-y-32">
+        <!-- 01. Tracking Engine -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                <div class="flex flex-col gap-8 order-2 lg:order-1">
+                    <div class="flex flex-col gap-4">
+                        <span class="text-5xl font-black text-primary/20 dark:text-primary/10 select-none leading-none">01</span>
+                        <h2 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Precision Tracking Engine</h2>
+                        <p class="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                            Every relationship executive is assigned unique tracking identifiers for their allocated institutions. 
+                            Our engine uses state-of-the-art attribution logic to ensure that every student referred through your network 
+                            is accurately logged and attributed to your profile instantly.
+                        </p>
+                    </div>
+                    <ul class="space-y-4">
+                        <li class="flex items-center gap-4 text-slate-900 dark:text-slate-300 font-bold">
+                            <i data-lucide="check-circle-2" class="w-6 h-6 text-primary"></i>
+                            Cryptographically unique referral IDs
+                        </li>
+                        <li class="flex items-center gap-4 text-slate-900 dark:text-slate-300 font-bold">
+                            <i data-lucide="check-circle-2" class="w-6 h-6 text-primary"></i>
+                            Session-based attribution monitoring
+                        </li>
+                        <li class="flex items-center gap-4 text-slate-900 dark:text-slate-300 font-bold">
+                            <i data-lucide="check-circle-2" class="w-6 h-6 text-primary"></i>
+                            Multi-device sync capabilities
+                        </li>
+                    </ul>
+                </div>
+                <div class="relative order-1 lg:order-2">
+                    <div class="absolute -inset-10 bg-primary/10 rounded-full blur-3xl"></div>
+                    <div class="relative glass-card p-4 rounded-[3rem] shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1551288049-bbbda536339a?auto=format&fit=crop&w=800&q=80" 
+                             class="rounded-[2rem] w-full h-80 object-cover" alt="Tracking Analytics">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 02. Live Analytics -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 bg-white/40 dark:bg-slate-900/40 py-24 rounded-[4rem] border border-slate-200/50 dark:border-slate-800/50">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                <div class="relative">
+                    <div class="absolute -inset-10 bg-emerald-500/10 rounded-full blur-3xl"></div>
+                    <div class="relative glass-card p-4 rounded-[3rem] shadow-2xl -rotate-3 hover:rotate-0 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=800&q=80" 
+                             class="rounded-[2rem] w-full h-80 object-cover" alt="Live Dashboard">
+                    </div>
+                </div>
+                <div class="flex flex-col gap-8">
+                    <div class="flex flex-col gap-4">
+                        <span class="text-5xl font-black text-emerald-500/20 select-none leading-none">02</span>
+                        <h2 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Real-Time Application Stream</h2>
+                        <p class="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                            Stop waiting for weekly reports. Your Executive Hub features a live stream of candidate activities. 
+                            Monitor every stage from initial click to document verification and payment completion.
+                        </p>
+                    </div>
+                    <div class="grid sm:grid-cols-2 gap-6">
+                        <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                            <i data-lucide="zap" class="w-8 h-8 text-emerald-500 mb-4"></i>
+                            <h4 class="font-black text-slate-900 dark:text-white mb-2">Instant Pings</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed font-medium">Get notified the moment a student completes a step.</p>
+                        </div>
+                        <div class="p-6 rounded-2xl bg-white dark:bg-slate-800 shadow-sm border border-slate-100 dark:border-slate-700">
+                            <i data-lucide="pie-chart" class="w-8 h-8 text-emerald-500 mb-4"></i>
+                            <h4 class="font-black text-slate-900 dark:text-white mb-2">Funnel Visuals</h4>
+                            <p class="text-xs text-slate-500 leading-relaxed font-medium">Identify where candidates drop off and optimize your pitch.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 03. Secure Payouts -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-2 gap-20 items-center">
+                <div class="flex flex-col gap-8 order-2 lg:order-1">
+                    <div class="flex flex-col gap-4">
+                        <span class="text-5xl font-black text-amber-500/20 select-none leading-none">03</span>
+                        <h2 class="text-4xl font-black text-slate-900 dark:text-white tracking-tight">Industry-Standard Payouts</h2>
+                        <p class="text-lg text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                            We've partnered with secure finance gateways to ensure that your commissions are calculated 
+                            transparently and settled on a predictable schedule. Every payment is audited and verifiable via your hub.
+                        </p>
+                    </div>
+                    <div class="flex flex-wrap gap-4">
+                        <div class="px-6 py-4 rounded-2xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-black text-sm uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            Secure Settlements
+                        </div>
+                        <div class="px-6 py-4 rounded-2xl border border-slate-200 dark:border-slate-700 text-slate-500 font-black text-sm uppercase tracking-widest flex items-center gap-3">
+                            <i data-lucide="clock" class="w-5 h-5"></i>
+                            Predictable Cycle
+                        </div>
+                    </div>
+                </div>
+                <div class="relative order-1 lg:order-2">
+                    <div class="absolute -inset-10 bg-amber-500/10 rounded-full blur-3xl"></div>
+                    <div class="relative glass-card p-4 rounded-[3rem] shadow-2xl rotate-3 hover:rotate-0 transition-transform duration-700">
+                        <img src="https://images.unsplash.com/photo-1554224155-1696413565d3?auto=format&fit=crop&w=800&q=80" 
+                             class="rounded-[2rem] w-full h-80 object-cover" alt="Secure Payouts">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="py-32 px-4 relative overflow-hidden text-center bg-stone-900 text-white">
+        <div class="absolute inset-0 bg-primary/20 blur-[130px]"></div>
+        <div class="relative z-10 max-w-4xl mx-auto flex flex-col items-center gap-12">
+            <h2 class="text-5xl md:text-7xl font-black tracking-tight leading-[1.1]">
+                Join the Network <br>of <span class="gradient-text">Excellence</span>
+            </h2>
+            <div class="flex flex-wrap justify-center gap-6">
+                {% if not user.is_authenticated %}
+                <a href="{% url 'register_cre' %}" class="h-16 px-12 rounded-2xl bg-primary text-white font-black text-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/40">
+                    Apply for Partnership
+                </a>
+                <a href="{% url 'login' %}" class="h-16 px-12 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 text-white font-black text-xl flex items-center justify-center hover:bg-white/20 transition-all">
+                    Partner Login
+                </a>
+                {% else %}
+                <a href="{% url 'cre_dashboard' %}" class="h-16 px-12 rounded-2xl bg-primary text-white font-black text-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/40">
+                    Go to Dashboard
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

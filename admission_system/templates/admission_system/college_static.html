@@ -20,7 +20,7 @@
             <a class="bg-primary text-white font-bold py-4 px-10 rounded-lg text-lg hover:shadow-xl hover:shadow-primary/20 transition-all"
                 href="#apply">Start Application</a>
             <a class="bg-white/10 backdrop-blur text-white border border-white/20 font-bold py-4 px-10 rounded-lg text-lg hover:bg-white/20 transition-all"
-                href="#about">Learn More</a>
+                href="{% url 'how_it_works' %}">Learn More</a>
         </div>
     </div>
 </section>
@@ -320,8 +320,8 @@
                 <div class="pt-10 border-t border-slate-100 dark:border-slate-800 flex justify-between items-center">
                     <button type="button" onclick="nextStep(2)"
                         class="text-slate-400 font-black uppercase text-xs tracking-widest hover:text-slate-600 transition-colors">Previous</button>
-                    <button type="submit"
-                        class="h-16 px-12 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-3">
+                    <button type="submit" id="submit-btn"
+                        class="hidden h-16 px-12 bg-primary text-white font-black rounded-2xl shadow-2xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center gap-3">
                         Submit & Pay Registration Fee <i data-lucide="chevron-right" class="w-5 h-5"></i>
                     </button>
                 </div>

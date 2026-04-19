@@ -16,7 +16,11 @@ import boto3
 from django.conf import settings
 from django.utils.text import slugify
 from django.http import JsonResponse
-from .models import AddonCourse
+from .models import AddonCourse, CampusManagerProfile
+
+class CampusManagerRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return hasattr(self.request.user, 'campus_manager_profile')
 
 def get_addon_courses(request):
     course_id = request.GET.get('course_id')
@@ -95,10 +99,21 @@ class AdminApproveCREView(SuperuserRequiredMixin, View):
 class AdminCREDetailView(SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_cre_detail.html'
 
+class HowItWorksView(TemplateView):
+    template_name = 'admission_system/how_it_works.html'
+
+class BenefitsView(TemplateView):
+    template_name = 'admission_system/benefits.html'
+
+class SupportView(TemplateView):
+    template_name = 'admission_system/support.html'
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cre_id = self.kwargs.get('pk')
-        cre_profile = get_object_or_404(CREProfile, id=cre_id)
+        cre_profile = None
+        if cre_id:
+            cre_profile = get_object_or_404(CREProfile, id=cre_id)
         
         # All referrals (students applied through this CRE)
         referrals = Application.objects.filter(referred_by=cre_profile).select_related('student', 'college', 'course').order_by('-applied_at')
@@ -108,7 +123,7 @@ class AdminCREDetailView(SuperuserRequiredMixin, TemplateView):
             'referrals': referrals,
             'total_referrals': referrals.count(),
             'successful_referrals': referrals.filter(payment_status='Success').count(),
-            'pending_referrals': referrals.filter(payment_status='Pending').count(),
+            'pending_referrals': referrals.filter(payment_status__in=['Pending', 'Pending Verification']).count(),
             'is_dashboard': True
         })
         return context
@@ -263,6 +278,94 @@ class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
         })
         return context
 
+class CampusManagerDashboardView(CampusManagerRequiredMixin, TemplateView):
+    template_name = 'admission_system/campus_manager_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manager_profile = self.request.user.campus_manager_profile
+        college = manager_profile.college
+        
+        # Base Querysets for this campus
+        campus_apps = Application.objects.filter(college=college).select_related('student', 'course', 'referred_by')
+        success_apps = campus_apps.filter(payment_status='Success')
+        
+        # Stats
+        total_apps = campus_apps.count()
+        total_paid = success_apps.count()
+        total_revenue = success_apps.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+        
+        # Course-wise breakdown
+        courses_data = []
+        for course in college.courses.all():
+            course_apps = campus_apps.filter(course=course)
+            courses_data.append({
+                'course': course,
+                'total': course_apps.count(),
+                'paid': course_apps.filter(payment_status='Success').count(),
+                'revenue': course_apps.filter(payment_status='Success').aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
+            })
+
+        context.update({
+            'college': college,
+            'campus_apps': campus_apps.order_by('-applied_at'),
+            'total_apps': total_apps,
+            'total_paid': total_paid,
+            'total_revenue': total_revenue,
+            'courses_data': courses_data,
+            'is_dashboard': True
+        })
+        return context
+
+class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
+    def get(self, request, *args, **kwargs):
+        manager_profile = request.user.campus_manager_profile
+        college = manager_profile.college
+        course_id = request.GET.get('course_id')
+        
+        apps = Application.objects.filter(college=college).select_related('student', 'course', 'referred_by__user')
+        
+        if course_id:
+            apps = apps.filter(course_id=course_id)
+            course_name = apps.first().course.name if apps.exists() else 'students'
+            safe_name = "".join([c for c in course_name if c.isalpha() or c.isdigit() or c==' ']).rstrip()
+            filename = f"{college.slug}_{safe_name.replace(' ', '_').lower()}_enrollments.csv"
+        else:
+            filename = f"{college.slug}_student_report.csv"
+            
+        response = HttpResponse(content_type='text/csv')
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        
+        writer = csv.writer(response)
+        writer.writerow([
+            'Name', 'Email', 'Phone', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
+            'Category', 'City', 'State', 'Father Name', 'Father Mobile', 
+            'Course', 'Addon Course', 'Referred By', 'Payment Status', 'Applied Date'
+        ])
+        
+        for app in apps:
+            writer.writerow([
+                app.student.name, 
+                app.student.email, 
+                app.student.phone, 
+                app.student.dob,
+                app.student.gender,
+                app.student.aadhar_number,
+                app.student.blood_group,
+                app.student.category,
+                app.student.city,
+                app.student.state,
+                app.student.father_name,
+                app.student.father_mobile,
+                app.course.name,
+                app.addon_course,
+                app.referred_by.user.username if app.referred_by else "Direct",
+                app.payment_status,
+                app.applied_at.strftime('%Y-%m-%d %H:%M')
+            ])
+            
+        return response
+
 class VerifyPaymentActionView(FinanceRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         app_id = request.POST.get('app_id')
@@ -381,6 +484,8 @@ class CRELoginView(LoginView):
             return reverse_lazy('admin_dashboard')
         if hasattr(self.request.user, 'finance_profile'):
             return reverse_lazy('finance_dashboard')
+        if hasattr(self.request.user, 'campus_manager_profile'):
+            return reverse_lazy('campus_manager_dashboard')
         return reverse_lazy('cre_dashboard')
 
 class DashboardView(LoginRequiredMixin, TemplateView):
@@ -425,6 +530,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         if request.user.is_authenticated:
             if hasattr(request.user, 'finance_profile'):
                 return redirect('finance_dashboard')
+            
+            if hasattr(request.user, 'campus_manager_profile'):
+                return redirect('campus_manager_dashboard')
             
             cre_profile = getattr(request.user, 'cre_profile', None)
             if cre_profile and not cre_profile.is_approved and not request.user.is_superuser:
@@ -477,30 +585,67 @@ def apply_admission(request, college_slug, cre_id):
                 }
             )
             
-            # 2. Check for existing successful application
+            # 2. Check for existing application status
             course = form.cleaned_data['course']
-            existing_app = Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists()
+            existing_app = Application.objects.filter(student=student, college=college, course=course).first()
+            
             if existing_app:
-                messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
-            else:
-                # 3. Create/Update Pending Application
-                app, _ = Application.objects.update_or_create(
-                    student=student, college=college, course=course,
-                    defaults={
-                        'addon_course': form.cleaned_data['addon_course'],
-                        'source': form.cleaned_data['source'],
-                        'referred_by': referrer,
-                        'doc_10th': form.cleaned_data['doc_10th'],
-                        'doc_11th': form.cleaned_data['doc_11th'],
-                        'doc_12th': form.cleaned_data['doc_12th'],
-                        'doc_aadhar': form.cleaned_data['doc_aadhar'],
-                        'payment_status': 'Pending'
-                    }
-                )
+                if existing_app.payment_status == 'Success':
+                    messages.success(request, f"You have already successfully applied for {course.name} at {college.name}.")
+                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
                 
+                elif existing_app.payment_status == 'Pending Verification':
+                    # Check if the existing app belongs to someone else
+                    if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
+                        messages.error(request, f"This student is already registered through another partner for {course.name}. Duplicate registrations across different partners are not allowed.")
+                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                    
+                    messages.warning(request, "Your previous payment for this course is currently being verified. Please do not pay again.")
+                    return redirect('manual_payment', app_id=existing_app.id)
                 
-                # 4. Redirect to manual payment page
-                return redirect('manual_payment', app_id=app.id)
+                # Check for cross-CRE ownership on Pending/Failed/Rejected too
+                if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
+                    # If the application was initially by someone else, we don't let current CRE overwrite it
+                    messages.error(request, f"This student was previously registered through another partner. Please contact the administrator for cross-partner transfers.")
+                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+
+            # 3. Create/Update Application atomically to prevent race condition overwrites
+            app, created = Application.objects.get_or_create(
+                student=student, college=college, course=course,
+                defaults={
+                    'addon_course': form.cleaned_data['addon_course'],
+                    'source': form.cleaned_data['source'],
+                    'referred_by': referrer,
+                    'doc_10th': form.cleaned_data.get('doc_10th'),
+                    'doc_11th': form.cleaned_data.get('doc_11th'),
+                    'doc_12th': form.cleaned_data.get('doc_12th'),
+                    'doc_aadhar': form.cleaned_data.get('doc_aadhar'),
+                    'payment_status': 'Pending'
+                }
+            )
+            
+            if not created:
+                # Due to a race condition (or normal revisit), the app exists.
+                # Verify ownership ONE MORE TIME to be absolutely certain.
+                if app.referred_by and app.referred_by.cre_id != referrer.cre_id:
+                    messages.error(request, f"This student was just registered through another partner. Duplicate registrations across different partners are not allowed.")
+                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                
+                # We own it, safely update the fields (only overwrite docs if new ones are provided)
+                app.addon_course = form.cleaned_data['addon_course']
+                app.source = form.cleaned_data['source']
+                if form.cleaned_data.get('doc_10th'): app.doc_10th = form.cleaned_data['doc_10th']
+                if form.cleaned_data.get('doc_11th'): app.doc_11th = form.cleaned_data['doc_11th']
+                if form.cleaned_data.get('doc_12th'): app.doc_12th = form.cleaned_data['doc_12th']
+                if form.cleaned_data.get('doc_aadhar'): app.doc_aadhar = form.cleaned_data['doc_aadhar']
+                
+                # Ensure we don't downgrade a processed payment status
+                if app.payment_status not in ['Success', 'Pending Verification']:
+                    app.payment_status = 'Pending'
+                app.save()
+            
+            # 4. Redirect to manual payment page
+            return redirect('manual_payment', app_id=app.id)
         else:
             for field, errors in form.errors.items():
                 for error in errors:
@@ -525,8 +670,10 @@ def manual_payment(request, app_id):
     app = get_object_or_404(Application, id=app_id)
     if app.payment_status in ['Success', 'Pending Verification']:
         messages.info(request, "Your payment is already processed or under verification.")
-        # Redirect back to the college landing page instead of dashboard
-        return redirect('apply_admission', college_slug=app.college.slug, cre_id=app.referred_by.cre_id)
+        # Re-verify if we have a referral profile to redirect back to
+        if app.referred_by:
+            return redirect('apply_admission', college_slug=app.college.slug, cre_id=app.referred_by.cre_id)
+        return redirect('admin_dashboard')
 
     if request.method == "POST":
         transaction_id = request.POST.get('transaction_id')

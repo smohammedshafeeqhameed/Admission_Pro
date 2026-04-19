@@ -10,6 +10,7 @@
         rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&display=swap"
         rel="stylesheet" />
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
@@ -29,6 +30,9 @@
         }
     </script>
     <style>
+        html {
+            scroll-behavior: smooth;
+        }
         .material-symbols-outlined {
             font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
         }
@@ -63,9 +67,23 @@
                         Apply Now
                     </a>
                 </div>
-                <button class="md:hidden text-slate-900 dark:text-slate-100">
-                    <span class="material-symbols-outlined">menu</span>
+                <button onclick="toggleMobileMenu()" class="md:hidden text-slate-900 dark:text-slate-100 p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">
+                    <i data-lucide="menu" id="mobile-menu-icon" class="w-6 h-6"></i>
                 </button>
+            </div>
+
+            <!-- Mobile Menu Overlay -->
+            <div id="mobile-menu" class="hidden md:hidden fixed inset-x-0 top-[65px] bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 shadow-xl z-50 animate-in slide-in-from-top duration-300">
+                <nav class="flex flex-col p-6 gap-4">
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#about" onclick="toggleMobileMenu()">About</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#courses" onclick="toggleMobileMenu()">Courses</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#apply" onclick="toggleMobileMenu()">Admissions</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#contact" onclick="toggleMobileMenu()">Contact</a>
+                    <a href="#apply" onclick="toggleMobileMenu()"
+                        class="bg-primary text-white text-center font-bold py-4 rounded-xl mt-4 shadow-lg shadow-primary/20">
+                        Apply Now
+                    </a>
+                </nav>
             </div>
         </header>
 
@@ -108,20 +126,50 @@
     
     <!-- Global Form Logic: Dynamic Addon Courses & File Size Restriction -->
     <script>
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('mobile-menu-icon');
+            const isHidden = menu.classList.contains('hidden');
+            
+            if (isHidden) {
+                menu.classList.remove('hidden');
+                if (icon) icon.setAttribute('data-lucide', 'x');
+            } else {
+                menu.classList.add('hidden');
+                if (icon) icon.setAttribute('data-lucide', 'menu');
+            }
+            if (window.lucide) lucide.createIcons();
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
+            if (window.lucide) lucide.createIcons();
+            
             // File Size Restriction
             var fileInputs = document.querySelectorAll('input[type="file"]');
             var maxSize = 1 * 1024 * 1024; // 1 MB
             
+            // Dynamic Submit Button Visibility
+            const submitBtn = document.getElementById('submit-btn');
+            
             fileInputs.forEach(function(input) {
                 input.addEventListener('change', function() {
                     if (this.files && this.files.length > 0) {
+                        // Check if file size is okay
+                        let allSmaller = true;
                         for (let i = 0; i < this.files.length; i++) {
                             if (this.files[i].size > maxSize) {
                                 alert('Maximum file size allowed is 1 MB. Please select a smaller file.');
                                 this.value = ''; // clear the input
+                                allSmaller = false;
                                 break;
                             }
+                        }
+                        
+                        // If file is valid, show the submit button
+                        if (allSmaller && submitBtn) {
+                            submitBtn.classList.remove('hidden');
+                            submitBtn.classList.add('animate-bounce');
+                            setTimeout(() => submitBtn.classList.remove('animate-bounce'), 1000);
                         }
                     }
                 });

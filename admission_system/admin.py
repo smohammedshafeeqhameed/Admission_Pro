@@ -1,7 +1,15 @@
 import csv
 from django.http import HttpResponse
 from django.contrib import admin
-from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse
+from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse, CampusManagerProfile
+
+# ... (rest of the code)
+
+@admin.register(CampusManagerProfile)
+class CampusManagerProfileAdmin(admin.ModelAdmin):
+    list_display = ('user', 'college', 'phone')
+    list_filter = ('college',)
+    search_fields = ('user__username', 'phone')
 
 @admin.action(description="Export Selected as CSV")
 def export_as_csv(modeladmin, request, queryset):

@@ -5,7 +5,7 @@
 <div class="bg-white dark:bg-slate-950 font-sans selection:bg-[#1A237E] selection:text-[#FF6B35]">
 
     <!-- ═══ HERO ═══ -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24">
+    <section class="relative min-h-screen flex flex-col justify-between overflow-hidden pt-24" id="about">
         <!-- Layered background -->
         <div class="absolute inset-0 bg-[#0D1554]">
             <div class="absolute inset-0 bg-cover bg-center opacity-20"
@@ -22,7 +22,7 @@
             </div>
         </div>
 
-        <div class="relative z-10 text-center px-4 md:px-8 max-w-7xl mx-auto">
+        <div class="relative z-10 text-center px-4 md:px-8 max-w-7xl mx-auto flex-1 flex flex-col justify-center py-12">
             <!-- KTU / AICTE badge -->
             <div class="inline-flex flex-wrap justify-center gap-3 mb-14 animate-in fade-in zoom-in duration-1000">
                 <span
@@ -70,15 +70,15 @@
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#FF6B35] text-white font-black py-6 px-14 rounded-[1.75rem] text-xl hover:bg-[#e55a26] hover:shadow-[0_20px_60px_-10px_rgba(255,107,53,0.6)] transition-all hover:-translate-y-2 active:scale-95">
                     Apply Now <i data-lucide="arrow-right" class="w-6 h-6"></i>
                 </a>
-                <a href="#programs"
+                <a href="#courses"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white/10 backdrop-blur-xl text-white border border-white/25 font-bold py-6 px-14 rounded-[1.75rem] text-xl hover:bg-white/20 transition-all">
                     View Programs <i data-lucide="layers" class="w-6 h-6"></i>
                 </a>
             </div>
         </div>
 
-        <!-- Stats strip pinned at bottom -->
-        <div class="absolute bottom-0 left-0 right-0 z-10 pb-8 px-4">
+        <!-- Stats strip -->
+        <div class="relative z-10 w-full pb-8 px-4">
             <div
                 class="max-w-5xl mx-auto grid grid-cols-4 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/15 text-center text-white py-7 overflow-hidden">
                 <div class="px-4 border-r border-white/10">
@@ -106,7 +106,7 @@
     </section>
 
     <!-- ═══ PROGRAMS ═══ -->
-    <section class="pt-48 pb-40 px-6 md:px-16 lg:px-28" id="programs">
+    <section class="pt-48 pb-40 px-6 md:px-16 lg:px-28" id="courses">
         <div class="max-w-7xl mx-auto">
             <!-- Section header -->
             <div class="text-center mb-24">
@@ -146,7 +146,6 @@
                 {% endfor %}
             </div>
         </div>
-    </section>
     </section>
 
     <!-- ═══ ADMISSION FORM ═══ -->
@@ -407,7 +406,7 @@
                             <button type="button" onclick="goToStep(3)" class="jbc-btn-back">
                                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
                             </button>
-                            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-4
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-4
                                 bg-[#FF6B35] text-white font-black py-5 px-14 rounded-[1.75rem] text-xl
                                 hover:bg-[#e55a26] hover:shadow-[0_15px_40px_-10px_rgba(255,107,53,0.6)]
                                 transition-all hover:-translate-y-1 active:scale-95">
@@ -423,7 +422,7 @@
 
     <!-- Footer -->
     <footer
-        class="py-14 bg-[#0D1554] text-white/25 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5">
+        class="py-14 bg-[#0D1554] text-white/25 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5" id="contact">
         Jai Bharath College of Management and Engineering Technology · JBCMET · Vengola, Perumbavoor
     </footer>
 
@@ -655,8 +654,28 @@
             if (currentStepMatch) {
                 const currentStep = parseInt(currentStepMatch[0]);
                 if (step > currentStep) {
+                    // Check standard validity
                     const inputs = currentStepEl.querySelectorAll('input, select, textarea');
                     for (let i = 0; i < inputs.length; i++) {
+                        // Special check for DOB age
+                        if (inputs[i].name === 'dob' || inputs[i].id === 'id_dob') {
+                            const dobVal = inputs[i].value;
+                            if (dobVal) {
+                                const dobDate = new Date(dobVal);
+                                const today = new Date();
+                                let age = today.getFullYear() - dobDate.getFullYear();
+                                const m = today.getMonth() - dobDate.getMonth();
+                                if (m < 0 || (m === 0 && today.getDate() < dobDate.getDate())) {
+                                    age--;
+                                }
+                                if (age < 15) {
+                                    inputs[i].setCustomValidity("You must be at least 15 years old to apply.");
+                                } else {
+                                    inputs[i].setCustomValidity("");
+                                }
+                            }
+                        }
+
                         if (!inputs[i].checkValidity()) {
                             inputs[i].reportValidity();
                             return; // Stop and do not proceed

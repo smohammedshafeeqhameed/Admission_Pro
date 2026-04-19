@@ -1,0 +1,123 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}Support Hub - AdmissionPro CRE{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-slate-50 dark:bg-background-dark">
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-32 overflow-hidden bg-slate-900 text-white">
+        <div class="absolute inset-0 bg-primary/20 blur-[120px]"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 text-white border border-white/20 text-[10px] font-black uppercase tracking-widest mb-8">
+                Executive Support
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tighter leading-[1.1]">
+                We're Here for <br><span class="gradient-text">Your Success</span>
+            </h1>
+            <p class="text-xl text-slate-300 max-w-2xl mx-auto font-medium leading-relaxed">
+                Connect with our dedicated partner managers, find quick answers in the FAQ, or request premium technical assistance.
+            </p>
+        </div>
+    </section>
+
+    <!-- Support Content -->
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid lg:grid-cols-3 gap-12">
+                <!-- Contact Channels -->
+                <div class="lg:col-span-1 space-y-8">
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">Direct Channels</h3>
+                    
+                    <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800/60 flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                            <i data-lucide="mail" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-slate-900 dark:text-white mb-2 uppercase tracking-widest text-[10px]">Email Us</h4>
+                            <p class="text-slate-500 font-bold mb-4">support@admissionpro.com</p>
+                            <a href="mailto:support@admissionpro.com" class="text-primary text-xs font-black uppercase tracking-widest hover:underline">Launch Email</a>
+                        </div>
+                    </div>
+
+                    <div class="glass-card p-8 rounded-[2.5rem] border border-slate-200/60 dark:border-slate-800/60 flex items-start gap-6">
+                        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-600 flex items-center justify-center shrink-0">
+                            <i data-lucide="phone" class="w-6 h-6"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-black text-slate-900 dark:text-white mb-2 uppercase tracking-widest text-[10px]">Call Line</h4>
+                            <p class="text-slate-500 font-bold mb-4">+91 1800-PARTNER</p>
+                            <p class="text-[10px] text-slate-400 font-medium">Mon - Sat · 9 AM to 6 PM</p>
+                        </div>
+                    </div>
+
+                    <div class="p-8 rounded-[2.5rem] bg-slate-900 text-white relative overflow-hidden group">
+                        <div class="relative z-10">
+                            <h4 class="font-black text-xs uppercase tracking-[0.2em] text-slate-400 mb-4">Dedicated Help</h4>
+                            <p class="font-bold text-lg leading-relaxed mb-6">Need a specialized setup or volume pricing?</p>
+                            <button class="bg-primary px-6 py-3 rounded-xl font-black text-xs uppercase tracking-widest hover:shadow-2xl transition-all">Request Callback</button>
+                        </div>
+                        <i data-lucide="zap" class="absolute bottom-0 right-0 w-32 h-32 opacity-10 -translate-x-1/2 translate-y-1/2 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                </div>
+
+                <!-- FAQ Section -->
+                <div class="lg:col-span-2 space-y-10">
+                    <h3 class="text-2xl font-black text-slate-900 dark:text-white">Frequent Questions</h3>
+                    <div class="space-y-4">
+                        <details class="group glass-card rounded-3xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden" open>
+                            <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
+                                <span class="text-lg font-black text-slate-900 dark:text-white group-open:text-primary transition-colors">How do I track my active referrals?</span>
+                                <i data-lucide="plus" class="w-5 h-5 text-slate-400 group-open:rotate-45 transition-transform"></i>
+                            </summary>
+                            <div class="px-8 pb-8 text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                Simply navigate to your Executive Hub Dashboard. All candidate activities are logged in the "Enrollment Stream" in real-time. You can filter by institution, course, or status.
+                            </div>
+                        </details>
+
+                        <details class="group glass-card rounded-3xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+                            <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
+                                <span class="text-lg font-black text-slate-900 dark:text-white group-open:text-primary transition-colors">When are commission payments processed?</span>
+                                <i data-lucide="plus" class="w-5 h-5 text-slate-400 group-open:rotate-45 transition-transform"></i>
+                            </summary>
+                            <div class="px-8 pb-8 text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                Payouts are typically processed twice a month (10th and 25th) after candidates complete their registration fee payment and initial document verification by the college manager.
+                            </div>
+                        </details>
+
+                        <details class="group glass-card rounded-3xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+                            <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
+                                <span class="text-lg font-black text-slate-900 dark:text-white group-open:text-primary transition-colors">Can I refer to multiple colleges simultaneously?</span>
+                                <i data-lucide="plus" class="w-5 h-5 text-slate-400 group-open:rotate-45 transition-transform"></i>
+                            </summary>
+                            <div class="px-8 pb-8 text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                Absolutely. Once your profile is approved, you can share tracking links for any allocated institution in your portfolio. All data merges seamlessly into your single dashboard view.
+                            </div>
+                        </details>
+
+                        <details class="group glass-card rounded-3xl border border-slate-200/60 dark:border-slate-800/60 overflow-hidden">
+                            <summary class="flex items-center justify-between p-8 cursor-pointer list-none">
+                                <span class="text-lg font-black text-slate-900 dark:text-white group-open:text-primary transition-colors">My candidate link isn't opening, what should I do?</span>
+                                <i data-lucide="plus" class="w-5 h-5 text-slate-400 group-open:rotate-45 transition-transform"></i>
+                            </summary>
+                            <div class="px-8 pb-8 text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                                First, ensure you've copied the full URL from your Referral Engine sidebar. If the issue persists, clear your browser cache or contact your dedicated success manager via the "Contact Hub" button on your dashboard.
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+
+<script>
+    // Style adjustments for summary to hide the default arrow in Safari/Chrome
+    const summaries = document.querySelectorAll('summary');
+    summaries.forEach(s => {
+        s.style.display = 'flex';
+        s.style.listStyle = 'none';
+        s.style.webkitAppearance = 'none';
+    });
+</script>
+{% endblock %}

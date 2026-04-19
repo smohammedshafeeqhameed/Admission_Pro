@@ -1,4 +1,5 @@
 from django import forms
+import datetime
 from django.contrib.auth.models import User
 from .models import CREProfile, Application, Course
 
@@ -58,6 +59,7 @@ class StudentAdmissionForm(forms.ModelForm):
         }
         widgets = {
             'dob': forms.DateInput(attrs={'type': 'date'}),
+            'email': forms.EmailInput(attrs={'placeholder': 'name@example.com'}),
             'permanent_address': forms.Textarea(attrs={'rows': 2}),
             'correspondence_address': forms.Textarea(attrs={'rows': 2}),
         }
@@ -67,6 +69,11 @@ class StudentAdmissionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if college:
             self.fields['course'].queryset = college.courses.all()
+        
+        # Enforce mandatory selection for Gender, Blood Group, and Aadhar
+        self.fields['gender'].required = True
+        self.fields['blood_group'].required = True
+        self.fields['aadhar_number'].required = True
         
         # If we have course data in POST, update addon_course choices to pass validation
         if 'course' in self.data:
@@ -91,6 +98,10 @@ class StudentAdmissionForm(forms.ModelForm):
             })
             if field.required:
                 field.widget.attrs['required'] = 'required'
+
+        # Set max date for DOB to prevent future dates and ensure minimum age (15 years)
+        max_dob = datetime.date.today() - datetime.timedelta(days=15*365)
+        self.fields['dob'].widget.attrs['max'] = max_dob.isoformat()
 
         # Custom placeholders for family profile
         custom_placeholders = {
@@ -138,3 +149,18 @@ class StudentAdmissionForm(forms.ModelForm):
                 'minlength': '12',
                 'maxlength': '12'
             })
+
+    def clean_dob(self):
+        dob = self.cleaned_data.get('dob')
+        if dob:
+            today = datetime.date.today()
+            age = today.year - dob.year - ((today.month, today.day) < (dob.month, dob.day))
+            if age < 15:
+                raise forms.ValidationError("You must be at least 15 years old to apply.")
+        return dob
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+        if email:
+            return email.lower()
+        return email

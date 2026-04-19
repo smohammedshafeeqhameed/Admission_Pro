@@ -49,9 +49,17 @@ class FinanceProfile(models.Model):
     def __str__(self):
         return f"Finance Manager: {self.user.username}"
 
+class CampusManagerProfile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='campus_manager_profile')
+    college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='managers')
+    phone = models.CharField(max_length=15, blank=True)
+
+    def __str__(self):
+        return f"Campus Manager: {self.user.username} ({self.college.name})"
+
 class Student(models.Model):
-    GENDER_CHOICES = [('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
-    BLOOD_GROUP_CHOICES = [('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')]
+    GENDER_CHOICES = [('', '----------'), ('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
+    BLOOD_GROUP_CHOICES = [('', '----------'), ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')]
     
     name = models.CharField(max_length=255)
     email = models.EmailField()

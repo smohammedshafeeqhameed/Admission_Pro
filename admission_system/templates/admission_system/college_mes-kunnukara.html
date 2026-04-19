@@ -5,7 +5,7 @@
 <div class="bg-white dark:bg-slate-950 font-sans">
 
     <!-- ═══ HERO ═══ -->
-    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24">
+    <section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-24" id="about">
         <div class="absolute inset-0 bg-[#0a2e0d]">
             <div class="absolute inset-0 bg-cover bg-center opacity-20"
                 style="background-image:url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')">
@@ -71,7 +71,7 @@
         </div>
 
         <!-- Stats strip -->
-        <div class="absolute bottom-0 left-0 right-0 z-10 pb-8 px-4">
+        <div class="relative z-10 pb-16 px-4 -mt-10">
             <div
                 class="max-w-4xl mx-auto grid grid-cols-4 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/15 text-center text-white py-7">
                 <div class="px-4 border-r border-white/10">
@@ -99,7 +99,8 @@
     </section>
 
     <!-- ═══ PROGRAMS ═══ -->
-    <section class="pt-44 pb-36 px-6 md:px-16 lg:px-28" id="programs">
+    <div id="programs"></div>
+    <section class="pt-24 pb-36 px-6 md:px-16 lg:px-28" id="courses">
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20">
                 <span class="text-[#1B5E20] font-black tracking-[0.5em] uppercase text-xs block mb-5">Academic
@@ -448,7 +449,7 @@
                             <button type="button" onclick="goToStep(3)" class="mes-back">
                                 <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
                             </button>
-                            <button type="submit" class="w-full sm:w-auto inline-flex items-center justify-center gap-4
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-4
                                 bg-[#FFD700] text-[#1B5E20] font-black py-5 px-14 rounded-[1.75rem] text-xl
                                 hover:bg-yellow-300 hover:shadow-[0_15px_40px_-8px_rgba(255,215,0,0.5)]
                                 transition-all hover:-translate-y-1 active:scale-95">
@@ -464,7 +465,7 @@
 
     <!-- Footer -->
     <footer
-        class="py-14 bg-[#0a2e0d] text-white/20 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5">
+        class="py-14 bg-[#0a2e0d] text-white/20 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5" id="contact">
         MES T.O. Abdulla Memorial College · Kunnukara · Muslim Education Society
     </footer>
 

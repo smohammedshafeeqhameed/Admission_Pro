@@ -89,7 +89,7 @@
             <a class="bg-orange-500 text-white font-black py-5 px-12 rounded-sm text-lg hover:bg-orange-600 hover:scale-105 transition-all shadow-2xl shadow-orange-500/20 uppercase tracking-widest"
                 href="#apply">Apply Online</a>
             <a class="bg-transparent text-white border-2 border-white font-black py-5 px-12 rounded-sm text-lg hover:bg-white hover:text-[#003366] transition-all uppercase tracking-widest"
-                href="#about">Prospectus</a>
+                href="#courses">Prospectus</a>
         </div>
     </div>
 
@@ -451,8 +451,8 @@
                             <button type="button" onclick="nextYmbcStep(2)"
                                 class="text-slate-400 font-black uppercase text-[10px] tracking-widest hover:text-orange-500 transition-colors">Go
                                 Back</button>
-                            <button type="submit"
-                                class="h-20 px-16 bg-orange-500 text-white font-black rounded-2xl shadow-3xl shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-sm">
+                            <button type="submit" id="submit-btn"
+                                class="hidden h-20 px-16 bg-orange-500 text-white font-black rounded-2xl shadow-3xl shadow-orange-500/20 hover:scale-105 active:scale-95 transition-all uppercase tracking-widest text-sm">
                                 Submit & pay ₹1,500
                             </button>
                         </div>
@@ -643,5 +643,31 @@
     if (typeof lucide !== 'undefined') {
         lucide.createIcons();
     }
+
+    // ════════════════════════════════════════════════════════════
+    // AGE VALIDATION GUARD (DOB field)
+    // ════════════════════════════════════════════════════════════
+    document.addEventListener('submit', function(e) {
+        if (e.target.tagName.toLowerCase() === 'form') {
+            const dobInput = document.querySelector('input[name="dob"]');
+            if (dobInput && dobInput.value) {
+                const dob = new Date(dobInput.value);
+                const today = new Date();
+                let age = today.getFullYear() - dob.getFullYear();
+                const m = today.getMonth() - dob.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < dob.getDate())) {
+                    age--;
+                }
+                
+                if (age < 15) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    alert("You must be at least 15 years old to apply.");
+                    dobInput.focus();
+                    return false;
+                }
+            }
+        }
+    }, true);
 </script>
 {% endblock %}

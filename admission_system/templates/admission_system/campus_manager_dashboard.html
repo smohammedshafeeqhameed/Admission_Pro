@@ -1,0 +1,187 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}Campus Manager Dashboard - {{ college.name }}{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest">
+                    <i data-lucide="building-2" class="w-4 h-4"></i> Campus Operations
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tight">
+                    {{ college.name }}
+                </h1>
+                <p class="text-slate-500 font-medium text-lg flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-5 h-5 text-slate-400"></i>
+                    Manager: {{ request.user.first_name|default:request.user.username }}
+                </p>
+            </div>
+            
+            <div class="flex items-center gap-4">
+                <a href="{% url 'campus_manager_export_csv' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold bg-primary text-white hover:bg-primary/90 transition-colors shadow-lg shadow-primary/20">
+                    <i data-lucide="download" class="w-4 h-4"></i> Download Student List
+                </a>
+                <a href="{% url 'logout' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <i data-lucide="log-out" class="w-4 h-4 text-slate-400"></i> Logout
+                </a>
+            </div>
+        </div>
+
+        <!-- Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                        <i data-lucide="users" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Total Registrations</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ total_apps }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
+                        <i data-lucide="credit-card" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Paid Admissions</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ total_paid }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
+                        <i data-lucide="indian-rupee" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Institutional Revenue</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">₹{{ total_revenue|floatformat:"0" }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Course Breakdown -->
+        <div class="space-y-6">
+            <h3 class="text-sm font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Department Performance</h3>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for data in courses_data %}
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-6 shadow-sm group/card">
+                    <div class="flex justify-between items-start mb-4 border-b border-slate-50 dark:border-slate-700 pb-3">
+                        <h4 class="text-lg font-black text-slate-900 dark:text-white leading-tight">{{ data.course.name }}</h4>
+                        <a href="{% url 'campus_manager_export_csv' %}?course_id={{ data.course.id }}" class="p-2 bg-slate-50 dark:bg-slate-900 rounded-xl text-slate-400 hover:text-primary transition-colors" title="Download Course List">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                        </a>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider">Total Students</span>
+                            <span class="font-black text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-900 px-2 py-1 rounded-lg">{{ data.total }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider">Paid Admissions</span>
+                            <span class="font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">{{ data.paid }}</span>
+                        </div>
+                        <div class="flex justify-between items-center text-xs pt-2 border-t border-slate-50 dark:border-slate-700/50">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider">Revenue</span>
+                            <span class="font-black text-slate-900 dark:text-white">₹{{ data.revenue|floatformat:"0" }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Student List -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <h2 class="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white">
+                    <i data-lucide="list" class="text-primary"></i> Student Registry
+                </h2>
+                <a href="{% url 'campus_manager_export_csv' %}" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-widest hover:opacity-90 transition-all shadow-md">
+                    <i data-lucide="download" class="w-3.5 h-3.5"></i> Export All
+                </a>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50">
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Student & Contact</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Enrolled Course</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Referred By</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Payment Status</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Applied Date</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for app in campus_apps %}
+                        <tr class="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="px-8 py-6">
+                                <div class="font-bold text-slate-900 dark:text-white text-lg leading-none mb-1">{{ app.student.name }}</div>
+                                <div class="text-xs text-slate-500 font-medium">{{ app.student.email }} | {{ app.student.phone }}</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="font-black text-xs text-primary mb-1 block uppercase tracking-wide">{{ app.course.name }}</span>
+                                {% if app.addon_course %}
+                                <div class="text-[10px] text-slate-400 font-bold">+ {{ app.addon_course }}</div>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                    {{ app.referred_by.user.username|default:"Direct" }}
+                                </div>
+                                <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Partner Portal</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                {% if app.payment_status == 'Success' %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> PAID
+                                </span>
+                                {% elif app.payment_status == 'Pending Verification' %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-amber-50 text-amber-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    <i data-lucide="clock" class="w-3.5 h-3.5"></i> IN REVIEW
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    <i data-lucide="info" class="w-3.5 h-3.5"></i> {{ app.payment_status }}
+                                </span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="text-sm font-bold text-slate-900 dark:text-white">{{ app.applied_at|date:"M j, Y" }}</div>
+                                <div class="text-[10px] text-slate-400 font-bold">{{ app.applied_at|time:"g:i A" }}</div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 mx-auto mb-4">
+                                    <i data-lucide="inbox" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">No Students Found</h3>
+                                <p class="text-slate-500 font-medium">No registrations have been logged for this campus yet.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

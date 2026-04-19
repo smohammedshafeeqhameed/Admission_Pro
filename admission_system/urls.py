@@ -4,6 +4,9 @@ from . import views
 
 urlpatterns = [
     path('', views.home, name='home'),
+    path('how-it-works/', views.HowItWorksView.as_view(), name='how_it_works'),
+    path('benefits/', views.BenefitsView.as_view(), name='benefits'),
+    path('support/', views.SupportView.as_view(), name='support'),
     path('register/', views.CRERegistrationView.as_view(), name='register_cre'),
     path('login/', views.CRELoginView.as_view(), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
@@ -22,5 +25,7 @@ urlpatterns = [
     path('payment/<int:app_id>/', views.manual_payment, name='manual_payment'),
     path('finance-dashboard/', views.FinanceDashboardView.as_view(), name='finance_dashboard'),
     path('finance-dashboard/verify/', views.VerifyPaymentActionView.as_view(), name='finance_verify_payment'),
+    path('campus-manager/dashboard/', views.CampusManagerDashboardView.as_view(), name='campus_manager_dashboard'),
+    path('campus-manager/export/', views.CampusManagerExportCSVView.as_view(), name='campus_manager_export_csv'),
     path('api/get-addon-courses/', views.get_addon_courses, name='get_addon_courses'),
 ]

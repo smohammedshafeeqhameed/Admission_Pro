@@ -233,7 +233,7 @@
                                 class="w-full h-14 rounded-2xl bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 text-xs font-black uppercase tracking-[0.15em] hover:opacity-90 active:scale-95 transition-all flex items-center justify-center gap-2 group-hover:bg-primary group-hover:text-white"
                                 onclick="copyLink('link-{{ college.id }}', this)">
                                 <i data-lucide="copy" class="w-4 h-4"></i>
-                                Copy ID Link
+                                <span class="btn-text">Copy ID Link</span>
                             </button>
                         </div>
                     </div>
@@ -247,20 +247,30 @@
 <script>
     function copyLink(elementId, btn) {
         const linkText = document.getElementById(elementId).innerText.trim();
+        const textSpan = btn.querySelector('.btn-text');
+        const iconWrap = btn.querySelector('[data-lucide]');
+        const originalText = textSpan.innerText;
+        const originalIcon = iconWrap.getAttribute('data-lucide');
 
         const showSuccess = () => {
-            const originalHTML = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="check-circle" class="w-4 h-4"></i> Copied';
+            textSpan.innerText = 'Copied';
+            
+            // Update icon name and re-run lucide to replace the element
+            iconWrap.setAttribute('data-lucide', 'check-circle');
             lucide.createIcons();
 
-            btn.classList.add('bg-emerald-600', 'text-white');
-            btn.classList.remove('bg-slate-900', 'dark:bg-slate-100');
-
+            // Use important (!) to override group-hover specificity
+            btn.classList.add('!bg-emerald-600', '!text-white');
+            
             setTimeout(() => {
-                btn.innerHTML = originalHTML;
-                lucide.createIcons();
-                btn.classList.remove('bg-emerald-600', 'text-white');
-                btn.classList.add('bg-slate-900', 'dark:bg-slate-100');
+                textSpan.innerText = originalText;
+                // Re-find the icon element because lucide.createIcons() replaced it
+                const currentIcon = btn.querySelector('[data-lucide], svg.lucide');
+                if (currentIcon) {
+                    currentIcon.setAttribute('data-lucide', originalIcon);
+                    lucide.createIcons();
+                }
+                btn.classList.remove('!bg-emerald-600', '!text-white');
             }, 2500);
         };
 

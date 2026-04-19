@@ -1,0 +1,115 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}Benefits - AdmissionPro CRE{% endblock %}
+
+{% block content %}
+<main class="min-h-screen bg-slate-50 dark:bg-background-dark">
+    <!-- Hero Section -->
+    <section class="relative pt-24 pb-32 overflow-hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-8 border border-emerald-500/20">
+                Partner Advantages
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-8 tracking-tighter text-slate-900 dark:text-white leading-[1.1]">
+                Maximize Your <span class="gradient-text">Potential</span> <br>as a Relationship Executive
+            </h1>
+            <p class="text-xl text-slate-500 dark:text-slate-400 max-w-3xl mx-auto font-medium leading-relaxed">
+                Unlock industry-leading commission structures, cutting-edge tracking tools, and direct access to 
+                premium educational institutions worldwide.
+            </p>
+        </div>
+        <!-- Abstract Decoration -->
+        <div class="absolute bottom-0 left-0 w-[500px] h-[500px] bg-emerald-500/5 rounded-full blur-3xl -translate-x-1/2 translate-y-1/2"></div>
+    </section>
+
+    <!-- Benefits Grid -->
+    <section class="py-24">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <!-- Benefit 1 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-primary/10">
+                    <div class="w-16 h-16 rounded-2xl bg-primary text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="coins" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">High Commissions</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Earn industry-leading payouts for every successful referral. Our transparent structures ensure you get paid exactly what you've earned.
+                    </p>
+                </div>
+
+                <!-- Benefit 2 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-emerald-500/10">
+                    <div class="w-16 h-16 rounded-2xl bg-emerald-500 text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="bar-chart-big" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">Advanced Analytics</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Track every candidate stage with real-time data. Stop guessing and start making data-driven decisions for your recruitment strategy.
+                    </p>
+                </div>
+
+                <!-- Benefit 3 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl hover:shadow-amber-500/10">
+                    <div class="w-16 h-16 rounded-2xl bg-amber-500 text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="landmark" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">Institutional Access</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Gain direct referral access to top-tier colleges and universities. No more middleman friction or delayed approvals.
+                    </p>
+                </div>
+
+                <!-- Benefit 4 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl">
+                    <div class="w-16 h-16 rounded-2xl bg-slate-900 dark:bg-slate-700 text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="award" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">Certification</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Become a Certified Relationship Executive. Elevate your professional standing with industry-recognized credentials.
+                    </p>
+                </div>
+
+                <!-- Benefit 5 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl">
+                    <div class="w-16 h-16 rounded-2xl bg-blue-500 text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="network" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">Executive Network</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Connect with 4,000+ top-tier executives. Share insights, strategies, and scale your influence together.
+                    </p>
+                </div>
+
+                <!-- Benefit 6 -->
+                <div class="group glass-card p-10 rounded-[3rem] border border-slate-200/60 dark:border-slate-800/60 transition-all hover:-translate-y-2 hover:shadow-2xl">
+                    <div class="w-16 h-16 rounded-2xl bg-purple-500 text-white flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform">
+                        <i data-lucide="headset" class="w-8 h-8"></i>
+                    </div>
+                    <h3 class="text-2xl font-black mb-4 text-slate-900 dark:text-white">Priority Support</h3>
+                    <p class="text-slate-500 dark:text-slate-400 font-medium leading-relaxed">
+                        Every partner gets a dedicated success manager. We're here 24/7 to ensure your recruitment pipeline is always active.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-24 relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative bg-emerald-600 rounded-[4rem] p-12 lg:p-24 overflow-hidden shadow-3xl text-center text-white">
+                <div class="absolute inset-0 bg-white/10 blur-[80px]"></div>
+                <div class="relative z-10 flex flex-col items-center gap-10">
+                    <h2 class="text-4xl md:text-6xl font-black tracking-tight">Ready to Start Earning?</h2>
+                    <p class="text-xl text-emerald-50 max-w-2xl font-medium">Join our global network of executives and transform your professional recruitment career today.</p>
+                    <a href="{% url 'register_cre' %}" class="h-16 px-12 rounded-2xl bg-white text-emerald-600 font-black text-xl flex items-center justify-center hover:scale-105 active:scale-95 transition-all shadow-xl">
+                        Become a Partner
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</main>
+{% endblock %}

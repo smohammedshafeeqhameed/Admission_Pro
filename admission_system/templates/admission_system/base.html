@@ -127,15 +127,15 @@
                     {% if not is_dashboard %}
                     <nav class="hidden md:flex items-center gap-10">
                         <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors"
-                            href="{% url 'home' %}#how-it-works">
+                            href="{% url 'how_it_works' %}">
                             How it Works
                         </a>
                         <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors"
-                            href="{% url 'home' %}#benefits">
+                            href="{% url 'benefits' %}">
                             Benefits
                         </a>
                         <a class="text-sm font-semibold text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-white transition-colors"
-                            href="#support">
+                            href="{% url 'support' %}">
                             Support
                         </a>
                     </nav>
@@ -195,11 +195,11 @@
                         <a class="text-2xl font-black text-slate-900 dark:text-white" href="{% url 'home' %}"
                             onclick="toggleMobileMenu()">Home</a>
                         {% if not is_dashboard %}
-                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="#how-it-works"
+                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="{% url 'how_it_works' %}"
                             onclick="toggleMobileMenu()">How it Works</a>
-                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="#benefits"
+                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="{% url 'benefits' %}"
                             onclick="toggleMobileMenu()">Benefits</a>
-                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="#support"
+                        <a class="text-2xl font-black text-slate-900 dark:text-white" href="{% url 'support' %}"
                             onclick="toggleMobileMenu()">Support</a>
                         {% endif %}
                     </nav>
@@ -267,7 +267,7 @@
                         <h5 class="font-bold text-sm mb-4 uppercase tracking-wider text-slate-900 dark:text-white">
                             Platform</h5>
                         <ul class="space-y-2 text-sm text-slate-500">
-                            <li><a class="hover:text-primary transition-colors" href="#">How it Works</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="{% url 'how_it_works' %}">How it Works</a></li>
                             <li><a class="hover:text-primary transition-colors" href="#">Feature List</a></li>
                             <li><a class="hover:text-primary transition-colors" href="#">Pricing</a></li>
                         </ul>
@@ -276,7 +276,7 @@
                         <h5 class="font-bold text-sm mb-4 uppercase tracking-wider text-slate-900 dark:text-white">
                             Resources</h5>
                         <ul class="space-y-2 text-sm text-slate-500">
-                            <li><a class="hover:text-primary transition-colors" href="#">Support Center</a></li>
+                            <li><a class="hover:text-primary transition-colors" href="{% url 'support' %}">Support Center</a></li>
                             <li><a class="hover:text-primary transition-colors" href="#">CRE Guidebook</a></li>
                             <li><a class="hover:text-primary transition-colors" href="#">Terms of Service</a></li>
                         </ul>
