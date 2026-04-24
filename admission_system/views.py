@@ -563,7 +563,6 @@ from .models import FinanceProfile
 def apply_admission(request, college_slug, cre_id):
     college = get_object_or_404(College, slug=college_slug)
     referrer = get_object_or_404(CREProfile, cre_id=cre_id)
-    
     if request.method == 'POST':
         form = StudentAdmissionForm(request.POST, request.FILES, college=college)
         if form.is_valid():
