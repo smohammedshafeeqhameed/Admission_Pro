@@ -168,7 +168,10 @@ UPI_ID = os.getenv('UPI_ID', 'finance@institution.com')
 UPI_PAYEE_NAME = os.getenv('UPI_PAYEE_NAME', 'AdmissionPro')
 
 # Email Settings (Gmail SMTP)
-EMAIL_BACKEND = os.getenv('EMAIL_BACKEND')
+EMAIL_BACKEND = os.getenv(
+    'EMAIL_BACKEND',
+    'django.core.mail.backends.smtp.EmailBackend'
+)
 EMAIL_HOST = os.getenv('EMAIL_HOST')
 EMAIL_PORT = int(os.getenv('EMAIL_PORT', 587))
 EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
@@ -177,17 +180,22 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 # AWS S3 Settings
 # IMPORTANT: Replace these placeholders with your actual AWS credentials
+AWS_S3_ENDPOINT_URL = "https://s3.ap-south-1.amazonaws.com"
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('AWS_STORAGE_BUCKET_NAME')
-AWS_S3_REGION_NAME = os.getenv('AWS_S3_REGION_NAME', 'ap-south-1')
+AWS_S3_REGION_NAME = "ap-south-1"
 AWS_S3_CUSTOM_DOMAIN = None
-AWS_S3_FILE_OVERWRITE = False
+AWS_S3_FILE_OVERWRITE = True
 AWS_DEFAULT_ACL = None
 AWS_QUERYSTRING_AUTH = True
 AWS_S3_SIGNATURE_VERSION = 's3v4'
 AWS_S3_ADDRESSING_STYLE = 'virtual'
-
+AWS_S3_OBJECT_PARAMETERS = {
+    "CacheControl": "max-age=86400",
+}
+AWS_S3_USE_SSL = True
+AWS_S3_VERIFY = True
 STORAGES = {
     "default": {
         "BACKEND": "storages.backends.s3boto3.S3Boto3Storage",
@@ -201,3 +209,4 @@ STORAGES = {
 # No hardcoded MEDIA_URL prefix - let django-storages generate authenticated S3 URLs
 # MEDIA_ROOT is not used by S3 storage but kept for reference
 MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_URL = f"https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/"
