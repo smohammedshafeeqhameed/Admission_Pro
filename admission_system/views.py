@@ -549,19 +549,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
 from .forms import StudentAdmissionForm
 from .models import FinanceProfile
-from django.shortcuts import get_object_or_404, render
-from .models import CREProfile, College
 
 def apply_admission(request, college_slug, cre_id):
     college = get_object_or_404(College, slug=college_slug)
     referrer = get_object_or_404(CREProfile, cre_id=cre_id)
-
-    # ✅ CORRECT PLACE (inside function)
-    if college not in referrer.allocated_colleges.all():
-        return render(request, "admission_system/error.html", {
-            "message": "This link is not valid for this college"
-        })
-    
     if request.method == 'POST':
         form = StudentAdmissionForm(request.POST, request.FILES, college=college)
         if form.is_valid():
