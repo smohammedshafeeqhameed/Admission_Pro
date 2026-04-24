@@ -368,6 +368,8 @@ class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
 
 class VerifyPaymentActionView(FinanceRequiredMixin, View):
     def post(self, request, *args, **kwargs):
+        from .utils import send_payment_slip_email
+        
         app_id = request.POST.get('app_id')
         action = request.POST.get('action') # 'approve' or 'reject'
         
@@ -376,12 +378,20 @@ class VerifyPaymentActionView(FinanceRequiredMixin, View):
         if action == 'approve':
             app.payment_status = 'Success'
             app.amount_paid = request.POST.get('amount_paid', 1500.00)
-            messages.success(request, f"Payment verified successfully for {app.student.name}")
+            app.save()
+            
+            # Send payment slip email to the student
+            email_sent = send_payment_slip_email(app)
+            if email_sent:
+                messages.success(request, f"Payment verified for {app.student.name}. Receipt email sent to {app.student.email}.")
+            else:
+                messages.success(request, f"Payment verified for {app.student.name}.")
+                messages.warning(request, f"Could not send receipt email to {app.student.email}. Please check email settings.")
         elif action == 'reject':
             app.payment_status = 'Rejected'
+            app.save()
             messages.warning(request, f"Payment rejected for {app.student.name}")
             
-        app.save()
         return redirect('finance_dashboard')
 
 class AdminExportCSVView(SuperuserRequiredMixin, View):
@@ -559,31 +569,41 @@ def apply_admission(request, college_slug, cre_id):
         if form.is_valid():
             # 1. Save/Update Student
             email = form.cleaned_data['email']
-            student, created = Student.objects.update_or_create(
-                email=email,
-                defaults={
-                    'name': form.cleaned_data['name'],
-                    'phone': form.cleaned_data['phone'],
-                    'dob': form.cleaned_data['dob'],
-                    'gender': form.cleaned_data['gender'],
-                    'aadhar_number': form.cleaned_data['aadhar_number'],
-                    'blood_group': form.cleaned_data['blood_group'],
-                    'category': form.cleaned_data['category'],
-                    'permanent_address': form.cleaned_data['permanent_address'],
-                    'correspondence_address': form.cleaned_data['correspondence_address'],
-                    'state': form.cleaned_data['state'],
-                    'city': form.cleaned_data['city'],
-                    'father_name': form.cleaned_data['father_name'],
-                    'father_mobile': form.cleaned_data['father_mobile'],
-                    'father_occupation': form.cleaned_data['father_occupation'],
-                    'mother_name': form.cleaned_data['mother_name'],
-                    'mother_mobile': form.cleaned_data['mother_mobile'],
-                    'mother_occupation': form.cleaned_data['mother_occupation'],
-                    'guardian_name': form.cleaned_data['guardian_name'],
-                    'guardian_mobile': form.cleaned_data['guardian_mobile'],
-                    'preferred_contact': form.cleaned_data['preferred_contact'],
-                }
-            )
+            defaults = {
+                'name': form.cleaned_data['name'],
+                'phone': form.cleaned_data['phone'],
+                'dob': form.cleaned_data['dob'],
+                'gender': form.cleaned_data['gender'],
+                'aadhar_number': form.cleaned_data['aadhar_number'],
+                'blood_group': form.cleaned_data['blood_group'],
+                'category': form.cleaned_data['category'],
+                'permanent_address': form.cleaned_data['permanent_address'],
+                'correspondence_address': form.cleaned_data['correspondence_address'],
+                'state': form.cleaned_data['state'],
+                'city': form.cleaned_data['city'],
+                'father_name': form.cleaned_data['father_name'],
+                'father_mobile': form.cleaned_data['father_mobile'],
+                'father_occupation': form.cleaned_data['father_occupation'],
+                'mother_name': form.cleaned_data['mother_name'],
+                'mother_mobile': form.cleaned_data['mother_mobile'],
+                'mother_occupation': form.cleaned_data['mother_occupation'],
+                'guardian_name': form.cleaned_data['guardian_name'],
+                'guardian_mobile': form.cleaned_data['guardian_mobile'],
+                'preferred_contact': form.cleaned_data['preferred_contact'],
+            }
+            
+            try:
+                student, created = Student.objects.update_or_create(
+                    email=email,
+                    defaults=defaults
+                )
+            except Student.MultipleObjectsReturned:
+                # Fallback: if multiple students have the same email, pick the first one and update it
+                student = Student.objects.filter(email=email).first()
+                for key, value in defaults.items():
+                    setattr(student, key, value)
+                student.save()
+                created = False
             
             # 2. Check for existing application status
             course = form.cleaned_data['course']
@@ -686,8 +706,8 @@ def manual_payment(request, app_id):
                 return render(request, 'admission_system/manual_payment.html', {
                     'app': app, 
                     'college': app.college,
-                    'upi_id': settings.UPI_ID,
-                    'upi_payee_name': settings.UPI_PAYEE_NAME
+                    'upi_id': app.college.upi_id or settings.UPI_ID,
+                    'upi_payee_name': app.college.upi_payee_name or settings.UPI_PAYEE_NAME
                 })
 
             app.transaction_id = transaction_id
@@ -701,11 +721,44 @@ def manual_payment(request, app_id):
     return render(request, 'admission_system/manual_payment.html', {
         'app': app, 
         'college': app.college,
-        'upi_id': settings.UPI_ID,
-        'upi_payee_name': settings.UPI_PAYEE_NAME
+        'upi_id': app.college.upi_id or settings.UPI_ID,
+        'upi_payee_name': app.college.upi_payee_name or settings.UPI_PAYEE_NAME
     })
 
 def home(request):
     if request.user.is_authenticated and hasattr(request.user, 'cre_profile'):
         return redirect('cre_dashboard')
     return render(request, 'admission_system/home.html')
+
+
+def check_duplicate_application(request):
+    """API endpoint to check if a student with the given aadhar number
+    has already applied for the same course at the same college."""
+    aadhar_number = request.GET.get('aadhar_number', '').strip()
+    course_id = request.GET.get('course_id', '').strip()
+    college_slug = request.GET.get('college_slug', '').strip()
+
+    if not aadhar_number or not course_id or not college_slug:
+        return JsonResponse({'exists': False})
+
+    try:
+        college = College.objects.get(slug=college_slug)
+    except College.DoesNotExist:
+        return JsonResponse({'exists': False})
+
+    existing = Application.objects.filter(
+        student__aadhar_number=aadhar_number,
+        course_id=course_id,
+        college=college,
+    ).select_related('student', 'course').first()
+
+    if existing:
+        return JsonResponse({
+            'exists': True,
+            'student_name': existing.student.name,
+            'course_name': existing.course.name,
+            'payment_status': existing.payment_status,
+            'message': f"A student with this Aadhar number has already applied for {existing.course.name} at {college.name}. (Status: {existing.payment_status})"
+        })
+
+    return JsonResponse({'exists': False})

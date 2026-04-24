@@ -32,9 +32,15 @@
                 </div>
                 
                 <div class="relative p-6 bg-white rounded-[2.5rem] border-2 border-slate-100 shadow-2xl shadow-slate-200/50 inline-block overflow-hidden group">
+                    {% if college.payment_qr_image %}
+                    <!-- Static College QR -->
+                    <img src="{{ college.payment_qr_image.url }}" 
+                         alt="Payment QR Code" class="w-56 h-56 transition-transform duration-500 group-hover:scale-105 object-contain">
+                    {% else %}
                     <!-- Dynamic GPay QR -->
                     <img src="https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=upi://pay?pa={{ upi_id }}&pn={{ upi_payee_name|urlencode }}&am=1500.00&cu=INR" 
                          alt="GPay QR Code" class="w-56 h-56 transition-transform duration-500 group-hover:scale-105">
+                    {% endif %}
                     
                     <div class="absolute inset-0 border-4 border-slate-900/5 rounded-[2.5rem] pointer-events-none"></div>
                 </div>
@@ -48,6 +54,17 @@
                     <p class="text-xs font-bold text-slate-400">Accepted on all UPI Apps</p>
                 </div>
             </div>
+
+            {% if college.bank_details %}
+            <div class="mb-8 p-6 bg-blue-50/50 border border-blue-100 rounded-2xl w-full">
+                <h3 class="text-sm font-black text-slate-700 uppercase tracking-widest mb-3 flex items-center gap-2">
+                    <i data-lucide="landmark" class="w-4 h-4 text-blue-500"></i> Direct Bank Transfer
+                </h3>
+                <div class="text-sm text-slate-700 font-medium leading-relaxed font-mono bg-white p-4 rounded-xl border border-blue-50">
+                    {{ college.bank_details|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
 
             {% if messages %}
             <div class="mb-6 space-y-2">

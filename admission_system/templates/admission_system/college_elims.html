@@ -662,6 +662,8 @@
 </style>
 
 <script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
     // ELIMS Multi-Step Logic
     function nextStep(step) {
         const totalSteps = 4;
@@ -688,7 +690,66 @@
                 }
             }
             if (!isValid) return;
+
+            // Check for duplicate application when leaving step 1
+            if (currentStep === 1) {
+                const aadharInput = document.querySelector('input[name="aadhar_number"]');
+                const courseSelect = document.querySelector('select[name="course"]');
+                const aadhar = aadharInput ? aadharInput.value.trim() : '';
+                const courseId = courseSelect ? courseSelect.value : '';
+
+                if (aadhar && courseId) {
+                    // Disable the Next button and show loading
+                    const nextBtn = currentStepDiv.querySelector('button[onclick="nextStep(2)"]');
+                    if (nextBtn) {
+                        nextBtn.disabled = true;
+                        nextBtn.innerHTML = '<span class="animate-pulse">Verifying Identity...</span>';
+                    }
+
+                    fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (nextBtn) {
+                                nextBtn.disabled = false;
+                                nextBtn.innerHTML = 'Continue to Location <i data-lucide="chevron-right" class="w-6 h-6"></i>';
+                                if (typeof lucide !== 'undefined') lucide.createIcons();
+                            }
+                            if (data.exists) {
+                                // Show duplicate warning
+                                let alertDiv = document.getElementById('duplicate-alert');
+                                if (!alertDiv) {
+                                    alertDiv = document.createElement('div');
+                                    alertDiv.id = 'duplicate-alert';
+                                    currentStepDiv.insertBefore(alertDiv, currentStepDiv.firstChild);
+                                }
+                                alertDiv.className = 'p-6 rounded-3xl bg-rose-50 text-rose-700 border-rose-200 border-2 mb-10 font-bold flex items-center gap-4 animate-in zoom-in duration-300';
+                                alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${data.message}`;
+                                document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                                return;
+                            }
+                            // Remove previous alert if exists
+                            const oldAlert = document.getElementById('duplicate-alert');
+                            if (oldAlert) oldAlert.remove();
+                            goToStep(step);
+                        })
+                        .catch(() => {
+                            if (nextBtn) {
+                                nextBtn.disabled = false;
+                                nextBtn.innerHTML = 'Continue to Location <i data-lucide="chevron-right" class="w-6 h-6"></i>';
+                                if (typeof lucide !== 'undefined') lucide.createIcons();
+                            }
+                            goToStep(step);
+                        });
+                    return;
+                }
+            }
         }
+
+        goToStep(step);
+    }
+
+    function goToStep(step) {
+        const totalSteps = 4;
 
         [1, 2, 3, 4].forEach(s => {
             const stepDiv = document.getElementById('step-' + s);

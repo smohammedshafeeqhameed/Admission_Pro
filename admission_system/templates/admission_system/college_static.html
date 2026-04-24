@@ -430,6 +430,8 @@
 </style>
 
 <script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
     function nextStep(step) {
         const currentStep = parseInt(document.getElementById('current-step-num').innerText, 10);
         
@@ -446,8 +448,66 @@
                 }
             }
             if (!isValid) return;
+
+            // Check for duplicate application when leaving step 1
+            if (currentStep === 1) {
+                const aadharInput = document.querySelector('input[name="aadhar_number"]');
+                const courseSelect = document.querySelector('select[name="course"]');
+                const aadhar = aadharInput ? aadharInput.value.trim() : '';
+                const courseId = courseSelect ? courseSelect.value : '';
+
+                if (aadhar && courseId) {
+                    // Disable the Next button and show loading
+                    const nextBtn = currentStepDiv.querySelector('button[onclick="nextStep(2)"]');
+                    if (nextBtn) {
+                        nextBtn.disabled = true;
+                        nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>';
+                    }
+
+                    fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                        .then(r => r.json())
+                        .then(data => {
+                            if (nextBtn) {
+                                nextBtn.disabled = false;
+                                nextBtn.innerHTML = 'Next: Family <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+                                if (typeof lucide !== 'undefined') lucide.createIcons();
+                            }
+                            if (data.exists) {
+                                // Show duplicate warning
+                                let alertDiv = document.getElementById('duplicate-alert');
+                                if (!alertDiv) {
+                                    alertDiv = document.createElement('div');
+                                    alertDiv.id = 'duplicate-alert';
+                                    currentStepDiv.insertBefore(alertDiv, currentStepDiv.firstChild);
+                                }
+                                alertDiv.className = 'p-4 rounded-xl bg-red-50 text-red-700 border-red-100 border mb-8 font-bold flex items-center gap-3 animate-in fade-in duration-300';
+                                alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>${data.message}`;
+                                document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                                return;
+                            }
+                            // Remove previous alert if exists
+                            const oldAlert = document.getElementById('duplicate-alert');
+                            if (oldAlert) oldAlert.remove();
+                            goToStep(step);
+                        })
+                        .catch(() => {
+                            if (nextBtn) {
+                                nextBtn.disabled = false;
+                                nextBtn.innerHTML = 'Next: Family <i data-lucide="arrow-right" class="w-4 h-4"></i>';
+                                if (typeof lucide !== 'undefined') lucide.createIcons();
+                            }
+                            // On network error, allow proceeding (server-side will catch it)
+                            goToStep(step);
+                        });
+                    return;
+                }
+            }
         }
 
+        goToStep(step);
+    }
+
+    function goToStep(step) {
         document.getElementById('step-1').classList.add('hidden');
         document.getElementById('step-2').classList.add('hidden');
         document.getElementById('step-3').classList.add('hidden');

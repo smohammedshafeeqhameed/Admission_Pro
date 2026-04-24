@@ -9,6 +9,13 @@ class College(models.Model):
     website_content = models.TextField(help_text="HTML content for the college static page")
     theme_color = models.CharField(max_length=7, default="#6366f1", help_text="HEX color code for institutional branding")
     logo_url = models.URLField(blank=True, null=True, help_text="URL to the institution's logo")
+    
+    # Custom Payment Settings
+    upi_id = models.CharField(max_length=255, blank=True, null=True, help_text="Specific UPI ID for this college (e.g., college@sbi)")
+    upi_payee_name = models.CharField(max_length=255, blank=True, null=True, help_text="Payee name for UPI (e.g., ABC College)")
+    payment_qr_image = models.ImageField(upload_to="college_qrs/", blank=True, null=True, help_text="Upload static QR code image (if empty, dynamic QR is shown using UPI ID)")
+    bank_details = models.TextField(blank=True, null=True, help_text="Bank Account Number, IFSC Code, Account Name, etc.")
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -646,16 +646,19 @@
 </style>
 
 <script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
     function goToStep(step) {
         // If moving forward, validate current step
         const currentStepEl = document.querySelector('.step-content:not(.hidden)');
+        let currentStep = 1;
         if (currentStepEl) {
             const currentStepMatch = currentStepEl.id.match(/\d+/);
             if (currentStepMatch) {
-                const currentStep = parseInt(currentStepMatch[0]);
+                currentStep = parseInt(currentStepMatch[0]);
                 if (step > currentStep) {
                     // Check standard validity
-                    const inputs = currentStepEl.querySelectorAll('input, select, textarea');
+                    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), select, textarea');
                     for (let i = 0; i < inputs.length; i++) {
                         // Special check for DOB age
                         if (inputs[i].name === 'dob' || inputs[i].id === 'id_dob') {
@@ -684,6 +687,60 @@
                 }
             }
         }
+
+        if (step > currentStep && currentStep === 1) {
+            const aadharInput = document.querySelector('input[name="aadhar_number"]');
+            const courseSelect = document.querySelector('select[name="course"]');
+            const aadhar = aadharInput ? aadharInput.value.trim() : '';
+            const courseId = courseSelect ? courseSelect.value : '';
+
+            if (aadhar && courseId) {
+                const nextBtn = currentStepEl.querySelector('button[onclick="goToStep(2)"]');
+                if (nextBtn) {
+                    nextBtn.disabled = true;
+                    nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>';
+                }
+
+                fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location Details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        if (data.exists) {
+                            let alertDiv = document.getElementById('duplicate-alert');
+                            if (!alertDiv) {
+                                alertDiv = document.createElement('div');
+                                alertDiv.id = 'duplicate-alert';
+                                currentStepEl.insertBefore(alertDiv, currentStepEl.firstChild);
+                            }
+                            alertDiv.className = 'p-5 rounded-2xl bg-red-50 text-red-800 border-red-200 border-2 mb-8 font-bold flex items-center gap-4 animate-in zoom-in duration-300 relative';
+                            alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="flex-1">${data.message}</div>`;
+                            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                        const oldAlert = document.getElementById('duplicate-alert');
+                        if (oldAlert) oldAlert.remove();
+                        executeStepTransition(step);
+                    })
+                    .catch(() => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location Details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        executeStepTransition(step);
+                    });
+                return;
+            }
+        }
+
+        executeStepTransition(step);
+    }
+
+    function executeStepTransition(step) {
 
         document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
         document.getElementById('step-' + step).classList.remove('hidden');

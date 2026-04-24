@@ -163,6 +163,15 @@ LOGOUT_REDIRECT_URL = 'home'
 # UPI Settings
 UPI_ID = os.getenv('UPI_ID', 'finance@institution.com')
 UPI_PAYEE_NAME = os.getenv('UPI_PAYEE_NAME', 'AdmissionPro')
+
+# Email Settings (Gmail SMTP)
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD', '')
+DEFAULT_FROM_EMAIL = os.getenv('EMAIL_HOST_USER', 'noreply@admissionpro.com')
 # AWS S3 Settings
 # IMPORTANT: Replace these placeholders with your actual AWS credentials
 AWS_ACCESS_KEY_ID = os.getenv('AWS_ACCESS_KEY_ID')
