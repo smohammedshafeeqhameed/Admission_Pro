@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin-dashboard/colleges/<int:pk>/', views.AdminCollegeDetailView.as_view(), name='admin_college_detail'),
     path('admin-dashboard/courses/<int:course_id>/students/', views.AdminCourseStudentListView.as_view(), name='admin_course_student_list'),
     path('admin-dashboard/approve/', views.AdminApproveCREView.as_view(), name='admin_approve_cre'),
-    path('apply/<slug:college_slug>/<uuid:cre_id>/', views.apply_admission, name='apply_admission'),
+    path('apply/<slug:college_slug>/<int:cre_id>/', views.apply_admission),
     path('payment/<int:app_id>/', views.manual_payment, name='manual_payment'),
     path('finance-dashboard/', views.FinanceDashboardView.as_view(), name='finance_dashboard'),
     path('finance-dashboard/verify/', views.VerifyPaymentActionView.as_view(), name='finance_verify_payment'),
