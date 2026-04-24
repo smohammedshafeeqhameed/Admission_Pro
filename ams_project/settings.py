@@ -102,6 +102,9 @@ if os.getenv("USE_RDS") == "True":
             'PASSWORD': os.getenv("RDS_PASSWORD"),
             'HOST': os.getenv("RDS_HOST"),
             'PORT': os.getenv("RDS_PORT"),
+            'OPTIONS': {
+                'sslmode': 'require',   # 🔥 THIS LINE IS THE FIX
+            },
         }
     }
 else:
