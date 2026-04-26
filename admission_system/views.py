@@ -17,6 +17,8 @@ from django.conf import settings
 from django.utils.text import slugify
 from django.http import JsonResponse
 from .models import AddonCourse, CampusManagerProfile
+from django.template.loader import get_template
+from xhtml2pdf import pisa
 
 class CampusManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -761,3 +763,26 @@ def check_duplicate_application(request):
         })
 
     return JsonResponse({'exists': False})
+
+def download_application_pdf(request, app_id):
+    app = get_object_or_404(Application, id=app_id)
+    template_path = 'admission_system/pdf_template.html'
+    context = {'app': app}
+    
+    # Create a Django response object, and specify content_type as pdf
+    response = HttpResponse(content_type='application/pdf')
+    # if you want to download it, uncomment below
+    response['Content-Disposition'] = f'attachment; filename="Application_Form_{app.student.name.replace(" ", "_")}.pdf"'
+    
+    # find the template and render it.
+    template = get_template(template_path)
+    html = template.render(context)
+
+    # create a pdf
+    pisa_status = pisa.CreatePDF(
+       html, dest=response)
+       
+    # if error then show some funny view
+    if pisa_status.err:
+       return HttpResponse('We had some errors <pre>' + html + '</pre>')
+    return response

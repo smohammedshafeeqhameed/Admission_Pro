@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Application Form - {{ app.student.name }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+            @frame header_frame {
+                -pdf-frame-content: header_content;
+                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
+            }
+            @frame footer_frame {
+                -pdf-frame-content: footer_content;
+                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+            }
+        }
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            color: #333333;
+        }
+        h1 {
+            color: {{ app.college.theme_color|default:"#800000" }};
+            text-align: center;
+            font-size: 18pt;
+            margin-bottom: 5px;
+        }
+        h2 {
+            font-size: 14pt;
+            color: #444444;
+            border-bottom: 1px solid #cccccc;
+            padding-bottom: 3px;
+            margin-top: 20px;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .text-right {
+            text-align: right;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 15px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #e2e8f0;
+            text-align: left;
+        }
+        th {
+            background-color: #f8fafc;
+            color: #64748b;
+            font-weight: bold;
+            width: 35%;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .meta-info {
+            font-size: 9pt;
+            color: #64748b;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header_content"></div>
+    <div id="footer_content" class="text-right" style="font-size: 8pt; color: #94a3b8;">
+        Page <pdf:pagenumber> of <pdf:pagecount>
+    </div>
+
+    <div class="header">
+        <h1>{{ app.college.name }}</h1>
+        <div><strong>ADMISSION APPLICATION FORM</strong></div>
+        <div class="meta-info">Application Ref: {{ app.id }} | Date: {{ app.applied_at|date:"d M Y, h:i A" }}</div>
+    </div>
+
+    <h2>Program Details</h2>
+    <table>
+        <tr>
+            <th>College Name</th>
+            <td>{{ app.college.name }}</td>
+        </tr>
+        <tr>
+            <th>Course Applied</th>
+            <td>{{ app.course.name }}</td>
+        </tr>
+        {% if app.addon_course %}
+        <tr>
+            <th>Addon Course</th>
+            <td>{{ app.addon_course }}</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <h2>Personal Details</h2>
+    <table>
+        <tr>
+            <th>Full Name</th>
+            <td>{{ app.student.name }}</td>
+        </tr>
+        <tr>
+            <th>Email Address</th>
+            <td>{{ app.student.email }}</td>
+        </tr>
+        <tr>
+            <th>Phone Number</th>
+            <td>{{ app.student.phone }}</td>
+        </tr>
+        <tr>
+            <th>Date of Birth</th>
+            <td>{{ app.student.dob|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>Gender</th>
+            <td>{{ app.student.get_gender_display|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>Aadhar Number</th>
+            <td>{{ app.student.aadhar_number|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>Blood Group</th>
+            <td>{{ app.student.blood_group|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>Category</th>
+            <td>{{ app.student.category|default:"Not Provided" }}</td>
+        </tr>
+    </table>
+
+    <h2>Address Details</h2>
+    <table>
+        <tr>
+            <th>Permanent Address</th>
+            <td>{{ app.student.permanent_address|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>Correspondence Address</th>
+            <td>{{ app.student.correspondence_address|default:"Not Provided" }}</td>
+        </tr>
+        <tr>
+            <th>City, State</th>
+            <td>{{ app.student.city|default:"-" }}, {{ app.student.state|default:"-" }}</td>
+        </tr>
+    </table>
+
+    <h2>Parent / Guardian Details</h2>
+    <table>
+        <tr>
+            <th>Father's Name</th>
+            <td>{{ app.student.father_name|default:"Not Provided" }} ({{ app.student.father_mobile|default:"-" }})</td>
+        </tr>
+        <tr>
+            <th>Mother's Name</th>
+            <td>{{ app.student.mother_name|default:"Not Provided" }} ({{ app.student.mother_mobile|default:"-" }})</td>
+        </tr>
+        {% if app.student.guardian_name %}
+        <tr>
+            <th>Guardian's Name</th>
+            <td>{{ app.student.guardian_name }} ({{ app.student.guardian_mobile|default:"-" }})</td>
+        </tr>
+        {% endif %}
+    </table>
+
+    <h2>Payment Details</h2>
+    <table>
+        <tr>
+            <th>Payment Status</th>
+            <td>{{ app.payment_status }}</td>
+        </tr>
+        <tr>
+            <th>Transaction ID</th>
+            <td>{{ app.transaction_id|default:"-" }}</td>
+        </tr>
+        <tr>
+            <th>Amount Paid</th>
+            <td>₹{{ app.amount_paid|default:"0.00" }}</td>
+        </tr>
+    </table>
+
+    <div style="margin-top: 50px; font-size: 9pt; color: #64748b; text-align: center;">
+        <p>This is a computer-generated document and does not require a signature.</p>
+        <p>Processed through AdmissionPro Network.</p>
+    </div>
+
+</body>
+</html>

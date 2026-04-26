@@ -26,6 +26,10 @@
             class="block w-full py-4 bg-primary text-white font-black rounded-xl hover:opacity-90 shadow-xl shadow-primary/20 transition-all">
             Apply for another Student
         </a>
+        <a href="{% url 'download_application_pdf' app.id %}" target="_blank"
+            class="block w-full mt-4 py-4 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-black rounded-xl hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center gap-2">
+            <i data-lucide="download" class="w-5 h-5"></i> Download Application PDF
+        </a>
     </div>
 </div>
 {% endblock %}
