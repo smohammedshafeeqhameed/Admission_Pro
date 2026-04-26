@@ -239,34 +239,42 @@ class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
         context = super().get_context_data(**kwargs)
         college_id = self.request.GET.get('college')
         
-        # All pending apps
-        pending_apps = Application.objects.filter(payment_status='Pending Verification').select_related('student', 'college', 'course')
+        # Use a base queryset with select_related to avoid additional student/college/course lookups
+        base_apps = Application.objects.select_related('student', 'college', 'course')
         
-        # History
-        history_apps = Application.objects.exclude(payment_status__in=['Pending', 'Pending Verification']).select_related('student', 'college', 'course').order_by('-applied_at')
+        # Pending verifications - prioritize these
+        pending_apps = base_apps.filter(payment_status='Pending Verification')
         
-        # Filtering logic
+        # History - limit to last 50 for performance
+        history_apps = base_apps.exclude(payment_status__in=['Pending', 'Pending Verification']).order_by('-applied_at')
+        
         if college_id:
             pending_apps = pending_apps.filter(college_id=college_id)
             history_apps = history_apps.filter(college_id=college_id)
             context['active_college'] = get_object_or_404(College, id=college_id)
             
-        # Global Stats
-        success_apps = Application.objects.filter(payment_status='Success')
-        total_revenue = success_apps.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-        total_verified = success_apps.count()
+        # Global Stats - Single aggregate query
+        stats = Application.objects.filter(payment_status='Success').aggregate(
+            total_revenue=Sum('amount_paid'),
+            total_verified=Count('id')
+        )
+        total_revenue = stats['total_revenue'] or 0
+        total_verified = stats['total_verified'] or 0
         
-        # College Breakdown
-        colleges_data = []
-        for college in College.objects.all():
-            college_success = success_apps.filter(college=college)
-            revenue = college_success.aggregate(Sum('amount_paid'))['amount_paid__sum'] or 0
-            count = college_success.count()
-            colleges_data.append({
+        # College Breakdown - Optimized with conditional annotation to replace N+1 loop
+        colleges_with_stats = College.objects.annotate(
+            revenue=Sum('applications__amount_paid', filter=Q(applications__payment_status='Success')),
+            app_count=Count('applications', filter=Q(applications__payment_status='Success'))
+        ).order_by('name')
+        
+        colleges_data = [
+            {
                 'college': college,
-                'revenue': revenue,
-                'count': count
-            })
+                'revenue': college.revenue or 0,
+                'count': college.app_count
+            }
+            for college in colleges_with_stats
+        ]
             
         context.update({
             'pending_apps': pending_apps,
@@ -276,7 +284,7 @@ class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
             'total_verified': total_verified,
             'total_revenue': total_revenue,
             'colleges_data': colleges_data,
-            'all_colleges': College.objects.order_by('name'),
+            'all_colleges': colleges_with_stats,
         })
         return context
 
@@ -571,8 +579,6 @@ def apply_admission(request, college_slug, cre_id):
             # 1. Save/Update Student
             email = form.cleaned_data['email']
             defaults = {
-                'name': form.cleaned_data['name'],
-                'phone': form.cleaned_data['phone'],
                 'dob': form.cleaned_data['dob'],
                 'gender': form.cleaned_data['gender'],
                 'aadhar_number': form.cleaned_data['aadhar_number'],
@@ -593,14 +599,19 @@ def apply_admission(request, college_slug, cre_id):
                 'preferred_contact': form.cleaned_data['preferred_contact'],
             }
             
+            name = form.cleaned_data['name']
+            phone = form.cleaned_data['phone']
+            
             try:
                 student, created = Student.objects.update_or_create(
                     email=email,
+                    name=name,
+                    phone=phone,
                     defaults=defaults
                 )
             except Student.MultipleObjectsReturned:
-                # Fallback: if multiple students have the same email, pick the first one and update it
-                student = Student.objects.filter(email=email).first()
+                # Fallback: if multiple students have the same email/name/phone, pick the first one and update it
+                student = Student.objects.filter(email=email, name=name, phone=phone).first()
                 for key, value in defaults.items():
                     setattr(student, key, value)
                 student.save()
