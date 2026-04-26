@@ -678,17 +678,9 @@
         document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // Re-initialize Lucide icons on step change
+    // Initialize Lucide icons
     document.addEventListener('DOMContentLoaded', () => {
-        const observer = new MutationObserver(() => {
-            if (typeof lucide !== 'undefined') lucide.createIcons();
-        });
-
-        observer.observe(document.getElementById('alshifa-form'), {
-            childList: true,
-            subtree: true,
-            attributes: true
-        });
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
 {% endblock %}
