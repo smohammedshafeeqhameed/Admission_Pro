@@ -118,7 +118,7 @@ class Application(models.Model):
     college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='applications')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='applications')
     addon_course = models.CharField(max_length=255, blank=True, null=True)
-    source = models.ForeignKey(ApplicationSource, on_delete=models.SET_NULL, null=True, blank=True, related_name='applications')
+    source = models.CharField(max_length=255, null=True, blank=True, verbose_name="Reference Source")
     referred_by = models.ForeignKey(CREProfile, on_delete=models.SET_NULL, null=True, related_name='referrals')
     applied_at = models.DateTimeField(auto_now_add=True)
     
