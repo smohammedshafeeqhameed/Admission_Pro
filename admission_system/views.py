@@ -350,7 +350,7 @@ class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
         writer.writerow([
             'Name', 'Email', 'Phone', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
             'Category', 'City', 'State', 'Father Name', 'Father Mobile', 
-            'Course', 'Addon Course', 'Referred By', 'Payment Status', 'Applied Date'
+            'Course', 'Addon Course', 'Referred By', 'Closed By', 'Payment Status', 'Applied Date'
         ])
         
         for app in apps:
@@ -370,6 +370,7 @@ class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
                 app.course.name,
                 app.addon_course,
                 app.referred_by.user.username if app.referred_by else "Direct",
+                app.source,
                 app.payment_status,
                 app.applied_at.strftime('%Y-%m-%d %H:%M')
             ])
@@ -426,7 +427,7 @@ class AdminExportCSVView(SuperuserRequiredMixin, View):
             writer.writerow([
                 'Name', 'Email', 'Phone', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
                 'Category', 'City', 'State', 'Father Name', 'Father Mobile', 'Applied College', 
-                'Applied Course', 'Addon Course', 'Referred By', 'Payment Status', 'Applied Date'
+                'Applied Course', 'Addon Course', 'Referred By', 'Closed By', 'Payment Status', 'Applied Date'
             ])
             
             for app in apps:
@@ -447,6 +448,7 @@ class AdminExportCSVView(SuperuserRequiredMixin, View):
                     app.course.name, 
                     app.addon_course,
                     app.referred_by.user.username if app.referred_by else 'Direct',
+                    app.source,
                     app.payment_status,
                     app.applied_at.strftime('%Y-%m-%d')
                 ])

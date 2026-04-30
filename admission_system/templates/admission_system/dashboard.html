@@ -147,6 +147,7 @@
                                 <th class="px-8 lg:px-10 py-6">Candidate</th>
                                 <th class="px-8 lg:px-10 py-6">Institution</th>
                                 <th class="px-8 lg:px-10 py-6">Program</th>
+                                <th class="px-8 lg:px-10 py-6">Closed By</th>
                                 <th class="px-8 lg:px-10 py-6">Timeline</th>
                             </tr>
                         </thead>
@@ -176,6 +177,9 @@
                                         class="inline-flex px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
                                         {{ referral.course.name }}
                                     </span>
+                                </td>
+                                <td class="px-8 lg:px-10 py-8 font-bold text-sm text-slate-600 dark:text-slate-300">
+                                    {{ referral.source|default:"-" }}
                                 </td>
                                 <td class="px-8 lg:px-10 py-8 text-xs text-slate-400 font-black uppercase">{{ referral.applied_at|date:"M d, Y" }}</td>
                             </tr>

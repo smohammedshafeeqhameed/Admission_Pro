@@ -197,6 +197,10 @@
                                 {% endif %}
                             </div>
                             <div>
+                                <p class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Closed By</p>
+                                <p class="font-medium text-slate-300">{{ app.source|default:"-" }}</p>
+                            </div>
+                            <div>
                                 <p class="text-[10px] uppercase font-black text-slate-400 tracking-widest mb-1">Filing Date</p>
                                 <p class="font-medium text-sm">{{ app.applied_at|date:"j F Y, g:i a" }}</p>
                             </div>

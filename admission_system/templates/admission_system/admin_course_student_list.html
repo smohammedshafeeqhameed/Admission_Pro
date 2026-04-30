@@ -78,6 +78,7 @@
                             <th class="px-8 py-5">Student Details</th>
                             <th class="px-8 py-5">Registration Add-On</th>
                             <th class="px-8 py-5">Referred By</th>
+                            <th class="px-8 py-5">Closed By</th>
                             <th class="px-8 py-5">Payment Status</th>
                             <th class="px-8 py-5">Applied Date</th>
                         </tr>
@@ -100,6 +101,9 @@
                                 {% else %}
                                 <span class="text-slate-400">Direct</span>
                                 {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-sm font-bold text-slate-600 dark:text-slate-300">
+                                {{ app.source|default:"-" }}
                             </td>
                             <td class="px-8 py-6">
                                 {% if app.payment_status == 'Success' %}

@@ -123,6 +123,7 @@
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Student & Contact</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Enrolled Course</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Referred By</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Closed By</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Payment Status</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Applied Date</th>
                         </tr>
@@ -147,6 +148,11 @@
                                 <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Partner Portal</div>
                             </td>
                             <td class="px-8 py-6">
+                                <div class="text-xs font-bold text-slate-600 dark:text-slate-300">
+                                    {{ app.source|default:"-" }}
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
                                 {% if app.payment_status == 'Success' %}
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-black uppercase tracking-widest">
                                     <i data-lucide="check" class="w-3.5 h-3.5"></i> PAID
@@ -168,7 +174,7 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="5" class="py-16 text-center">
+                            <td colspan="6" class="py-16 text-center">
                                 <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 mx-auto mb-4">
                                     <i data-lucide="inbox" class="w-8 h-8"></i>
                                 </div>
