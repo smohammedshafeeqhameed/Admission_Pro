@@ -98,6 +98,7 @@
                             <th class="px-8 py-5">Student Details</th>
                             <th class="px-8 py-5">Institution</th>
                             <th class="px-8 py-5">Course</th>
+                            <th class="px-8 py-5">Referred By</th>
                             <th class="px-8 py-5">Closed By</th>
                             <th class="px-8 py-5">Status</th>
                             <th class="px-8 py-5">Applied Date</th>
@@ -115,6 +116,13 @@
                             </td>
                             <td class="px-8 py-6 text-sm font-bold text-slate-600 dark:text-slate-300">
                                 {{ app.course.name }}
+                            </td>
+                            <td class="px-8 py-6 text-sm font-bold text-primary">
+                                {% if app.referred_by %}
+                                {{ app.referred_by.user.username }}
+                                {% else %}
+                                <span class="text-slate-400">Direct</span>
+                                {% endif %}
                             </td>
                             <td class="px-8 py-6 text-sm font-bold text-slate-600 dark:text-slate-300">
                                 {{ app.source|default:"-" }}

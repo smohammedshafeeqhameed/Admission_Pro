@@ -147,6 +147,7 @@
                                 <th class="px-8 lg:px-10 py-6">Candidate</th>
                                 <th class="px-8 lg:px-10 py-6">Institution</th>
                                 <th class="px-8 lg:px-10 py-6">Program</th>
+                                <th class="px-8 lg:px-10 py-6">Referred By</th>
                                 <th class="px-8 lg:px-10 py-6">Closed By</th>
                                 <th class="px-8 lg:px-10 py-6">Timeline</th>
                             </tr>
@@ -177,6 +178,13 @@
                                         class="inline-flex px-3 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-primary/5 text-primary border border-primary/10">
                                         {{ referral.course.name }}
                                     </span>
+                                </td>
+                                <td class="px-8 lg:px-10 py-8 font-bold text-sm text-slate-600 dark:text-slate-300">
+                                    {% if referral.referred_by %}
+                                    {{ referral.referred_by.user.username }}
+                                    {% else %}
+                                    Direct
+                                    {% endif %}
                                 </td>
                                 <td class="px-8 lg:px-10 py-8 font-bold text-sm text-slate-600 dark:text-slate-300">
                                     {{ referral.source|default:"-" }}
