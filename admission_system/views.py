@@ -101,15 +101,6 @@ class AdminApproveCREView(SuperuserRequiredMixin, View):
 class AdminCREDetailView(SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_cre_detail.html'
 
-class HowItWorksView(TemplateView):
-    template_name = 'admission_system/how_it_works.html'
-
-class BenefitsView(TemplateView):
-    template_name = 'admission_system/benefits.html'
-
-class SupportView(TemplateView):
-    template_name = 'admission_system/support.html'
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         cre_id = self.kwargs.get('pk')
@@ -129,6 +120,15 @@ class SupportView(TemplateView):
             'is_dashboard': True
         })
         return context
+
+class HowItWorksView(TemplateView):
+    template_name = 'admission_system/how_it_works.html'
+
+class BenefitsView(TemplateView):
+    template_name = 'admission_system/benefits.html'
+
+class SupportView(TemplateView):
+    template_name = 'admission_system/support.html'
 
 class AdminCollegeListView(SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_college_list.html'
