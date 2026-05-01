@@ -686,7 +686,12 @@ def apply_admission(request, college_slug, cre_id):
                     messages.error(request, f"{form.fields[field].label}: {error}")
 
     courses = college.courses.all()
-    template_name = f'admission_system/college_{college.slug}.html'
+    
+    template_slug = college.slug.lower()
+    if template_slug == 'jbc':
+        template_slug = 'jbcmet'
+        
+    template_name = f'admission_system/college_{template_slug}.html'
     try:
         from django.template.loader import get_template
         get_template(template_name)
