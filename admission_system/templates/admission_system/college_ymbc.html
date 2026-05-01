@@ -1,27 +1,37 @@
 {% extends 'admission_system/college_base.html' %}
 
 {% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
 <style>
     :root {
-        --ymbc-blue: #003366;
-        --ymbc-orange: #FF9900;
+        --ymbc-navy: #242f51; /* Official dark navy */
+        --ymbc-blue: #106eea; /* Official bright blue */
+        --ymbc-red: #f5300f; /* Official red accent */
+        --ymbc-gold: #ffc600; /* Official gold accent */
+    }
+
+    * {
+        font-family: 'Roboto', sans-serif !important;
     }
 
     .ymbc-gradient {
-        background: linear-gradient(135deg, var(--ymbc-blue) 0%, #004080 100%);
+        background: linear-gradient(135deg, var(--ymbc-navy) 0%, #1e2640 100%);
     }
 
-    .ymbc-orange-bg {
-        background-color: var(--ymbc-orange);
+    .ymbc-accent-bg {
+        background-color: var(--ymbc-blue) !important;
     }
 
-    .ymbc-border-orange {
-        border-color: var(--ymbc-orange);
+    .ymbc-text-accent {
+        color: var(--ymbc-blue) !important;
     }
-
-    .ymbc-text-orange {
-        color: var(--ymbc-orange);
-    }
+    
+    /* Override tailwind orange classes to use official blue/red */
+    .bg-orange-500, .hover\:bg-orange-600:hover { background-color: var(--ymbc-blue) !important; }
+    .text-orange-500, .hover\:text-orange-400:hover, .text-orange-400, .text-orange-600 { color: var(--ymbc-blue) !important; }
+    .border-orange-500 { border-color: var(--ymbc-blue) !important; }
+    .bg-orange-500\/5 { background-color: rgba(16, 110, 234, 0.05) !important; }
+    .shadow-orange-500\/20 { box-shadow: 0 10px 15px -3px rgba(16, 110, 234, 0.2) !important; }
 </style>
 
 <!-- Top News Bar (Mimicking official site) -->
@@ -39,7 +49,7 @@
         const header = document.querySelector('header');
         if (header) {
             header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
-            header.classList.add('bg-[#003366]', 'text-white', 'border-white/10');
+            header.classList.add('bg-[#242f51]', 'text-white', 'border-white/10');
 
             // Fix text colors for brand and nav
             header.querySelectorAll('h2, a, span.material-symbols-outlined').forEach(el => {
@@ -54,7 +64,7 @@
             const applyBtn = header.querySelector('a[href="#apply"]');
             if (applyBtn) {
                 applyBtn.classList.remove('bg-primary', 'text-white');
-                applyBtn.classList.add('bg-[#FF9900]', 'text-white', 'hover:bg-orange-600', 'border-none');
+                applyBtn.classList.add('bg-[#f5300f]', 'text-white', 'hover:bg-red-700', 'border-none');
             }
         }
     });
@@ -63,7 +73,7 @@
 <!-- Hero Section -->
 <section class="relative h-[700px] flex items-center justify-center overflow-hidden">
     <div class="absolute inset-0 z-0 bg-cover bg-center scale-105 transition-transform duration-1000"
-        style="background-image: linear-gradient(rgba(0, 51, 102, 0.75), rgba(0, 20, 40, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
+        style="background-image: linear-gradient(rgba(36, 47, 81, 0.75), rgba(30, 38, 64, 0.85)), url('https://images.unsplash.com/photo-1541339907198-e08756ebafe3?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
     </div>
     <div class="relative z-10 text-center px-4 max-w-5xl">
         <div
@@ -88,7 +98,7 @@
         <div class="flex flex-col sm:flex-row gap-6 justify-center">
             <a class="bg-orange-500 text-white font-black py-5 px-12 rounded-sm text-lg hover:bg-orange-600 hover:scale-105 transition-all shadow-2xl shadow-orange-500/20 uppercase tracking-widest"
                 href="#apply">Apply Online</a>
-            <a class="bg-transparent text-white border-2 border-white font-black py-5 px-12 rounded-sm text-lg hover:bg-white hover:text-[#003366] transition-all uppercase tracking-widest"
+            <a class="bg-transparent text-white border-2 border-white font-black py-5 px-12 rounded-sm text-lg hover:bg-white hover:text-[#242f51] transition-all uppercase tracking-widest"
                 href="#courses">Prospectus</a>
         </div>
     </div>
@@ -97,7 +107,7 @@
     <div
         class="absolute bottom-10 right-10 hidden lg:block bg-white p-4 rounded-xl shadow-2xl border-t-4 border-orange-500">
         <div class="text-center">
-            <div class="text-[#003366] font-black text-2xl">NAAC</div>
+            <div class="text-[#242f51] font-black text-2xl">NAAC</div>
             <div class="text-orange-500 font-extrabold text-3xl">B++</div>
             <div class="text-slate-400 text-[10px] font-bold uppercase tracking-widest">Accredited</div>
         </div>
@@ -105,7 +115,7 @@
 </section>
 
 <!-- Stats Section (New for YMBC) -->
-<section class="py-12 bg-[#003366] text-white">
+<section class="py-12 bg-[#242f51] text-white">
     <div class="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 px-6">
         <div class="text-center">
             <div class="text-4xl font-black text-orange-500">25+</div>
@@ -133,7 +143,7 @@
             <div class="absolute -top-16 -left-16 w-64 h-64 bg-orange-500/5 rounded-full blur-3xl -z-10"></div>
             <div class="flex items-center gap-4 mb-8">
                 <div class="h-1px w-12 bg-orange-500"></div>
-                <h2 class="text-[#003366] font-black tracking-[0.4em] uppercase text-xs">Discover YMBC</h2>
+                <h2 class="text-[#242f51] font-black tracking-[0.4em] uppercase text-xs">Discover YMBC</h2>
             </div>
 
             <h3
@@ -166,7 +176,7 @@
                     </div>
                 </div>
                 <div
-                    class="flex items-start gap-4 p-6 rounded-3xl bg-[#003366] text-white transition-all hover:shadow-xl hover:-translate-y-1">
+                    class="flex items-start gap-4 p-6 rounded-3xl bg-[#242f51] text-white transition-all hover:shadow-xl hover:-translate-y-1">
                     <div class="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center shrink-0">
                         <i data-lucide="users" class="w-7 h-7"></i>
                     </div>
@@ -178,9 +188,7 @@
             </div>
         </div>
         <div class="grid grid-cols-2 gap-4">
-            <img class="rounded-2xl w-full h-[400px] object-cover shadow-2xl transition-transform hover:scale-105 duration-500"
-                src="https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
-                alt="Campus">
+           
             <div class="space-y-4 pt-12">
                 <img class="rounded-2xl w-full h-48 object-cover shadow-xl"
                     src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
@@ -201,8 +209,8 @@
         <div class="flex flex-col md:flex-row md:items-end justify-between mb-20 gap-8">
             <div class="space-y-4">
                 <div class="flex items-center gap-4">
-                    <div class="h-px w-8 bg-[#003366]"></div>
-                    <h2 class="text-[#003366] font-black tracking-[0.3em] uppercase text-[10px]">Excellence in Education
+                    <div class="h-px w-8 bg-[#242f51]"></div>
+                    <h2 class="text-[#242f51] font-black tracking-[0.3em] uppercase text-[10px]">Excellence in Education
                     </h2>
                 </div>
                 <h3 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white tracking-tight">Academic
@@ -220,12 +228,12 @@
             <div
                 class="group relative bg-white dark:bg-slate-900 p-10 rounded-[2.5rem] border border-slate-100 dark:border-slate-800 shadow-sm hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 overflow-hidden">
                 <div
-                    class="absolute top-0 right-0 w-32 h-32 bg-[#003366]/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110">
+                    class="absolute top-0 right-0 w-32 h-32 bg-[#242f51]/5 rounded-bl-full -z-0 transition-transform group-hover:scale-110">
                 </div>
 
                 <div class="relative z-10">
                     <div
-                        class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-[#003366] mb-8 group-hover:bg-[#003366] group-hover:text-white transition-all duration-500">
+                        class="w-16 h-16 bg-slate-50 dark:bg-slate-800 rounded-2xl flex items-center justify-center text-[#242f51] mb-8 group-hover:bg-[#242f51] group-hover:text-white transition-all duration-500">
                         <i data-lucide="graduation-cap" class="w-8 h-8"></i>
                     </div>
                     <h4 class="text-2xl font-black mb-4 text-slate-900 dark:text-white leading-tight">{{ course.name }}
@@ -234,7 +242,7 @@
                         Comprehensive curriculum focused on industry requirements and leadership development.
                     </p>
                     <a href="#apply"
-                        class="inline-flex items-center gap-2 text-[#003366] font-black uppercase text-[10px] tracking-[0.2em] hover:gap-4 transition-all">
+                        class="inline-flex items-center gap-2 text-[#242f51] font-black uppercase text-[10px] tracking-[0.2em] hover:gap-4 transition-all">
                         Enroll Now <i data-lucide="chevron-right" class="w-4 h-4 text-orange-500"></i>
                     </a>
                 </div>
@@ -256,11 +264,11 @@
                 <div id="connector-2" class="ymbc-step-connector"></div>
                 <div id="step-3-btn" class="ymbc-step-badge">3<span class="ymbc-step-label">Documents</span></div>
             </div>
-            <div class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#003366] opacity-40">Section <span
+            <div class="text-[10px] font-extrabold uppercase tracking-[0.3em] text-[#242f51] opacity-40">Section <span
                     id="current-step-num">1</span>/3</div>
         </div>
 
-        <div class="flex flex-col lg:flex-row bg-[#003366] rounded-[4rem] overflow-hidden shadow-3xl text-white">
+        <div class="flex flex-col lg:flex-row bg-[#242f51] rounded-[4rem] overflow-hidden shadow-3xl text-white">
             <div class="lg:w-1/3 p-12 lg:p-16 ymbc-gradient flex flex-col justify-between">
                 <div>
                     <h2 class="text-4xl font-black mb-8 leading-tight">Join the <span
@@ -361,7 +369,7 @@
                         </div>
                         <div class="pt-10 flex justify-end">
                             <button type="button" onclick="nextYmbcStep(2)"
-                                class="h-16 px-12 bg-[#003366] text-white font-black rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-4 group">
+                                class="h-16 px-12 bg-[#242f51] text-white font-black rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-4 group">
                                 Next: Family Info <i data-lucide="arrow-right"
                                     class="w-5 h-5 group-hover:translate-x-2 transition-transform"></i>
                             </button>
@@ -407,7 +415,7 @@
                                 class="text-slate-400 font-black uppercase text-[10px] tracking-widest hover:text-orange-500 transition-colors">Go
                                 Back</button>
                             <button type="button" onclick="nextYmbcStep(3)"
-                                class="h-16 px-12 bg-[#003366] text-white font-black rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-4 group">
+                                class="h-16 px-12 bg-[#242f51] text-white font-black rounded-2xl hover:bg-orange-600 transition-all flex items-center gap-4 group">
                                 Next: Documents <i data-lucide="arrow-right"
                                     class="w-5 h-5 group-hover:translate-x-2 transition-transform"></i>
                             </button>
@@ -494,15 +502,15 @@
     }
 
     .ymbc-step-badge.active {
-        border-color: #003366;
-        color: #003366;
+        border-color: #242f51;
+        color: #242f51;
         transform: scale(1.1);
         box-shadow: 0 20px 25px -5px rgba(0, 51, 102, 0.1);
     }
 
     .ymbc-step-badge.completed {
-        background-color: #003366;
-        border-color: #003366;
+        background-color: #242f51;
+        border-color: #242f51;
         color: white;
     }
 
@@ -543,7 +551,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background-color: #003366;
+        background-color: #242f51;
         transform: translateX(-100%);
         transition: transform 0.8s ease-in-out;
     }
@@ -668,21 +676,17 @@
 </script>
 
 <!-- Footer Address Override -->
-<section class="py-20 px-6 md:px-20 lg:px-40 bg-[#003366] text-white border-b border-white/10" id="contact">
+<section class="py-20 px-6 md:px-20 lg:px-40 bg-[#242f51] text-white border-b border-white/10" id="contact">
     <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start gap-16">
         <div class="max-w-xs">
             <h4 class="text-orange-500 font-black uppercase tracking-widest text-sm mb-6">Contact Us</h4>
             <div class="space-y-4 text-sm font-medium leading-relaxed opacity-80">
-                <p>Yeldo Mar Baselios College <br>Padiyattuchira, Kothamangalam <br>Ernakulam, Kerala - 686691</p>
+                <p>Yeldo Mar Baselios College <br>Marian Village, Puthuppady P.O.<br>Ernakulam, Kerala - 686673</p>
             </div>
         </div>
         <div class="max-w-xs">
             <h4 class="text-orange-500 font-black uppercase tracking-widest text-sm mb-6">Quick Connectivity</h4>
             <div class="space-y-3 text-sm font-bold">
-                <p class="flex items-center gap-3"><i data-lucide="phone" class="w-4 h-4 text-orange-500"></i> +91 485
-                    2823525</p>
-                <p class="flex items-center gap-3"><i data-lucide="mail" class="w-4 h-4 text-orange-500"></i>
-                    info@ymbc.edu.in</p>
                 <p class="flex items-center gap-3"><i data-lucide="globe" class="w-4 h-4 text-orange-500"></i>
                     www.ymbc.edu.in</p>
             </div>

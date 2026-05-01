@@ -10,8 +10,15 @@
         <!-- Header -->
         <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
             <div class="space-y-4">
-                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest">
-                    <i data-lucide="building-2" class="w-4 h-4"></i> Campus Operations
+                <div class="inline-flex items-center gap-2 px-1 py-1 rounded-full bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 shadow-sm">
+                    {% if college.logo_url %}
+                    <img src="{{ college.logo_url }}" alt="{{ college.name }}" class="w-8 h-8 object-contain rounded-full">
+                    {% else %}
+                    <div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+                        <i data-lucide="building-2" class="w-4 h-4"></i>
+                    </div>
+                    {% endif %}
+                    <span class="pr-3 text-primary text-[10px] font-black uppercase tracking-widest">Campus Operations</span>
                 </div>
                 <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tight">
                     {{ college.name }}

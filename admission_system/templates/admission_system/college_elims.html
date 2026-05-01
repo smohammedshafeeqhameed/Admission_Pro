@@ -2,19 +2,85 @@
 {% load static %}
 
 {% block content %}
-<div class="bg-white dark:bg-slate-950 font-sans selection:bg-secondary selection:text-primary">
-    <!-- Premium Navigation Overlay (Optional, but adds flair) -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --elims-blue: #2b6eb5; /* Primary brand blue */
+        --elims-navy: #1a4d80; /* Main navigation navy */
+        --elims-orange: #f19e12; /* Official accent orange */
+        --elims-yellow: #fdb813; /* Secondary yellow */
+        --elims-green: #8dc63f; /* Logo green */
+    }
 
-    <!-- Hero Section: Enhanced Visuals -->
+    * {
+        font-family: 'Roboto', sans-serif !important;
+    }
+
+    .elims-gradient {
+        background: linear-gradient(135deg, var(--elims-navy) 0%, #102e4d 100%);
+    }
+
+    .elims-orange-bg {
+        background-color: var(--elims-orange) !important;
+    }
+
+    .elims-blue-bg {
+        background-color: var(--elims-blue) !important;
+    }
+
+    /* Override tailwind secondary/primary for ELIMS */
+    .text-secondary { color: var(--elims-orange) !important; }
+    .bg-secondary { background-color: var(--elims-orange) !important; }
+    .border-secondary { border-color: var(--elims-orange) !important; }
+    .text-primary { color: var(--elims-blue) !important; }
+    .bg-primary { background-color: var(--elims-blue) !important; }
+    .hover\:bg-secondary:hover { background-color: #d68a0f !important; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.querySelector('header');
+        if (header) {
+            header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+            header.classList.add('bg-[#1a4d80]', 'text-white', 'border-white/10');
+
+            header.querySelectorAll('h2, a, span.material-symbols-outlined').forEach(el => {
+                el.classList.add('text-white');
+                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary');
+            });
+
+            const applyBtn = header.querySelector('a[href="#apply"]');
+            if (applyBtn) {
+                applyBtn.classList.remove('bg-primary', 'text-white');
+                applyBtn.classList.add('bg-[#f19e12]', 'text-white', 'hover:bg-[#d68a0f]', 'border-none');
+            }
+        }
+    });
+</script>
+
+<!-- Top Bar (Mimicking official ELIMS site) -->
+<div class="bg-[#2b6eb5] text-white py-2.5 px-6 md:px-20 lg:px-40 text-[10px] font-bold overflow-hidden border-b border-white/5">
+    <div class="flex flex-col md:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
+        <div class="flex items-center gap-6">
+            <span class="hidden md:flex items-center gap-2"><i data-lucide="mail" class="w-3 h-3 text-[#f19e12]"></i> info@elims.edu.in</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="bg-[#f19e12] text-white px-2 py-0.5 rounded text-[8px] uppercase animate-pulse">Update</span>
+            <marquee class="w-48 md:w-96" scrollamount="3">Admission Open for 2026-27 | MBA, MCA, B.Com, BBA Applications Invited</marquee>
+        </div>
+    </div>
+</div>
+
+<div class="bg-white dark:bg-slate-950 font-sans selection:bg-secondary selection:text-primary">
+    <!-- Hero Section -->
     <section class="relative min-h-[700px] flex flex-col justify-between overflow-hidden pt-20" id="about">
         <!-- Modern Layered Background -->
-        <div class="absolute inset-0 z-0 bg-[#001A33]">
-            <div class="absolute inset-0 bg-cover bg-center opacity-40 mix-blend-overlay scale-110"
+        <div class="absolute inset-0 z-0 bg-[#1a4d80]">
+            <div class="absolute inset-0 bg-cover bg-center opacity-30 mix-blend-overlay scale-110"
                 style="background-image: url('https://images.unsplash.com/photo-1523050854058-8df90110c9f1?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80');">
             </div>
-            <!-- Complex Graduate Gradients -->
-            <div class="absolute inset-0 bg-gradient-to-tr from-[#003366] via-[#003366]/60 to-transparent"></div>
-            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,204,0,0.15),transparent_60%)]"></div>
+            <div class="absolute inset-0 bg-gradient-to-tr from-[#1a4d80] via-[#1a4d80]/60 to-transparent"></div>
+            <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(241,158,18,0.15),transparent_60%)]"></div>
             <!-- Animated pattern overlay -->
             <div class="absolute inset-0 opacity-[0.03] animate-pulse"
                 style="background-image: radial-gradient(circle, #fff 1px, transparent 1px); background-size: 50px 50px;"></div>
@@ -23,38 +89,29 @@
         <div class="relative z-10 text-center px-4 md:px-6 max-w-6xl mx-auto flex-1 flex flex-col justify-center py-16">
             <div
                 class="inline-flex items-center gap-3 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.25em] mb-8 animate-in fade-in zoom-in duration-1000">
-                <span class="flex h-2 w-2 rounded-full bg-secondary shadow-[0_0_10px_#FFCC00]"></span>
-                Institutional Admissions 2026-27
-            </div>
-
-            <!-- College Logo -->
-            <div class="mb-8 mx-auto w-28 h-28 md:w-36 md:h-36 rounded-2xl border-[3px] border-secondary shadow-[0_20px_40px_-15px_rgba(255,204,0,0.5)] overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 transform hover:scale-105 transition-all p-4">
-                {% if college.logo_url %}
-                <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
-                {% else %}
-                <i data-lucide="graduation-cap" class="w-14 h-14 text-secondary"></i>
-                {% endif %}
+                <span class="flex h-2 w-2 rounded-full bg-[#f19e12] shadow-[0_0_10px_#f19e12]"></span>
+                Affiliated to University of Calicut
             </div>
 
             <!-- Main Headline -->
             <h1 class="text-white font-black leading-[0.88] tracking-tighter mb-10 animate-in slide-in-from-bottom-16 duration-700"
-                style="font-size: clamp(3.2rem, 11vw, 8.5rem)">
-                Forge Your <span class="text-secondary italic">Leadership</span><br class="hidden md:block"/>at ELIMS
+                style="font-size: clamp(3rem, 10vw, 7.5rem)">
+                Elijah Institute of<br class="hidden md:block"/> <span class="text-[#f19e12] italic">Management Studies</span>
             </h1>
 
             <p class="text-blue-100/90 font-semibold leading-relaxed mb-14 mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000"
                 style="max-width: 52rem; font-size: clamp(1rem, 2.5vw, 1.45rem)">
-                Our 44-year legacy in Thrissur fosters ethical, innovative, and socially committed managers for the global industry.
+                Empowering the next generation of global leaders through ethical education and industry-aligned academic excellence in Thrissur.
             </p>
 
             <div class="flex flex-col sm:flex-row gap-6 justify-center items-center animate-in fade-in slide-in-from-bottom-12 duration-1200">
-                <a class="w-full sm:w-auto h-20 px-12 bg-white/5 backdrop-blur-2xl text-white border-2 border-white/20 font-black rounded-3xl text-xl hover:bg-white/10 transition-all flex items-center justify-center gap-4"
+                <a class="w-full sm:w-auto h-20 px-12 bg-[#f19e12] text-white font-black rounded-3xl text-xl hover:bg-[#d68a0f] hover:scale-105 transition-all shadow-2xl shadow-[#f19e12]/20 flex items-center justify-center gap-4 group"
                     href="#apply">
-                    Step Into ELIMS <i data-lucide="sparkles" class="w-6 h-6 group-hover:rotate-12 transition-transform"></i>
+                    Apply Online <i data-lucide="arrow-right" class="w-6 h-6 group-hover:translate-x-2 transition-transform"></i>
                 </a>
                 <a class="w-full sm:w-auto h-20 px-12 bg-white/5 backdrop-blur-2xl text-white border-2 border-white/20 font-black rounded-3xl text-xl hover:bg-white/10 transition-all flex items-center justify-center gap-4"
                     href="#courses">
-                    Curriculum <i data-lucide="layers" class="w-6 h-6"></i>
+                    View Programs <i data-lucide="layers" class="w-6 h-6"></i>
                 </a>
             </div>
         </div>
@@ -500,16 +557,70 @@
         </div>
     </section>
 
-    <!-- Footer decoration -->
-    <footer class="py-20 bg-slate-950 text-white/40 text-[10px] font-black tracking-[0.5em] text-center uppercase" id="contact">
-        Elijah Institute of Management Studies • Elite Global Network
+    <!-- Enhanced Footer (Mimicking official ELIMS site) -->
+    <footer class="py-20 bg-[#2b6eb5] text-white border-t-8 border-[#f19e12]" id="contact">
+        <div class="max-w-7xl mx-auto px-6 md:px-20 lg:px-40">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
+                <div>
+                    <h4 class="text-[#f19e12] font-black uppercase tracking-widest text-xs mb-8">About ELIMS</h4>
+                    <p class="text-slate-100 text-sm leading-relaxed mb-6 font-medium">
+                        Elijah Institute of Management Studies (ELIMS) is a premier educational institution in Thrissur, committed to excellence in management and arts education.
+                    </p>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-[#f19e12] transition-all cursor-pointer group">
+                            <i data-lucide="facebook" class="w-5 h-5 text-white/50 group-hover:text-white"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-[#f19e12] transition-all cursor-pointer group">
+                            <i data-lucide="instagram" class="w-5 h-5 text-white/50 group-hover:text-white"></i>
+                        </div>
+                        <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center hover:bg-[#f19e12] transition-all cursor-pointer group">
+                            <i data-lucide="linkedin" class="w-5 h-5 text-white/50 group-hover:text-white"></i>
+                        </div>
+                    </div>
+                </div>
+                
+                <div>
+                    <h4 class="text-[#f19e12] font-black uppercase tracking-widest text-xs mb-8">Quick Links</h4>
+                    <ul class="space-y-4 text-sm font-bold">
+                        <li><a href="#about" class="text-slate-200 hover:text-[#f19e12] transition-colors">The Institution</a></li>
+                        <li><a href="#courses" class="text-slate-200 hover:text-[#f19e12] transition-colors">Academic Programs</a></li>
+                        <li><a href="#apply" class="text-slate-200 hover:text-[#f19e12] transition-colors">Online Admission</a></li>
+                        <li><a href="#" class="text-slate-200 hover:text-[#f19e12] transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h4 class="text-[#f19e12] font-black uppercase tracking-widest text-xs mb-8">Contact Info</h4>
+                    <ul class="space-y-4 text-sm font-bold">
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-[#f19e12] shrink-0"></i>
+                            <span class="text-slate-200 leading-snug">ELIMS Campus, Ponganamkad, Kurichikkara P.O, Thrissur - 680028</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="phone" class="w-5 h-5 text-[#f19e12]"></i>
+                            <span class="text-slate-200">+91 94951 23456</span>
+                        </li>
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="mail" class="w-5 h-5 text-[#f19e12]"></i>
+                            <span class="text-slate-200">info@elims.edu.in</span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="pt-8 border-t border-white/5 text-center">
+                <p class="text-white/40 text-[10px] font-black tracking-[0.5em] uppercase">
+                    © 2026 Elijah Institute of Management Studies • All Rights Reserved
+                </p>
+            </div>
+        </div>
     </footer>
 </div>
 
 <style>
     :root {
-        --elims-navy: #003366;
-        --elims-gold: #FFCC00;
+        --elims-navy: #2d3e50;
+        --elims-green: #83c02f;
         --elims-slate: #f8fafc;
     }
 
@@ -544,18 +655,15 @@
     .dark .elims-step-badge { background-color: #0f172a; color: #475569; }
 
     .elims-step-badge.active {
-        background-color: var(--elims-navy);
+        background-color: var(--elims-green);
         color: white;
-        transform: scale(1.1) rotate(3deg);
-        box-shadow: 0 20px 40px -10px rgba(0, 51, 102, 0.3);
-        border-color: var(--elims-gold);
+        transform: scale(1.1);
+        box-shadow: 0 20px 40px -10px rgba(131, 192, 47, 0.4);
     }
 
     .elims-step-badge.completed {
-        background-color: #f8fafc;
-        color: var(--elims-navy);
-        border: 2px solid var(--elims-navy);
-        transform: scale(0.95);
+        background-color: var(--elims-navy);
+        color: white;
     }
 
     .elims-step-label {

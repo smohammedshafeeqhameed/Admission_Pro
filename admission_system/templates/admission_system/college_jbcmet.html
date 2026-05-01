@@ -2,20 +2,67 @@
 {% load static %}
 
 {% block content %}
-<div class="bg-white dark:bg-slate-950 font-sans selection:bg-[#1A237E] selection:text-[#FF6B35]">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --jbc-navy: #051d4d;
+        --jbc-blue: #2b4ba1;
+        --jbc-dark: #05101c;
+        --jbc-accent: #2b4ba1;
+    }
+
+    * {
+        font-family: 'Poppins', sans-serif !important;
+    }
+
+    .jbc-gradient {
+        background: linear-gradient(135deg, var(--jbc-navy) 0%, #102e4d 100%);
+    }
+
+    /* Override tailwind secondary/primary for JBC */
+    .text-secondary { color: var(--jbc-blue) !important; }
+    .bg-secondary { background-color: var(--jbc-blue) !important; }
+    .border-secondary { border-color: var(--jbc-blue) !important; }
+    .text-primary { color: var(--jbc-navy) !important; }
+    .bg-primary { background-color: var(--jbc-navy) !important; }
+    .hover\:bg-secondary:hover { background-color: #1e3a8a !important; }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.querySelector('header');
+        if (header) {
+            header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+            header.classList.add('bg-[#051d4d]', 'text-white', 'border-white/10');
+
+            header.querySelectorAll('h2, a, span.material-symbols-outlined').forEach(el => {
+                el.classList.add('text-white');
+                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary');
+            });
+
+            const applyBtn = header.querySelector('a[href="#apply"]');
+            if (applyBtn) {
+                applyBtn.classList.remove('bg-primary', 'text-white');
+                applyBtn.classList.add('bg-[#2b4ba1]', 'text-white', 'hover:bg-[#1e3a8a]', 'border-none');
+            }
+        }
+    });
+</script>
+
+<div class="bg-white dark:bg-slate-950 font-sans selection:bg-[#2b4ba1] selection:text-white">
 
     <!-- ═══ HERO ═══ -->
     <section class="relative min-h-screen flex flex-col justify-between overflow-hidden pt-24" id="about">
         <!-- Layered background -->
-        <div class="absolute inset-0 bg-[#0D1554]">
-            <div class="absolute inset-0 bg-cover bg-center opacity-20"
+        <div class="absolute inset-0 bg-[#051d4d]">
+            <div class="absolute inset-0 bg-cover bg-center opacity-30"
                 style="background-image:url('https://images.unsplash.com/photo-1581092795360-fd1ca04f0952?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80')">
             </div>
             <!-- Gradient over image -->
-            <div class="absolute inset-0 bg-gradient-to-br from-[#1A237E] via-[#1A237E]/90 to-[#0D1554]"></div>
+            <div class="absolute inset-0 bg-gradient-to-br from-[#051d4d] via-[#051d4d]/90 to-[#05101c]"></div>
             <!-- Accent glows -->
-            <div class="absolute top-0 right-0 w-[40rem] h-[40rem] bg-[#FF6B35]/10 rounded-full blur-[120px]"></div>
-            <div class="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-[#FF6B35]/5 rounded-full blur-[80px]"></div>
+            <div class="absolute top-0 right-0 w-[40rem] h-[40rem] bg-[#2b4ba1]/10 rounded-full blur-[120px]"></div>
+            <div class="absolute bottom-0 left-0 w-[30rem] h-[30rem] bg-[#2b4ba1]/5 rounded-full blur-[80px]"></div>
             <!-- Grid texture -->
             <div class="absolute inset-0 opacity-[0.03]"
                 style="background-image:linear-gradient(#fff 1px,transparent 1px),linear-gradient(90deg,#fff 1px,transparent 1px);background-size:60px 60px">
@@ -27,24 +74,24 @@
             <div class="inline-flex flex-wrap justify-center gap-3 mb-14 animate-in fade-in zoom-in duration-1000">
                 <span
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em]">
-                    <i data-lucide="award" class="w-3.5 h-3.5 text-[#FF6B35]"></i> KTU Affiliated
+                    <i data-lucide="award" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> KTU Affiliated
                 </span>
                 <span
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em]">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#FF6B35]"></i> AICTE Approved
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> AICTE Approved
                 </span>
                 <span
-                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#FF6B35]/20 backdrop-blur-xl border border-[#FF6B35]/40 text-[#FF6B35] text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
-                    <i data-lucide="zap" class="w-3.5 h-3.5 fill-[#FF6B35]"></i> Admissions Open 2026
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#2b4ba1]/20 backdrop-blur-xl border border-[#2b4ba1]/40 text-[#2b4ba1] text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
+                    <i data-lucide="zap" class="w-3.5 h-3.5 fill-[#2b4ba1]"></i> Admissions Open 2026
                 </span>
             </div>
 
             <!-- College Logo -->
             <div class="mb-8 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 transform hover:-translate-y-2 transition-transform p-4">
-                {% if college.logo %}
-                <img src="{{ college.logo.url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
+                {% if college.logo_url %}
+                <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
                 {% else %}
-                <i data-lucide="graduation-cap" class="w-14 h-14 text-[#FF6B35]"></i>
+                <i data-lucide="graduation-cap" class="w-14 h-14 text-[#2b4ba1]"></i>
                 {% endif %}
             </div>
 
@@ -52,10 +99,10 @@
             <h1 class="text-white font-black tracking-tighter leading-[0.88] mb-10 animate-in slide-in-from-bottom-16 duration-700"
                 style="font-size:clamp(3rem,9vw,8rem)">
                 Jai Bharath<br />
-                <span class="text-[#FF6B35]">Group of Institutions</span>
+                <span class="text-[#2b4ba1]">Group of Institutions</span>
             </h1>
 
-            <p class="text-blue-200/70 font-semibold leading-relaxed mb-16 mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000"
+            <p class="text-blue-100/70 font-semibold leading-relaxed mb-16 mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000"
                 style="max-width:50rem;font-size:clamp(1rem,2.2vw,1.375rem)">
                 Vengola, Perumbavoor, Ernakulam · Est. 2009 · Shaping engineers, managers, and technologists for a
                 dynamic world.
@@ -65,12 +112,12 @@
             <div
                 class="flex flex-col sm:flex-row gap-5 justify-center items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
                 <a href="#apply"
-                    class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#FF6B35] text-white font-black py-6 px-14 rounded-[1.75rem] text-xl hover:bg-[#e55a26] hover:shadow-[0_20px_60px_-10px_rgba(255,107,53,0.6)] transition-all hover:-translate-y-2 active:scale-95">
-                    Apply Now <i data-lucide="arrow-right" class="w-6 h-6"></i>
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#2b4ba1] text-white font-black py-6 px-14 rounded-[1.75rem] text-xl hover:bg-[#1e3a8a] hover:shadow-[0_20px_60px_-10px_rgba(43,75,161,0.6)] transition-all hover:-translate-y-2 active:scale-95">
+                    APPLY NOW <i data-lucide="arrow-right" class="w-6 h-6"></i>
                 </a>
                 <a href="#courses"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-white/10 backdrop-blur-xl text-white border border-white/25 font-bold py-6 px-14 rounded-[1.75rem] text-xl hover:bg-white/20 transition-all">
-                    View Programs <i data-lucide="layers" class="w-6 h-6"></i>
+                    VIEW PROGRAMS <i data-lucide="layers" class="w-6 h-6"></i>
                 </a>
             </div>
         </div>
@@ -80,22 +127,22 @@
             <div
                 class="max-w-5xl mx-auto grid grid-cols-4 bg-white/10 backdrop-blur-xl rounded-[2rem] border border-white/15 text-center text-white py-7 overflow-hidden">
                 <div class="px-4 border-r border-white/10">
-                    <div class="font-black text-[#FF6B35]" style="font-size:clamp(1.75rem,4vw,2.75rem)">9</div>
+                    <div class="font-black text-[#2b4ba1]" style="font-size:clamp(1.75rem,4vw,2.75rem)">9</div>
                     <div class="text-[9px] md:text-xs font-bold uppercase tracking-widest opacity-50 mt-1">
                         B.Tech<br />Branches</div>
                 </div>
                 <div class="px-4 border-r border-white/10">
-                    <div class="font-black text-[#FF6B35]" style="font-size:clamp(1.75rem,4vw,2.75rem)">6</div>
+                    <div class="font-black text-[#2b4ba1]" style="font-size:clamp(1.75rem,4vw,2.75rem)">6</div>
                     <div class="text-[9px] md:text-xs font-bold uppercase tracking-widest opacity-50 mt-1">
                         Diploma<br />Courses</div>
                 </div>
                 <div class="px-4 border-r border-white/10">
-                    <div class="font-black text-[#FF6B35]" style="font-size:clamp(1.75rem,4vw,2.75rem)">4</div>
+                    <div class="font-black text-[#2b4ba1]" style="font-size:clamp(1.75rem,4vw,2.75rem)">4</div>
                     <div class="text-[9px] md:text-xs font-bold uppercase tracking-widest opacity-50 mt-1">PG/UG
                         Mgmt<br />Programs</div>
                 </div>
                 <div class="px-4">
-                    <div class="font-black text-[#FF6B35]" style="font-size:clamp(1.75rem,4vw,2.75rem)">15+</div>
+                    <div class="font-black text-[#2b4ba1]" style="font-size:clamp(1.75rem,4vw,2.75rem)">15+</div>
                     <div class="text-[9px] md:text-xs font-bold uppercase tracking-widest opacity-50 mt-1">Years
                         of<br />Excellence</div>
                 </div>
@@ -108,11 +155,11 @@
         <div class="max-w-7xl mx-auto">
             <!-- Section header -->
             <div class="text-center mb-24">
-                <span class="text-[#FF6B35] font-black tracking-[0.5em] uppercase text-xs block mb-5">Academic
+                <span class="text-[#2b4ba1] font-black tracking-[0.5em] uppercase text-xs block mb-5">Academic
                     Catalogue</span>
                 <h2 class="font-black text-slate-900 dark:text-white tracking-tighter leading-none"
                     style="font-size:clamp(2.5rem,7vw,6rem)">
-                    Programs We <span class="text-[#1A237E]">Offer</span>
+                    Programs We <span class="text-[#2b4ba1]">Offer</span>
                 </h2>
             </div>
 
@@ -127,17 +174,17 @@
             <!-- Unified Course Grid -->
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7" id="course-grid">
                 {% for course in courses %}
-                <div class="course-card group bg-slate-50 dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-transparent hover:border-[#1A237E]/20 hover:-translate-y-3 hover:shadow-xl transition-all duration-500 relative overflow-hidden"
+                <div class="course-card group bg-slate-50 dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-transparent hover:border-[#2b4ba1]/20 hover:-translate-y-3 hover:shadow-xl transition-all duration-500 relative overflow-hidden"
                      data-cat="{{ course.name|slice:'1:6' }}">
-                    <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#1A237E]/5 group-hover:scale-150 transition-transform duration-700"></div>
-                    <div class="w-12 h-12 bg-[#1A237E] text-white rounded-xl flex items-center justify-center mb-6 shadow-md shadow-[#1A237E]/30 group-hover:rotate-6 transition-transform">
+                    <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#2b4ba1]/5 group-hover:scale-150 transition-transform duration-700"></div>
+                    <div class="w-12 h-12 bg-[#2b4ba1] text-white rounded-xl flex items-center justify-center mb-6 shadow-md shadow-[#2b4ba1]/30 group-hover:rotate-6 transition-transform">
                         <i data-lucide="graduation-cap" class="w-6 h-6"></i>
                     </div>
-                    <h4 class="font-black text-slate-900 dark:text-white text-lg leading-tight mb-3 group-hover:text-[#1A237E] transition-colors">
+                    <h4 class="font-black text-slate-900 dark:text-white text-lg leading-tight mb-3 group-hover:text-[#2b4ba1] transition-colors">
                         {{ course.name }}
                     </h4>
                     <p class="text-slate-500 text-sm font-medium leading-relaxed line-clamp-2">{{ course.description }}</p>
-                    <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#FF6B35]">
+                    <div class="mt-6 pt-5 border-t border-slate-200 dark:border-slate-800 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-[#2b4ba1]">
                         <i data-lucide="check-circle" class="w-3.5 h-3.5"></i> KTU / AICTE Approved
                     </div>
                 </div>
@@ -151,11 +198,11 @@
         <div class="max-w-5xl mx-auto">
             <!-- Header -->
             <div class="text-center mb-20">
-                <span class="text-[#FF6B35] font-black tracking-[0.5em] uppercase text-xs block mb-5">Online Admission
+                <span class="text-[#2b4ba1] font-black tracking-[0.5em] uppercase text-xs block mb-5">Online Admission
                     Portal</span>
                 <h2 class="font-black text-slate-900 dark:text-white tracking-tighter leading-none mb-6"
                     style="font-size:clamp(2.5rem,7vw,6rem)">
-                    Start Your<br /><span class="text-[#1A237E]">Application</span>
+                    Start Your<br /><span class="text-[#2b4ba1]">Application</span>
                 </h2>
                 <p class="text-slate-500 font-semibold text-lg max-w-2xl mx-auto">
                     Complete all four steps to submit your application for JBCMET.
@@ -167,7 +214,7 @@
                 class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-[0_50px_120px_-30px_rgba(26,35,126,0.2)] border border-slate-100 dark:border-slate-800 overflow-hidden">
 
                 <!-- Step bar -->
-                <div class="bg-gradient-to-r from-[#1A237E] to-[#0D1554] px-10 py-10 md:px-20">
+                <div class="bg-gradient-to-r from-[#051d4d] to-[#05101c] px-10 py-10 md:px-20">
                     <div class="flex items-center justify-between max-w-2xl mx-auto">
                         <div id="step-1-btn" class="jbc-step active">1<span class="jbc-lbl">Identity</span></div>
                         <div class="jbc-line" id="connector-1"></div>
@@ -414,23 +461,92 @@
                     </div>
 
                 </form>
+             <!-- ═══ FOOTER (Official JBC Theme) ═══ -->
+    <footer class="bg-[#05101c] text-white pt-24 border-t-4 border-[#2b4ba1]" id="contact">
+        <div class="max-w-7xl mx-auto px-6 md:px-16 lg:px-28">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-20">
+                <!-- Brand Info -->
+                <div class="space-y-6">
+                    <div class="w-48 bg-white p-4 rounded-2xl">
+                        {% if college.logo_url %}
+                        <img src="{{ college.logo_url }}" alt="JBC Logo" class="w-full h-auto">
+                        {% endif %}
+                    </div>
+                    <p class="text-slate-400 text-sm leading-relaxed font-medium">
+                        Jai Bharath Group of Institutions is a premier educational destination in Kerala, committed to excellence in professional education since 2009.
+                    </p>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#2b4ba1] transition-all"><i data-lucide="facebook" class="w-5 h-5"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#2b4ba1] transition-all"><i data-lucide="instagram" class="w-5 h-5"></i></a>
+                        <a href="#" class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center hover:bg-[#2b4ba1] transition-all"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="text-[#2b4ba1] font-black uppercase tracking-widest text-xs mb-8">Navigation</h4>
+                    <ul class="space-y-4 text-sm font-bold">
+                        <li><a href="#about" class="text-slate-400 hover:text-white transition-colors">The Institute</a></li>
+                        <li><a href="#courses" class="text-slate-400 hover:text-white transition-colors">Academic Programs</a></li>
+                        <li><a href="#apply" class="text-slate-400 hover:text-white transition-colors">Online Admission</a></li>
+                        <li><a href="#" class="text-slate-400 hover:text-white transition-colors">Campus Life</a></li>
+                    </ul>
+                </div>
+
+                <!-- Institutions -->
+                <div>
+                    <h4 class="text-[#2b4ba1] font-black uppercase tracking-widest text-xs mb-8">Group Entities</h4>
+                    <ul class="space-y-4 text-sm font-bold text-slate-400">
+                        <li>Jai Bharath Arts & Science</li>
+                        <li>Jai Bharath Management Studies</li>
+                        <li>Jai Bharath Training College</li>
+                        <li>Jai Bharath ITI</li>
+                    </ul>
+                </div>
+
+                <!-- Contact -->
+                <div>
+                    <h4 class="text-[#2b4ba1] font-black uppercase tracking-widest text-xs mb-8">Reach Us</h4>
+                    <ul class="space-y-4 text-sm font-bold">
+                        <li class="flex items-start gap-3">
+                            <i data-lucide="map-pin" class="w-5 h-5 text-[#2b4ba1] shrink-0"></i>
+                            <span class="text-slate-400 leading-snug">Vengola, Perumbavoor, Ernakulam, Kerala - 683556</span>
+                        </li>
+                        
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="mail" class="w-5 h-5 text-[#2b4ba1]"></i>
+                            <span class="text-slate-400">info@jaibharath.edu.in</span>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </div>
-    </section>
-
-    <!-- Footer -->
-    <footer
-        class="py-14 bg-[#0D1554] text-white/25 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5" id="contact">
-        Jai Bharath Group of Institutions · Vengola, Perumbavoor
+        
+        <!-- Copyright Bar -->
+        <div class="bg-[#2b4ba1] py-6 px-4 text-center">
+            <p class="text-white text-[10px] font-black uppercase tracking-[0.4em]">
+                © 2026 Jai Bharath Group of Institutions • Designed for Excellence
+            </p>
+        </div>
     </footer>
+
+    <!-- Floating Contact (Official JBC Element) -->
+    <div class="fixed right-6 bottom-6 z-[100] flex flex-col gap-3">
+        <a href="https://wa.me/919495123456" class="w-14 h-14 bg-[#25d366] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+            <i data-lucide="message-circle" class="w-7 h-7"></i>
+        </a>
+        <a href="tel:+914842521234" class="w-14 h-14 bg-[#2b4ba1] text-white rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition-transform">
+            <i data-lucide="phone" class="w-6 h-6"></i>
+        </a>
+    </div>
 
 </div>
 
 <style>
     :root {
-        --jbc-blue: #1A237E;
-        --jbc-orange: #FF6B35;
-        --jbc-dark: #0D1554;
+        --jbc-blue: #2b4ba1;
+        --jbc-navy: #051d4d;
+        --jbc-dark: #05101c;
     }
 
     /* ── Step indicator ── */
@@ -462,34 +578,33 @@
     }
 
     .jbc-step.active {
-        background: var(--jbc-orange);
+        background: var(--jbc-blue);
         color: white;
-        transform: scale(1.25) rotate(-4deg);
-        box-shadow: 0 15px 40px -8px rgba(255, 107, 53, 0.6);
+        box-shadow: 0 15px 35px -5px rgba(43, 75, 161, 0.4);
+        transform: scale(1.1);
     }
 
     .jbc-step.completed {
-        background: rgba(255, 255, 255, 0.9);
-        color: var(--jbc-blue);
-        transform: scale(0.9);
+        background: white;
+        color: var(--jbc-navy);
     }
 
     .jbc-lbl {
         position: absolute;
-        bottom: -2.5rem;
+        top: 100%;
         left: 50%;
         transform: translateX(-50%);
+        padding-top: .75rem;
         font-size: 9px;
         font-weight: 900;
         text-transform: uppercase;
-        letter-spacing: .35em;
-        color: rgba(255, 255, 255, 0.35);
+        letter-spacing: .2em;
+        color: white;
+        opacity: 0.4;
         white-space: nowrap;
-        transition: all .4s;
     }
 
     .jbc-step.active .jbc-lbl {
-        color: var(--jbc-orange);
         opacity: 1;
         transform: translate(-50%, -3px);
     }
@@ -513,7 +628,7 @@
         content: '';
         position: absolute;
         inset: 0;
-        background: var(--jbc-orange);
+        background: var(--jbc-blue);
         transform: translateX(-100%);
         transition: transform .9s ease-in-out;
     }
@@ -557,8 +672,7 @@
     textarea:focus {
         border-color: var(--jbc-blue);
         background: white;
-        box-shadow: 0 8px 24px -6px rgba(26, 35, 126, 0.15);
-        transform: translateY(-2px);
+        box-shadow: 0 10px 30px -10px rgba(43, 75, 161, 0.15);
     }
 
     textarea {
@@ -567,35 +681,25 @@
 
     /* ── Buttons ── */
     .jbc-btn-primary {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: .65rem;
         background: var(--jbc-blue);
         color: white;
         font-weight: 900;
-        padding: 1.1rem 2.75rem;
+        text-transform: uppercase;
+        letter-spacing: .2em;
+        font-size: 12px;
+        padding: 1.25rem 2.5rem;
         border-radius: 1.25rem;
-        font-size: 1.05rem;
-        box-shadow: 0 8px 24px -6px rgba(26, 35, 126, 0.4);
-        transition: all .3s;
-        width: 100%;
-    }
-
-    @media(min-width:640px) {
-        .jbc-btn-primary {
-            width: auto;
-        }
+        display: inline-flex;
+        align-items: center;
+        gap: .75rem;
+        transition: all .4s;
+        box-shadow: 0 15px 35px -10px rgba(43, 75, 161, 0.3);
     }
 
     .jbc-btn-primary:hover {
-        background: var(--jbc-dark);
-        transform: translateY(-2px);
-        box-shadow: 0 16px 36px -8px rgba(26, 35, 126, 0.5);
-    }
-
-    .jbc-btn-primary:active {
-        transform: scale(.97);
+        transform: translateY(-3px);
+        box-shadow: 0 20px 45px -10px rgba(43, 75, 161, 0.4);
+        filter: brightness(1.1);
     }
 
     .jbc-btn-back {
@@ -628,7 +732,7 @@
         border-color: var(--jbc-blue);
         background: white;
         transform: scale(1.02);
-        box-shadow: 0 10px 30px -8px rgba(26, 35, 126, 0.1);
+        box-shadow: 0 10px 30px -8px rgba(43, 75, 161, 0.1);
     }
 
     /* ── Category tabs ── */
@@ -638,8 +742,8 @@
         background:#f1f5f9; color:#94a3b8; border:2px solid transparent;
         transition:all .3s; cursor:pointer;
     }
-    .jbc-tab:hover { background:#e8edf5; color:#1A237E; }
-    .jbc-tab.active { background:#1A237E; color:white; box-shadow:0 8px 20px -5px rgba(26,35,126,0.4); }
+    .jbc-tab:hover { background:#e8edf5; color:var(--jbc-blue); }
+    .jbc-tab.active { background:var(--jbc-blue); color:white; box-shadow:0 8px 20px -5px rgba(43,75,161,0.4); }
     .course-card.hidden-cat { display:none; }
 </style>
 
