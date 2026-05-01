@@ -41,8 +41,8 @@
 
             <!-- College Logo -->
             <div class="mb-8 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 transform hover:-translate-y-2 transition-transform p-4">
-                {% if college.logo_url %}
-                <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
+                {% if college.logo %}
+                <img src="{{ college.logo.url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
                 {% else %}
                 <i data-lucide="graduation-cap" class="w-14 h-14 text-[#FF6B35]"></i>
                 {% endif %}
@@ -50,11 +50,9 @@
 
             <!-- Headline -->
             <h1 class="text-white font-black tracking-tighter leading-[0.88] mb-10 animate-in slide-in-from-bottom-16 duration-700"
-                style="font-size:clamp(3rem,10vw,8.5rem)">
+                style="font-size:clamp(3rem,9vw,8rem)">
                 Jai Bharath<br />
-                <span class="text-[#FF6B35]">Engineering</span><br />
-                <span class="text-white/50" style="font-size:0.55em;letter-spacing:.05em">College of Management &
-                    Technology</span>
+                <span class="text-[#FF6B35]">Group of Institutions</span>
             </h1>
 
             <p class="text-blue-200/70 font-semibold leading-relaxed mb-16 mx-auto animate-in fade-in slide-in-from-bottom-10 duration-1000"
@@ -423,7 +421,7 @@
     <!-- Footer -->
     <footer
         class="py-14 bg-[#0D1554] text-white/25 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5" id="contact">
-        Jai Bharath College of Management and Engineering Technology · JBCMET · Vengola, Perumbavoor
+        Jai Bharath Group of Institutions · Vengola, Perumbavoor
     </footer>
 
 </div>
