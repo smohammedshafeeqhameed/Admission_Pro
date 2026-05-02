@@ -34,7 +34,7 @@ class StudentAdmissionForm(forms.ModelForm):
     # Documents (to be handled in Application model)
     doc_10th = forms.FileField(required=True, label="10th Marksheet")
     doc_11th = forms.FileField(required=False, label="11th Marksheet")
-    doc_12th = forms.FileField(required=True, label="12th Marksheet")
+    doc_12th = forms.FileField(required=False, label="12th Marksheet")
     doc_aadhar = forms.FileField(required=True, label="Aadhar Card Copy")
 
     class Meta:
