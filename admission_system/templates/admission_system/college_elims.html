@@ -42,18 +42,18 @@
         const header = document.querySelector('header');
         if (header) {
             header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
-            header.classList.add('bg-[#1a4d80]', 'text-white', 'border-white/10');
+            header.classList.add('bg-white', 'text-slate-900', 'border-b', 'border-slate-100', 'shadow-sm');
 
             header.querySelectorAll('h2, a, span.material-symbols-outlined').forEach(el => {
-                el.classList.add('text-white');
-                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary');
+                el.classList.add('text-slate-900');
+                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary', 'text-white');
             });
 
-            const applyBtn = header.querySelector('a[href="#apply"]');
-            if (applyBtn) {
-                applyBtn.classList.remove('bg-primary', 'text-white');
-                applyBtn.classList.add('bg-[#f19e12]', 'text-white', 'hover:bg-[#d68a0f]', 'border-none');
-            }
+            const applyBtns = document.querySelectorAll('header a[href="#apply"], #mobile-menu a[href="#apply"]');
+            applyBtns.forEach(btn => {
+                btn.className = "bg-[#f19e12] text-white px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-md hover:shadow-lg active:scale-95 border-none flex items-center justify-center";
+                btn.style.setProperty('color', 'white', 'important');
+            });
         }
     });
 </script>
@@ -250,7 +250,7 @@
                     <div class="relative z-10">
                         <div class="flex items-center gap-4 text-primary font-black text-xs uppercase tracking-[0.2em] border-t border-slate-100 dark:border-slate-800/60 pt-10">
                             <div class="w-2 h-2 rounded-full bg-secondary shadow-[0_0_8px_#FFCC00]"></div>
-                            AICTE Approved Program
+                            APPROVED BY AICTE
                         </div>
                     </div>
                 </div>

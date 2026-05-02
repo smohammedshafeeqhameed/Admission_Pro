@@ -33,18 +33,18 @@
         const header = document.querySelector('header');
         if (header) {
             header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
-            header.classList.add('bg-[#051d4d]', 'text-white', 'border-white/10');
+            header.classList.add('bg-white', 'text-slate-900', 'border-b', 'border-slate-100', 'shadow-sm');
 
             header.querySelectorAll('h2, a, span.material-symbols-outlined').forEach(el => {
-                el.classList.add('text-white');
-                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary');
+                el.classList.add('text-slate-900');
+                el.classList.remove('text-slate-900', 'dark:text-slate-100', 'text-primary', 'text-white');
             });
 
-            const applyBtn = header.querySelector('a[href="#apply"]');
-            if (applyBtn) {
-                applyBtn.classList.remove('bg-primary', 'text-white');
-                applyBtn.classList.add('bg-[#2b4ba1]', 'text-white', 'hover:bg-[#1e3a8a]', 'border-none');
-            }
+            const applyBtns = document.querySelectorAll('header a[href="#apply"], #mobile-menu a[href="#apply"]');
+            applyBtns.forEach(btn => {
+                btn.className = "bg-[#2b4ba1] text-white px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-md hover:shadow-lg active:scale-95 border-none flex items-center justify-center";
+                btn.style.setProperty('color', 'white', 'important');
+            });
         }
     });
 </script>
@@ -78,7 +78,7 @@
                 </span>
                 <span
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em]">
-                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> AICTE Approved
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> APPROVED BY AICTE
                 </span>
                 <span
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#2b4ba1]/20 backdrop-blur-xl border border-[#2b4ba1]/40 text-[#2b4ba1] text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
@@ -87,7 +87,7 @@
             </div>
 
             <!-- College Logo -->
-            <div class="mb-8 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 transform hover:-translate-y-2 transition-transform p-4">
+            <div class="mb-8 mx-auto w-28 h-28 sm:w-40 sm:h-40 rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-white flex items-center justify-center animate-in zoom-in duration-700 transform hover:-translate-y-2 transition-transform p-4">
                 {% if college.logo_url %}
                 <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
                 {% else %}
@@ -112,7 +112,7 @@
             <div
                 class="flex flex-col sm:flex-row gap-5 justify-center items-center animate-in fade-in slide-in-from-bottom-12 duration-1000">
                 <a href="#apply"
-                    class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#2b4ba1] text-white font-black py-6 px-14 rounded-[1.75rem] text-xl hover:bg-[#1e3a8a] hover:shadow-[0_20px_60px_-10px_rgba(43,75,161,0.6)] transition-all hover:-translate-y-2 active:scale-95">
+                    class="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#2b4ba1] text-white font-extrabold py-6 px-14 rounded-[1.75rem] text-xl hover:bg-[#1e3a8a] hover:shadow-[0_20px_60px_-10px_rgba(43,75,161,0.6)] transition-all hover:-translate-y-2 active:scale-95">
                     APPLY NOW <i data-lucide="arrow-right" class="w-6 h-6"></i>
                 </a>
                 <a href="#courses"

@@ -25,15 +25,22 @@
 
         <div class="relative z-10 text-center px-4 md:px-8 max-w-7xl mx-auto flex-1 flex flex-col justify-center py-20">
             <!-- Badge -->
-            <div
-                class="inline-flex items-center gap-3 px-7 py-3 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-14 animate-in fade-in zoom-in duration-1000 shadow-2xl">
-                <span
-                    class="w-2.5 h-2.5 rounded-full bg-[#B6E3D4] shadow-[0_0_12px_#B6E3D4] animate-pulse shrink-0"></span>
-                Admissions Open 2026–27 · Mahatma Gandhi University
+            <div class="flex flex-wrap justify-center gap-4 mb-14">
+                <div
+                    class="inline-flex items-center gap-3 px-7 py-3 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <span
+                        class="w-2.5 h-2.5 rounded-full bg-[#B6E3D4] shadow-[0_0_12px_#B6E3D4] animate-pulse shrink-0"></span>
+                    Admissions Open 2026–27
+                </div>
+                <div
+                    class="inline-flex items-center gap-3 px-7 py-3 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-[#B6E3D4]"></i>
+                    APPROVED BY AICTE
+                </div>
             </div>
 
             <!-- College Logo -->
-            <div class="mb-8 mx-auto w-32 h-32 sm:w-44 sm:h-44 rounded-full border-[6px] border-[#B6E3D4]/20 shadow-[0_20px_50px_-10px_rgba(182,227,212,0.3)] overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 transform hover:scale-105 transition-all p-6">
+            <div class="mb-8 mx-auto w-32 h-32 sm:w-44 sm:h-44 rounded-full border-[6px] border-[#B6E3D4]/20 shadow-[0_20px_50px_-10px_rgba(182,227,212,0.3)] overflow-hidden bg-white flex items-center justify-center animate-in zoom-in duration-700 transform hover:scale-105 transition-all p-6">
                 {% if college.logo_url %}
                 <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
                 {% else %}
@@ -728,5 +735,13 @@
 
         document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+        const applyBtn = document.querySelector('header a[href="#apply"]');
+        if (applyBtn) {
+            applyBtn.className = "bg-[#B6E3D4] text-[#1E3A8A] px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-md hover:shadow-lg active:scale-95 border-none flex items-center justify-center";
+        }
+    });
 </script>
 {% endblock %}

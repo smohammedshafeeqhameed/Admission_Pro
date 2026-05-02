@@ -11,13 +11,10 @@
 <script>
     // Custom Header Overwrite for Apply Now button to match Al Azhar Gold
     document.addEventListener('DOMContentLoaded', () => {
-        const applyBtns = document.querySelectorAll('header a[href="#apply"], #mobile-menu a[href="#apply"]');
-        applyBtns.forEach(btn => {
-            if (btn.innerText.trim() === 'Apply Now') {
-                btn.classList.remove('bg-primary', 'text-white');
-                btn.classList.add('bg-[#E5A425]', 'text-[#311B1B]', 'hover:bg-yellow-500');
-            }
-        });
+        const applyBtn = document.querySelector('header a[href="#apply"]');
+        if (applyBtn) {
+            applyBtn.className = "bg-[#E5A425] text-[#311B1B] px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-md hover:shadow-lg active:scale-95 border-none flex items-center justify-center";
+        }
     });
 </script>
 
@@ -36,10 +33,17 @@
         </div>
 
         <div class="relative z-10 text-center px-4 md:px-6 max-w-6xl mx-auto">
-            <div
-                class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-3xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] mb-12 animate-in fade-in zoom-in duration-1000 shadow-2xl">
-                <span class="flex h-3 w-3 rounded-full bg-[#E5A425] shadow-[0_0_15px_#E5A425] animate-pulse"></span>
-                Excellence in Education Since 2002
+            <div class="flex flex-wrap justify-center gap-4 mb-12">
+                <div
+                    class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-3xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <span class="flex h-3 w-3 rounded-full bg-[#E5A425] shadow-[0_0_15px_#E5A425] animate-pulse"></span>
+                    Excellence in Education Since 2002
+                </div>
+                <div
+                    class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-3xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.4em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-[#E5A425]"></i>
+                    APPROVED BY AICTE
+                </div>
             </div>
 
             <!-- College Logo -->

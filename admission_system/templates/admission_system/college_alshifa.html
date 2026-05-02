@@ -38,10 +38,17 @@
         </div>
 
         <div class="relative z-10 text-center px-4 md:px-6 max-w-6xl mx-auto">
-            <div
-                class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.3em] mb-10 animate-in fade-in zoom-in duration-1000 shadow-2xl">
-                <span class="flex h-2.5 w-2.5 rounded-full bg-secondary shadow-[0_0_15px_#BA8E23] animate-pulse"></span>
-                Admissions Open 2026-27
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <div
+                    class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.3em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <span class="flex h-2.5 w-2.5 rounded-full bg-secondary shadow-[0_0_15px_#BA8E23] animate-pulse"></span>
+                    Admissions Open 2026-27
+                </div>
+                <div
+                    class="inline-flex items-center gap-3 px-6 py-2.5 rounded-full bg-white/10 backdrop-blur-2xl border border-white/20 text-white text-[10px] md:text-xs font-black uppercase tracking-[0.3em] animate-in fade-in zoom-in duration-1000 shadow-2xl">
+                    <i data-lucide="shield-check" class="w-4 h-4 text-secondary"></i>
+                    APPROVED BY AICTE
+                </div>
             </div>
 
             <!-- College Logo -->
@@ -681,6 +688,10 @@
     // Initialize Lucide icons
     document.addEventListener('DOMContentLoaded', () => {
         if (typeof lucide !== 'undefined') lucide.createIcons();
+        const applyBtn = document.querySelector('header a[href="#apply"]');
+        if (applyBtn) {
+            applyBtn.className = "bg-[#BA8E23] text-white px-6 py-2.5 rounded-full font-black text-[10px] uppercase tracking-[0.2em] transition-all hover:scale-105 shadow-md hover:shadow-lg active:scale-95 border-none flex items-center justify-center";
+        }
     });
 </script>
 {% endblock %}
