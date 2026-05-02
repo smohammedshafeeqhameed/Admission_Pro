@@ -95,6 +95,10 @@
             <td>{{ app.addon_course }}</td>
         </tr>
         {% endif %}
+        <tr>
+            <th>Reference</th>
+            <td>{{ app.source|default:"-" }}</td>
+        </tr>
     </table>
 
     <h2>Personal Details</h2>
@@ -106,10 +110,6 @@
         <tr>
             <th>Email Address</th>
             <td>{{ app.student.email }}</td>
-        </tr>
-        <tr>
-            <th>Phone Number</th>
-            <td>{{ app.student.phone }}</td>
         </tr>
         <tr>
             <th>Date of Birth</th>
