@@ -1,5 +1,10 @@
 {% extends 'admission_system/college_base.html' %}
 {% load static %}
+{% block footer_contact %}
+<a href="tel:+919072277240" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#e11d48]"></i> +91 90722 77240
+</a>
+{% endblock %}
 
 {% block content %}
 <div class="bg-white dark:bg-slate-950 font-sans selection:bg-[#253E7D] selection:text-white">

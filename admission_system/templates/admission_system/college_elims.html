@@ -560,6 +560,15 @@
     <!-- Enhanced Footer (Mimicking official ELIMS site) -->
     <footer class="py-20 bg-[#2b6eb5] text-white border-t-8 border-[#f19e12]" id="contact">
         <div class="max-w-7xl mx-auto px-6 md:px-20 lg:px-40">
+            <div class="flex flex-col md:flex-row items-center gap-10 mb-16 pb-16 border-b border-white/10">
+                <div class="w-24 h-24 bg-white rounded-2xl p-4 shadow-2xl flex items-center justify-center shrink-0">
+                    <img src="{% if college.logo_url %}{{ college.logo_url }}{% else %}{% static 'admission_system/images/logos/logo_elims.png' %}{% endif %}" alt="ELIMS Logo" class="w-full h-full object-contain">
+                </div>
+                <div class="text-center md:text-left">
+                    <h3 class="text-2xl font-black tracking-tighter mb-1 uppercase">Elijah Institute of Management Studies</h3>
+                    <p class="text-white/60 text-sm font-bold tracking-widest uppercase">Empowering Excellence since 2004</p>
+                </div>
+            </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-16">
                 <div>
                     <h4 class="text-[#f19e12] font-black uppercase tracking-widest text-xs mb-8">About ELIMS</h4>
@@ -597,6 +606,10 @@
                             <span class="text-slate-200 leading-snug">ELIMS Campus, Ponganamkad, Kurichikkara P.O, Thrissur - 680028</span>
                         </li>
                      
+                        <li class="flex items-center gap-3">
+                            <i data-lucide="phone" class="w-5 h-5 text-[#f19e12] shrink-0"></i>
+                            <a href="tel:+918714829995" class="text-slate-200 hover:text-white transition-colors">+91 87148 29995</a>
+                        </li>
                         <li class="flex items-center gap-3">
                             <i data-lucide="mail" class="w-5 h-5 text-[#f19e12]"></i>
                             <span class="text-slate-200">info@elims.edu.in</span>

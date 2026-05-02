@@ -1,5 +1,6 @@
 {% extends 'admission_system/college_base.html' %}
 {% load static %}
+{% block title %}MES GROUP OF INSTITUTIONS{% endblock %}
 
 {% block content %}
 <div class="bg-white dark:bg-slate-950 font-sans">
@@ -41,7 +42,7 @@
             </div>
 
             <!-- College Logo -->
-            <div class="mb-6 mx-auto w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-white/10 backdrop-blur-md flex items-center justify-center animate-in zoom-in duration-700 p-4">
+            <div class="mb-6 mx-auto w-24 h-24 sm:w-32 sm:h-32 rounded-full border-4 border-white/20 shadow-2xl overflow-hidden bg-white flex items-center justify-center animate-in zoom-in duration-700 p-4">
                 {% if college.logo_url %}
                 <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="w-full h-full object-contain">
                 {% else %}
@@ -467,10 +468,25 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer
-        class="py-14 bg-[#0a2e0d] text-white/20 text-xs font-bold tracking-[0.5em] uppercase text-center border-t border-white/5" id="contact">
-        MES GROUP OF INSTITUTIONS · Kunnukara · Muslim Education Society
+        class="py-16 bg-[#0a2e0d] text-center border-t border-white/5" id="contact">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col items-center gap-6">
+                <div class="w-16 h-16 bg-white rounded-full p-3 shadow-2xl shadow-black/50 flex items-center justify-center">
+                    {% if college.logo_url %}
+                    <img src="{{ college.logo_url }}" alt="Logo" class="w-full h-full object-contain">
+                    {% else %}
+                    <i data-lucide="graduation-cap" class="w-8 h-8 text-[#1B5E20]"></i>
+                    {% endif %}
+                </div>
+                <div class="text-white/30 text-[10px] font-black tracking-[0.5em] uppercase mb-2">
+                    MES GROUP OF INSTITUTIONS · Kunnukara
+                </div>
+                <a href="tel:+919072277245" class="text-white/40 text-[10px] font-black tracking-[0.2em] uppercase flex items-center justify-center gap-2 hover:text-white transition-colors">
+                    <i data-lucide="phone" class="w-3 h-3"></i> +91 90722 77245
+                </a>
+            </div>
+        </div>
     </footer>
 
 </div>

@@ -69,6 +69,7 @@ class StudentAdmissionForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         if college:
             self.fields['course'].queryset = college.courses.all()
+            self.fields['course'].label_from_instance = lambda obj: f"{obj.name}"
         
         # Enforce mandatory selection for Gender, Blood Group, and Aadhar
         self.fields['gender'].required = True

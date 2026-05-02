@@ -1,5 +1,10 @@
 {% extends 'admission_system/college_base.html' %}
 {% load static %}
+{% block footer_contact %}
+<a href="tel:+918714766654" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#8B0000]"></i> +91 87147 66654
+</a>
+{% endblock %}
 
 {% block extra_head %}
     <script id="tailwind-config">
