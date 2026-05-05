@@ -29,7 +29,7 @@ class StudentAdmissionForm(forms.ModelForm):
     # Additional fields from Application model or custom ones
     addon_course = forms.ChoiceField(choices=[('', 'Select Add-on Course')], required=False, label="Add-on Course")
     course = forms.ModelChoiceField(queryset=Course.objects.none(), required=True, label="Main Course")
-    source = forms.CharField(required=False, label="Reference Source", widget=forms.TextInput(attrs={'placeholder': 'How did you hear about us?'}))
+    source = forms.CharField(required=True, label="Reference Source", widget=forms.TextInput(attrs={'placeholder': 'How did you hear about us?'}))
     
     # Documents (to be handled in Application model)
     doc_10th = forms.FileField(required=True, label="10th Marksheet")

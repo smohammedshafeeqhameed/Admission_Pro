@@ -153,16 +153,16 @@
     <table>
         <tr>
             <th>Father's Name</th>
-            <td>{{ app.student.father_name|default:"Not Provided" }} ({{ app.student.father_mobile|default:"-" }})</td>
+            <td>{{ app.student.father_name|default:"Not Provided" }}</td>
         </tr>
         <tr>
             <th>Mother's Name</th>
-            <td>{{ app.student.mother_name|default:"Not Provided" }} ({{ app.student.mother_mobile|default:"-" }})</td>
+            <td>{{ app.student.mother_name|default:"Not Provided" }}</td>
         </tr>
         {% if app.student.guardian_name %}
         <tr>
             <th>Guardian's Name</th>
-            <td>{{ app.student.guardian_name }} ({{ app.student.guardian_mobile|default:"-" }})</td>
+            <td>{{ app.student.guardian_name }}</td>
         </tr>
         {% endif %}
     </table>
