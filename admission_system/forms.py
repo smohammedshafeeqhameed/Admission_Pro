@@ -71,10 +71,16 @@ class StudentAdmissionForm(forms.ModelForm):
             self.fields['course'].queryset = college.courses.all()
             self.fields['course'].label_from_instance = lambda obj: f"{obj.name}"
         
-        # Enforce mandatory selection for Gender, Blood Group, and Aadhar
+        # Enforce mandatory selection for Gender and Aadhar
         self.fields['gender'].required = True
-        self.fields['blood_group'].required = True
         self.fields['aadhar_number'].required = True
+        
+        # Explicitly make these optional as per user request
+        self.fields['blood_group'].required = False
+        self.fields['father_occupation'].required = False
+        self.fields['mother_occupation'].required = False
+        self.fields['correspondence_address'].required = False
+        self.fields['category'].required = False
         
         # If we have course data in POST, update addon_course choices to pass validation
         if 'course' in self.data:
