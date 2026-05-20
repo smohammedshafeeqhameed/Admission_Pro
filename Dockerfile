@@ -9,4 +9,4 @@ COPY . .
 
 RUN python manage.py collectstatic --noinput
 
-CMD ["gunicorn", "--bind", "0.0.0.0:8000", "ams_project.wsgi:application"]
+CMD ["gunicorn","--bind","0.0.0.0:8000","--timeout","180","--workers","2","ams_project.wsgi:application"]
