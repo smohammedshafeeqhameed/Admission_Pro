@@ -64,6 +64,7 @@ class StudentAdmissionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         college = kwargs.pop('college', None)
+        has_files_in_session = kwargs.pop('has_files_in_session', False)
         super().__init__(*args, **kwargs)
         if college:
             self.fields['course'].queryset = college.courses.all()
@@ -84,6 +85,11 @@ class StudentAdmissionForm(forms.ModelForm):
              addons = AddonCourse.objects.filter(course=course)
              self.fields['addon_course'].choices = [('', 'Select Add-on Course')] + [(a.name, a.name) for a in addons]
         
+        if has_files_in_session:
+            self.fields['doc_10th'].required = False
+            self.fields['doc_12th'].required = False
+            self.fields['doc_aadhar'].required = False
+
         # Add Tailwind classes to all fields
         for field_name, field in self.fields.items():
             field.widget.attrs.update({

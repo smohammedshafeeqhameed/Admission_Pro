@@ -446,65 +446,86 @@ def apply_admission(request, college_slug, cre_id):
     college = get_object_or_404(College, slug=college_slug)
     referrer = get_object_or_404(CREProfile, cre_id=cre_id)
     
-    if request.method == 'POST':
-        form = StudentAdmissionForm(request.POST, request.FILES, college=college)
-        if form.is_valid():
-            # 1. Save/Update Student
-            email = form.cleaned_data['email']
-            student, created = Student.objects.update_or_create(
-                email=email,
-                defaults={
-                    'name': form.cleaned_data['name'],
-                    'phone': form.cleaned_data['phone'],
-                    'dob': form.cleaned_data['dob'],
-                    'gender': form.cleaned_data['gender'],
-                    'aadhar_number': form.cleaned_data['aadhar_number'],
-                    'blood_group': form.cleaned_data['blood_group'],
-                    'category': form.cleaned_data['category'],
-                    'permanent_address': form.cleaned_data['permanent_address'],
-                    'correspondence_address': form.cleaned_data['correspondence_address'],
-                    'state': form.cleaned_data['state'],
-                    'city': form.cleaned_data['city'],
-                    'father_name': form.cleaned_data['father_name'],
-                    'father_mobile': form.cleaned_data['father_mobile'],
-                    'father_occupation': form.cleaned_data['father_occupation'],
-                    'mother_name': form.cleaned_data['mother_name'],
-                    'mother_mobile': form.cleaned_data['mother_mobile'],
-                    'mother_occupation': form.cleaned_data['mother_occupation'],
-                    'guardian_name': form.cleaned_data['guardian_name'],
-                    'guardian_mobile': form.cleaned_data['guardian_mobile'],
-                    'preferred_contact': form.cleaned_data['preferred_contact'],
-                }
-            )
+    # Retrieve pending data from session
+    pending_student_data = request.session.get('pending_student_data')
+    pending_application_data = request.session.get('pending_application_data')
+    pending_files = request.session.get('pending_files', {})
+    
+    initial_data = {}
+    has_files_in_session = False
+    
+    # Pre-populate student data if present
+    if pending_student_data:
+        initial_data.update(pending_student_data)
+        
+    # Pre-populate application data and files if it belongs to the same college
+    if pending_application_data and pending_application_data.get('college') == college.id:
+        initial_data.update(pending_application_data)
+        has_files_in_session = bool(pending_files)
+        if request.method == 'GET':
+            messages.info(request, "We found your incomplete application. You can review, update your details, and proceed to payment.")
             
-            # 2. Check for existing successful application
+    if request.method == 'POST':
+        form = StudentAdmissionForm(request.POST, request.FILES, college=college, has_files_in_session=has_files_in_session)
+        if form.is_valid():
+            # Check for existing successful application by email
+            email = form.cleaned_data['email']
             course = form.cleaned_data['course']
-            existing_app = Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists()
-            if existing_app:
+            student_exists = Student.objects.filter(email=email).first()
+            if student_exists and Application.objects.filter(student=student_exists, college=college, course=course, payment_status='Success').exists():
                 messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
             else:
-                # 3. Create/Update Pending Application
-                app, _ = Application.objects.update_or_create(
-                    student=student, college=college, course=course,
-                    defaults={
-                        'addon_course': form.cleaned_data['addon_course'],
-                        'source': form.cleaned_data['source'],
-                        'referred_by': referrer,
-                        'doc_10th': form.cleaned_data['doc_10th'],
-                        'doc_11th': form.cleaned_data['doc_11th'],
-                        'doc_12th': form.cleaned_data['doc_12th'],
-                        'doc_aadhar': form.cleaned_data['doc_aadhar'],
-                        'payment_status': 'Pending'
-                    }
-                )
+                # Serialize Student Data
+                student_data = {}
+                student_fields = [
+                    'name', 'phone', 'email', 'dob', 'gender', 'aadhar_number', 'blood_group', 
+                    'category', 'permanent_address', 'correspondence_address', 'state', 'city', 
+                    'father_name', 'father_mobile', 'father_occupation', 'mother_name', 
+                    'mother_mobile', 'mother_occupation', 'guardian_name', 'guardian_mobile', 
+                    'preferred_contact'
+                ]
+                for f in student_fields:
+                    val = form.cleaned_data.get(f)
+                    if hasattr(val, 'isoformat'): # dob DateField
+                        student_data[f] = val.isoformat()
+                    else:
+                        student_data[f] = val
                 
+                # Serialize Application Data
+                addon_course = form.cleaned_data.get('addon_course')
+                source = form.cleaned_data.get('source')
                 
-                # 4. Redirect to manual payment page
-                return redirect('manual_payment', app_id=app.id)
+                application_data = {
+                    'college': college.id,
+                    'course': course.id,
+                    'addon_course': addon_course,
+                    'source': source.id if source else None,
+                    'referred_by': referrer.id
+                }
+                
+                # Save file uploads to storage
+                from django.core.files.storage import default_storage
+                for file_field in ['doc_10th', 'doc_11th', 'doc_12th', 'doc_aadhar']:
+                    uploaded_file = request.FILES.get(file_field)
+                    if uploaded_file:
+                        folder = file_field.split('_')[1] # '10th', '11th', '12th', 'aadhar'
+                        saved_path = default_storage.save(f"documents/{folder}/{uploaded_file.name}", uploaded_file)
+                        pending_files[file_field] = saved_path
+                
+                # Store all pending data in the session
+                request.session['pending_student_data'] = student_data
+                request.session['pending_application_data'] = application_data
+                request.session['pending_files'] = pending_files
+                request.session['pending_college_slug'] = college_slug
+                request.session['pending_cre_id'] = str(cre_id)
+                
+                return redirect('manual_payment')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{form.fields[field].label}: {error}")
+    else:
+        form = StudentAdmissionForm(initial=initial_data, college=college, has_files_in_session=has_files_in_session)
 
     courses = college.courses.all()
     template_name = f'admission_system/college_{college.slug}.html'
@@ -518,15 +539,23 @@ def apply_admission(request, college_slug, cre_id):
         'college': college,
         'courses': courses,
         'cre_id': cre_id,
-        'form': StudentAdmissionForm(college=college)
+        'form': form,
+        'pending_files': pending_files
     })
 
-def manual_payment(request, app_id):
-    app = get_object_or_404(Application, id=app_id)
-    if app.payment_status in ['Success', 'Pending Verification']:
-        messages.info(request, "Your payment is already processed or under verification.")
-        # Redirect back to the college landing page instead of dashboard
-        return redirect('apply_admission', college_slug=app.college.slug, cre_id=app.referred_by.cre_id)
+def manual_payment(request):
+    pending_student_data = request.session.get('pending_student_data')
+    pending_application_data = request.session.get('pending_application_data')
+    pending_files = request.session.get('pending_files', {})
+    
+    if not pending_student_data or not pending_application_data:
+        messages.warning(request, "No active application session found. Please fill out the form first.")
+        return redirect('home')
+
+    college = get_object_or_404(College, id=pending_application_data['college'])
+    course = get_object_or_404(Course, id=pending_application_data['course'])
+    college_slug = request.session.get('pending_college_slug')
+    cre_id = request.session.get('pending_cre_id')
 
     if request.method == "POST":
         transaction_id = request.POST.get('transaction_id')
@@ -534,26 +563,108 @@ def manual_payment(request, app_id):
         
         if transaction_id and payment_screenshot:
             # Check for duplicate transaction ID
-            if Application.objects.filter(transaction_id=transaction_id).exclude(id=app.id).exists():
+            if Application.objects.filter(transaction_id=transaction_id).exists():
                 messages.error(request, "This Transaction ID has already been used. Please provide the unique ID for this payment.")
                 return render(request, 'admission_system/manual_payment.html', {
-                    'app': app, 
-                    'college': app.college,
+                    'college': college,
+                    'course': course,
+                    'college_slug': college_slug,
+                    'cre_id': cre_id,
                     'upi_id': settings.UPI_ID,
                     'upi_payee_name': settings.UPI_PAYEE_NAME
                 })
 
-            app.transaction_id = transaction_id
-            app.payment_screenshot = payment_screenshot
-            app.payment_status = 'Pending Verification'
-            app.save()
-            return render(request, 'admission_system/success.html', {'college': app.college, 'app': app})
+            # Save Student and Application to the database in a transaction
+            from django.db import transaction
+            from .models import ApplicationSource
+            try:
+                with transaction.atomic():
+                    # 1. Save/Update Student
+                    email = pending_student_data['email']
+                    student, created = Student.objects.update_or_create(
+                        email=email,
+                        defaults={
+                            'name': pending_student_data['name'],
+                            'phone': pending_student_data['phone'],
+                            'dob': pending_student_data.get('dob') if pending_student_data.get('dob') else None,
+                            'gender': pending_student_data.get('gender'),
+                            'aadhar_number': pending_student_data.get('aadhar_number'),
+                            'blood_group': pending_student_data.get('blood_group'),
+                            'category': pending_student_data.get('category'),
+                            'permanent_address': pending_student_data.get('permanent_address'),
+                            'correspondence_address': pending_student_data.get('correspondence_address'),
+                            'state': pending_student_data.get('state'),
+                            'city': pending_student_data.get('city'),
+                            'father_name': pending_student_data.get('father_name'),
+                            'father_mobile': pending_student_data.get('father_mobile'),
+                            'father_occupation': pending_student_data.get('father_occupation'),
+                            'mother_name': pending_student_data.get('mother_name'),
+                            'mother_mobile': pending_student_data.get('mother_mobile'),
+                            'mother_occupation': pending_student_data.get('mother_occupation'),
+                            'guardian_name': pending_student_data.get('guardian_name'),
+                            'guardian_mobile': pending_student_data.get('guardian_mobile'),
+                            'preferred_contact': pending_student_data.get('preferred_contact'),
+                        }
+                    )
+
+                    # 2. Check for duplicate successful application just in case
+                    if Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists():
+                        messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
+                        return redirect('apply_admission', college_slug=college_slug, cre_id=cre_id)
+
+                    # 3. Resolve ForeignKey objects
+                    referrer = None
+                    cre_profile_id = pending_application_data.get('referred_by')
+                    if cre_profile_id:
+                        referrer = get_object_or_404(CREProfile, id=cre_profile_id)
+                        
+                    source = None
+                    source_id = pending_application_data.get('source')
+                    if source_id:
+                        source = get_object_or_404(ApplicationSource, id=source_id)
+
+                    # 4. Save/Update Application
+                    app, _ = Application.objects.update_or_create(
+                        student=student, college=college, course=course,
+                        defaults={
+                            'addon_course': pending_application_data.get('addon_course'),
+                            'source': source,
+                            'referred_by': referrer,
+                            'doc_10th': pending_files.get('doc_10th'),
+                            'doc_11th': pending_files.get('doc_11th'),
+                            'doc_12th': pending_files.get('doc_12th'),
+                            'doc_aadhar': pending_files.get('doc_aadhar'),
+                            'payment_status': 'Pending Verification',
+                            'transaction_id': transaction_id,
+                            'payment_screenshot': payment_screenshot,
+                        }
+                    )
+
+                # Clear pending data from session on success
+                for key in ['pending_student_data', 'pending_application_data', 'pending_files', 'pending_college_slug', 'pending_cre_id']:
+                    if key in request.session:
+                        del request.session[key]
+
+                return render(request, 'admission_system/success.html', {'college': college, 'app': app})
+
+            except Exception as e:
+                messages.error(request, f"An error occurred while saving your application: {e}")
+                return render(request, 'admission_system/manual_payment.html', {
+                    'college': college,
+                    'course': course,
+                    'college_slug': college_slug,
+                    'cre_id': cre_id,
+                    'upi_id': settings.UPI_ID,
+                    'upi_payee_name': settings.UPI_PAYEE_NAME
+                })
         else:
             messages.error(request, "Please provide both Transaction ID and the Payment Screenshot.")
             
     return render(request, 'admission_system/manual_payment.html', {
-        'app': app, 
-        'college': app.college,
+        'college': college,
+        'course': course,
+        'college_slug': college_slug,
+        'cre_id': cre_id,
         'upi_id': settings.UPI_ID,
         'upi_payee_name': settings.UPI_PAYEE_NAME
     })
