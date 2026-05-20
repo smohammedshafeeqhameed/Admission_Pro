@@ -18,7 +18,7 @@ from django.utils.text import slugify
 from django.http import JsonResponse
 from .models import AddonCourse, CampusManagerProfile
 from django.template.loader import get_template
-from xhtml2pdf import pisa
+
 
 class CampusManagerRequiredMixin(UserPassesTestMixin):
     def test_func(self):
@@ -573,13 +573,18 @@ from .models import FinanceProfile
 def apply_admission(request, college_slug, cre_id):
     college = get_object_or_404(College, slug=college_slug)
     referrer = get_object_or_404(CREProfile, cre_id=cre_id)
+    
+    # Retrieve pending data from session
+    pending_student_data = request.session.get('pending_student_data')
+    has_files_in_session = bool(request.session.get('pending_files'))
+
     if request.method == 'POST':
-        form = StudentAdmissionForm(request.POST, request.FILES, college=college)
+        form = StudentAdmissionForm(request.POST, request.FILES, college=college, has_files_in_session=has_files_in_session)
         if form.is_valid():
-            # 1. Save/Update Student
-            email = form.cleaned_data['email']
-            defaults = {
-                'dob': form.cleaned_data['dob'],
+            # Save student data to session
+            student_data = {
+                'email': form.cleaned_data['email'],
+                'dob': form.cleaned_data['dob'].isoformat() if form.cleaned_data['dob'] else None,
                 'gender': form.cleaned_data['gender'],
                 'aadhar_number': form.cleaned_data['aadhar_number'],
                 'blood_group': form.cleaned_data['blood_group'],
@@ -597,91 +602,86 @@ def apply_admission(request, college_slug, cre_id):
                 'guardian_name': form.cleaned_data['guardian_name'],
                 'guardian_mobile': form.cleaned_data['guardian_mobile'],
                 'preferred_contact': form.cleaned_data['preferred_contact'],
+                'name': form.cleaned_data['name'],
+                'phone': form.cleaned_data['phone'],
             }
             
-            name = form.cleaned_data['name']
-            phone = form.cleaned_data['phone']
-            
-            try:
-                student, created = Student.objects.update_or_create(
-                    email=email,
-                    name=name,
-                    phone=phone,
-                    defaults=defaults
-                )
-            except Student.MultipleObjectsReturned:
-                # Fallback: if multiple students have the same email/name/phone, pick the first one and update it
-                student = Student.objects.filter(email=email, name=name, phone=phone).first()
-                for key, value in defaults.items():
-                    setattr(student, key, value)
-                student.save()
-                created = False
-            
-            # 2. Check for existing application status
-            course = form.cleaned_data['course']
-            existing_app = Application.objects.filter(student=student, college=college, course=course).first()
-            
-            if existing_app:
-                if existing_app.payment_status == 'Success':
-                    messages.success(request, f"You have already successfully applied for {course.name} at {college.name}.")
-                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+            # Check for existing application before proceeding
+            student = Student.objects.filter(email=student_data['email']).first()
+            if not student:
+                student = Student.objects.filter(phone=student_data['phone']).first()
                 
-                elif existing_app.payment_status == 'Pending Verification':
-                    # Check if the existing app belongs to someone else
-                    if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
-                        messages.error(request, f"This student is already registered through another partner for {course.name}. Duplicate registrations across different partners are not allowed.")
+            if student:
+                course = form.cleaned_data['course']
+                existing_app = Application.objects.filter(student=student, college=college, course=course).first()
+                if existing_app:
+                    if existing_app.payment_status == 'Success':
+                        messages.success(request, f"You have already successfully applied for {course.name} at {college.name}.")
+                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                    elif existing_app.payment_status == 'Pending Verification':
+                        if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
+                            messages.error(request, f"This student is already registered through another partner for {course.name}. Duplicate registrations across different partners are not allowed.")
+                            return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                        messages.warning(request, "Your previous payment for this course is currently being verified. Please do not pay again.")
                         return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
                     
-                    messages.warning(request, "Your previous payment for this course is currently being verified. Please do not pay again.")
-                    return redirect('manual_payment', app_id=existing_app.id)
-                
-                # Check for cross-CRE ownership on Pending/Failed/Rejected too
-                if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
-                    # If the application was initially by someone else, we don't let current CRE overwrite it
-                    messages.error(request, f"This student was previously registered through another partner. Please contact the administrator for cross-partner transfers.")
-                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                    if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
+                        messages.error(request, f"This student was previously registered through another partner. Please contact the administrator for cross-partner transfers.")
+                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
 
-            # 3. Create/Update Application atomically to prevent race condition overwrites
-            app, created = Application.objects.get_or_create(
-                student=student, college=college, course=course,
-                defaults={
-                    'addon_course': form.cleaned_data['addon_course'],
-                    'source': form.cleaned_data['source'],
-                    'referred_by': referrer,
-                    'doc_10th': form.cleaned_data.get('doc_10th'),
-                    'doc_11th': form.cleaned_data.get('doc_11th'),
-                    'doc_12th': form.cleaned_data.get('doc_12th'),
-                    'doc_aadhar': form.cleaned_data.get('doc_aadhar'),
-                    'payment_status': 'Pending'
-                }
-            )
+            # Save application data to session
+            course = form.cleaned_data['course']
+            source = form.cleaned_data.get('source', '')
             
-            if not created:
-                # Due to a race condition (or normal revisit), the app exists.
-                # Verify ownership ONE MORE TIME to be absolutely certain.
-                if app.referred_by and app.referred_by.cre_id != referrer.cre_id:
-                    messages.error(request, f"This student was just registered through another partner. Duplicate registrations across different partners are not allowed.")
-                    return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
-                
-                # We own it, safely update the fields (only overwrite docs if new ones are provided)
-                app.addon_course = form.cleaned_data['addon_course']
-                app.source = form.cleaned_data['source']
-                if form.cleaned_data.get('doc_10th'): app.doc_10th = form.cleaned_data['doc_10th']
-                if form.cleaned_data.get('doc_11th'): app.doc_11th = form.cleaned_data['doc_11th']
-                if form.cleaned_data.get('doc_12th'): app.doc_12th = form.cleaned_data['doc_12th']
-                if form.cleaned_data.get('doc_aadhar'): app.doc_aadhar = form.cleaned_data['doc_aadhar']
-                
-                # Ensure we don't downgrade a processed payment status
-                if app.payment_status not in ['Success', 'Pending Verification']:
-                    app.payment_status = 'Pending'
-                app.save()
+            application_data = {
+                'college': college.id,
+                'course': course.id,
+                'addon_course': form.cleaned_data['addon_course'],
+                'source': source,
+                'referred_by': referrer.id,
+            }
             
-            # 4. Redirect to manual payment page
-            return redirect('manual_payment', app_id=app.id)
+            # Handle file uploads (save temporarily to default storage, keep path in session)
+            from django.core.files.storage import default_storage
+            from django.core.files.base import ContentFile
+            import os
+            
+            file_paths = request.session.get('pending_files', {})
+            
+            for doc_field in ['doc_10th', 'doc_11th', 'doc_12th', 'doc_aadhar']:
+                uploaded_file = form.cleaned_data.get(doc_field)
+                if uploaded_file:
+                    # Clean up old file if replacing
+                    if doc_field in file_paths and default_storage.exists(file_paths[doc_field]):
+                        default_storage.delete(file_paths[doc_field])
+                        
+                    file_name = default_storage.save(f"temp/{uploaded_file.name}", ContentFile(uploaded_file.read()))
+                    file_paths[doc_field] = file_name
+
+            request.session['pending_student_data'] = student_data
+            request.session['pending_application_data'] = application_data
+            request.session['pending_files'] = file_paths
+            request.session['pending_college_slug'] = college_slug
+            request.session['pending_cre_id'] = str(cre_id)
+            
+            return redirect('manual_payment')
         else:
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{form.fields[field].label}: {error}")
+    else:
+        # Pre-fill form if session data exists
+        initial_data = {}
+        if pending_student_data:
+            initial_data.update(pending_student_data)
+        
+        pending_app_data = request.session.get('pending_application_data')
+        if pending_app_data:
+            initial_data['course'] = pending_app_data.get('course')
+            initial_data['addon_course'] = pending_app_data.get('addon_course')
+            initial_data['source'] = pending_app_data.get('source')
+            
+        form = StudentAdmissionForm(college=college, initial=initial_data, has_files_in_session=has_files_in_session)
 
     courses = college.courses.all()
     
@@ -700,46 +700,137 @@ def apply_admission(request, college_slug, cre_id):
         'college': college,
         'courses': courses,
         'cre_id': cre_id,
-        'form': StudentAdmissionForm(college=college)
+        'form': form
     })
 
-def manual_payment(request, app_id):
-    app = get_object_or_404(Application, id=app_id)
-    if app.payment_status in ['Success', 'Pending Verification']:
-        messages.info(request, "Your payment is already processed or under verification.")
-        # Re-verify if we have a referral profile to redirect back to
-        if app.referred_by:
-            return redirect('apply_admission', college_slug=app.college.slug, cre_id=app.referred_by.cre_id)
-        return redirect('admin_dashboard')
+from django.db import transaction
+
+def manual_payment(request):
+    pending_student_data = request.session.get('pending_student_data')
+    pending_application_data = request.session.get('pending_application_data')
+    pending_files = request.session.get('pending_files', {})
+    college_slug = request.session.get('pending_college_slug')
+    cre_id = request.session.get('pending_cre_id')
+
+    if not all([pending_student_data, pending_application_data, college_slug, cre_id]):
+        messages.error(request, "No pending application found. Please fill out the admission form first.")
+        return redirect('home')
+
+    college = get_object_or_404(College, slug=college_slug)
+    course = get_object_or_404(Course, id=pending_application_data['course'])
 
     if request.method == "POST":
         transaction_id = request.POST.get('transaction_id')
         payment_screenshot = request.FILES.get('payment_screenshot')
         
         if transaction_id and payment_screenshot:
-            # Check for duplicate transaction ID
-            if Application.objects.filter(transaction_id=transaction_id).exclude(id=app.id).exists():
+            if Application.objects.filter(transaction_id=transaction_id).exists():
                 messages.error(request, "This Transaction ID has already been used. Please provide the unique ID for this payment.")
                 return render(request, 'admission_system/manual_payment.html', {
-                    'app': app, 
-                    'college': app.college,
-                    'upi_id': app.college.upi_id or settings.UPI_ID,
-                    'upi_payee_name': app.college.upi_payee_name or settings.UPI_PAYEE_NAME
+                    'college': college,
+                    'course': course,
+                    'college_slug': college_slug,
+                    'cre_id': cre_id,
+                    'upi_id': college.upi_id or settings.UPI_ID,
+                    'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
                 })
+                
+            try:
+                with transaction.atomic():
+                    # 1. Save/Update Student
+                    email = pending_student_data['email']
+                    student, created = Student.objects.update_or_create(
+                        email=email,
+                        defaults={
+                            'name': pending_student_data['name'],
+                            'phone': pending_student_data['phone'],
+                            'dob': pending_student_data.get('dob') if pending_student_data.get('dob') else None,
+                            'gender': pending_student_data.get('gender'),
+                            'aadhar_number': pending_student_data.get('aadhar_number'),
+                            'blood_group': pending_student_data.get('blood_group'),
+                            'category': pending_student_data.get('category'),
+                            'permanent_address': pending_student_data.get('permanent_address'),
+                            'correspondence_address': pending_student_data.get('correspondence_address'),
+                            'state': pending_student_data.get('state'),
+                            'city': pending_student_data.get('city'),
+                            'father_name': pending_student_data.get('father_name'),
+                            'father_mobile': pending_student_data.get('father_mobile'),
+                            'father_occupation': pending_student_data.get('father_occupation'),
+                            'mother_name': pending_student_data.get('mother_name'),
+                            'mother_mobile': pending_student_data.get('mother_mobile'),
+                            'mother_occupation': pending_student_data.get('mother_occupation'),
+                            'guardian_name': pending_student_data.get('guardian_name'),
+                            'guardian_mobile': pending_student_data.get('guardian_mobile'),
+                            'preferred_contact': pending_student_data.get('preferred_contact'),
+                        }
+                    )
 
-            app.transaction_id = transaction_id
-            app.payment_screenshot = payment_screenshot
-            app.payment_status = 'Pending Verification'
-            app.save()
-            return render(request, 'admission_system/success.html', {'college': app.college, 'app': app})
+                    # 2. Check for duplicate successful application just in case
+                    if Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists():
+                        messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
+                        return redirect('apply_admission', college_slug=college_slug, cre_id=cre_id)
+
+                    # 3. Resolve ForeignKey objects
+                    referrer = None
+                    cre_profile_id = pending_application_data.get('referred_by')
+                    if cre_profile_id:
+                        referrer = get_object_or_404(CREProfile, id=cre_profile_id)
+                        
+                    source = pending_application_data.get('source')
+
+                    # 4. Save/Update Application
+                    app, _ = Application.objects.update_or_create(
+                        student=student, college=college, course=course,
+                        defaults={
+                            'addon_course': pending_application_data.get('addon_course'),
+                            'source': source,
+                            'referred_by': referrer,
+                            'payment_status': 'Pending Verification',
+                            'transaction_id': transaction_id,
+                            'payment_screenshot': payment_screenshot,
+                        }
+                    )
+                    
+                    # Process files from default_storage
+                    from django.core.files.storage import default_storage
+                    from django.core.files import File
+                    import os
+                    for doc_field in ['doc_10th', 'doc_11th', 'doc_12th', 'doc_aadhar']:
+                        file_path = pending_files.get(doc_field)
+                        if file_path and default_storage.exists(file_path):
+                            with default_storage.open(file_path) as f:
+                                getattr(app, doc_field).save(os.path.basename(file_path), File(f))
+                            default_storage.delete(file_path)
+                    
+                    app.save()
+
+                # Clear pending data from session on success
+                for key in ['pending_student_data', 'pending_application_data', 'pending_files', 'pending_college_slug', 'pending_cre_id']:
+                    if key in request.session:
+                        del request.session[key]
+
+                return render(request, 'admission_system/success.html', {'college': college, 'app': app})
+
+            except Exception as e:
+                messages.error(request, f"An error occurred while saving your application: {e}")
+                return render(request, 'admission_system/manual_payment.html', {
+                    'college': college,
+                    'course': course,
+                    'college_slug': college_slug,
+                    'cre_id': cre_id,
+                    'upi_id': college.upi_id or settings.UPI_ID,
+                    'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
+                })
         else:
             messages.error(request, "Please provide both Transaction ID and the Payment Screenshot.")
             
     return render(request, 'admission_system/manual_payment.html', {
-        'app': app, 
-        'college': app.college,
-        'upi_id': app.college.upi_id or settings.UPI_ID,
-        'upi_payee_name': app.college.upi_payee_name or settings.UPI_PAYEE_NAME
+        'college': college,
+        'course': course,
+        'college_slug': college_slug,
+        'cre_id': cre_id,
+        'upi_id': college.upi_id or settings.UPI_ID,
+        'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
     })
 
 def home(request):
@@ -795,6 +886,7 @@ def download_application_pdf(request, app_id):
     html = template.render(context)
 
     # create a pdf
+    from xhtml2pdf import pisa
     pisa_status = pisa.CreatePDF(
        html, dest=response)
        

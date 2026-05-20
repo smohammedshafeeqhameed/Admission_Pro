@@ -66,7 +66,14 @@ class StudentAdmissionForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         college = kwargs.pop('college', None)
+        has_files_in_session = kwargs.pop('has_files_in_session', False)
         super().__init__(*args, **kwargs)
+        if has_files_in_session:
+            self.fields['doc_10th'].required = False
+            self.fields['doc_11th'].required = False
+            self.fields['doc_12th'].required = False
+            self.fields['doc_aadhar'].required = False
+
         if college:
             self.fields['course'].queryset = college.courses.all()
             self.fields['course'].label_from_instance = lambda obj: f"{obj.name}"
