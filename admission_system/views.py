@@ -348,7 +348,7 @@ class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
         
         writer = csv.writer(response)
         writer.writerow([
-            'Name', 'Email', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
+            'Name', 'Email', 'Phone', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
             'Category', 'City', 'State', 'Father Name', 'Father Mobile', 
             'Course', 'Addon Course', 'Referred By', 'Reference', 'Payment Status', 'Applied Date'
         ])
@@ -356,7 +356,8 @@ class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
         for app in apps:
             writer.writerow([
                 app.student.name, 
-                app.student.email, 
+                app.student.email,
+                app.student.phone, 
                 app.student.dob,
                 app.student.gender,
                 app.student.aadhar_number,
@@ -424,7 +425,7 @@ class AdminExportCSVView(SuperuserRequiredMixin, View):
                 
             writer = csv.writer(response)
             writer.writerow([
-                'Name', 'Email', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
+                'Name', 'Email', 'Phone', 'DOB', 'Gender', 'Aadhar Number', 'Blood Group',
                 'Category', 'City', 'State', 'Father Name', 'Father Mobile', 'Applied College', 
                 'Applied Course', 'Addon Course', 'Referred By', 'Reference', 'Payment Status', 'Applied Date'
             ])
@@ -433,6 +434,7 @@ class AdminExportCSVView(SuperuserRequiredMixin, View):
                 writer.writerow([
                     app.student.name, 
                     app.student.email, 
+                    app.student.phone,
                     app.student.dob,
                     app.student.gender,
                     app.student.aadhar_number,
