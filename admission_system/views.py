@@ -11,7 +11,7 @@ from django.contrib import messages
 from .forms import CRERegistrationForm, StudentAdmissionForm
 from .models import CREProfile, College, Application, Student, Course
 import csv
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 import boto3
 from django.conf import settings
 from django.utils.text import slugify
@@ -578,7 +578,15 @@ def apply_admission(request, college_slug, username, cre_id):
     # mismatched/stale username in the URL doesn't silently attribute the
     # referral to the wrong CRE.
     referrer = get_object_or_404(CREProfile, cre_id=cre_id, user__username=username)
-    
+
+    # If this CRE has since been deallocated from this college, the referral
+    # link is dead. Checked live against allocated_colleges (not a separate
+    # blacklist), so re-allocating the college instantly revives the link.
+    # Superuser CRE profiles (auto-created for dashboard testing) are exempt
+    # since they aren't given real per-college allocations.
+    if not referrer.user.is_superuser and not referrer.allocated_colleges.filter(pk=college.pk).exists():
+        raise Http404("This referral link is no longer active.")
+
     # Retrieve pending data from session
     pending_student_data = request.session.get('pending_student_data')
     has_files_in_session = bool(request.session.get('pending_files'))
@@ -784,7 +792,18 @@ def manual_payment(request):
                     cre_profile_id = pending_application_data.get('referred_by')
                     if cre_profile_id:
                         referrer = get_object_or_404(CREProfile, id=cre_profile_id)
-                        
+
+                        # Second checkpoint: the CRE may have been deallocated
+                        # from this college after the student filled the form
+                        # but before paying. Block the save rather than let a
+                        # dead link's submission slip through at the last step.
+                        if not referrer.user.is_superuser and not referrer.allocated_colleges.filter(pk=college.pk).exists():
+                            for key in ['pending_student_data', 'pending_application_data', 'pending_files', 'pending_college_slug', 'pending_username', 'pending_cre_id']:
+                                if key in request.session:
+                                    del request.session[key]
+                            messages.error(request, "This referral link is no longer active. Please contact the institution directly.")
+                            return redirect('home')
+
                     source = pending_application_data.get('source')
 
                     # 4. Save/Update Application
