@@ -1,3 +1,4 @@
+import os
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, Count, Sum
 from django.views import View
@@ -220,7 +221,42 @@ def download_application_document(request, app_id, doc_field):
     from django.core.files.storage import default_storage
     try:
         url = default_storage.url(
-            doc_file.name, 
+            doc_file.name,
+            parameters={'ResponseContentDisposition': f'attachment; filename="{filename}"'}
+        )
+        return redirect(url)
+    except Exception as e:
+        messages.error(request, f"Error generating download link: {e}")
+        return redirect('admin_student_detail', app_id=app_id)
+
+
+@login_required
+def download_student_photo(request, app_id):
+    """
+    Forces a download of the student's passport-size photo. Scoped through
+    the Application (app_id) - same as download_application_document - so
+    Super Admin reaches it from the student profile page, even though the
+    photo itself lives on Student, not Application.
+    """
+    if not request.user.is_superuser:
+        messages.error(request, "Permission denied.")
+        return redirect('home')
+
+    application = get_object_or_404(Application, id=app_id)
+    photo_file = application.student.photo
+
+    if not photo_file or not hasattr(photo_file, 'name') or not photo_file.name:
+        messages.error(request, "No photo on file for this student.")
+        return redirect('admin_student_detail', app_id=app_id)
+
+    ext = photo_file.name.split('.')[-1]
+    name_slug = slugify(application.student.name)
+    filename = f"{name_slug}_passport_photo.{ext}"
+
+    from django.core.files.storage import default_storage
+    try:
+        url = default_storage.url(
+            photo_file.name,
             parameters={'ResponseContentDisposition': f'attachment; filename="{filename}"'}
         )
         return redirect(url)
@@ -661,13 +697,13 @@ def apply_admission(request, college_slug, username, cre_id):
             
             file_paths = request.session.get('pending_files', {})
             
-            for doc_field in ['doc_10th', 'doc_11th', 'doc_12th', 'doc_aadhar']:
+            for doc_field in ['doc_10th', 'doc_11th', 'doc_12th', 'doc_aadhar', 'photo']:
                 uploaded_file = form.cleaned_data.get(doc_field)
                 if uploaded_file:
                     # Clean up old file if replacing
                     if doc_field in file_paths and default_storage.exists(file_paths[doc_field]):
                         default_storage.delete(file_paths[doc_field])
-                        
+
                     file_name = default_storage.save(f"temp/{uploaded_file.name}", ContentFile(uploaded_file.read()))
                     file_paths[doc_field] = file_name
 
@@ -782,6 +818,21 @@ def manual_payment(request):
                         }
                     )
 
+                    # 1b. Attach the passport-size photo to the Student record
+                    # (not Application - it's a student identity attribute).
+                    # Staged earlier in apply_admission() the same way the
+                    # 10th/11th/12th/Aadhar docs are, as a temp file in
+                    # default_storage, keyed by field name in pending_files.
+                    from django.core.files.storage import default_storage as _default_storage
+                    from django.core.files import File as _File
+                    import os as _os
+                    photo_path = pending_files.get('photo')
+                    if photo_path and _default_storage.exists(photo_path):
+                        with _default_storage.open(photo_path) as f:
+                            student.photo.save(_os.path.basename(photo_path), _File(f))
+                        _default_storage.delete(photo_path)
+                        student.save()
+
                     # 2. Check for duplicate successful application just in case
                     if Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists():
                         messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
@@ -837,7 +888,7 @@ def manual_payment(request):
                     if key in request.session:
                         del request.session[key]
 
-                return render(request, 'admission_system/success.html', {'college': college, 'app': app})
+                return render(request, 'admission_system/success.html', {'college': college, 'app': app, 'username': username, 'cre_id': cre_id})
 
             except Exception as e:
                 messages.error(request, f"An error occurred while saving your application: {e}")
@@ -901,16 +952,42 @@ def check_duplicate_application(request):
 
     return JsonResponse({'exists': False})
 
+def _pdf_link_callback(uri, rel):
+    """
+    xhtml2pdf's link_callback: resolves an <img src="..."> URI to something
+    it can actually read.
+
+    - An absolute http(s) URL (the student's photo when stored on S3, where
+      Student.photo.url returns a full, signed S3 URL) is passed through
+      unchanged - xhtml2pdf fetches it over the network itself.
+    - A local MEDIA_URL-relative path (photo stored on local FileSystemStorage
+      in dev, where .url() returns e.g. "/media/student_photos/x.jpg") is
+      resolved to an absolute filesystem path under MEDIA_ROOT, since
+      xhtml2pdf can't resolve a site-relative URL on its own.
+    """
+    if uri.startswith('http://') or uri.startswith('https://'):
+        return uri
+
+    if uri.startswith(settings.MEDIA_URL):
+        path = os.path.join(settings.MEDIA_ROOT, uri.replace(settings.MEDIA_URL, '', 1))
+    elif uri.startswith(settings.STATIC_URL):
+        path = os.path.join(settings.STATIC_ROOT, uri.replace(settings.STATIC_URL, '', 1))
+    else:
+        return uri
+
+    return path
+
+
 def download_application_pdf(request, app_id):
     app = get_object_or_404(Application, id=app_id)
     template_path = 'admission_system/pdf_template.html'
     context = {'app': app}
-    
+
     # Create a Django response object, and specify content_type as pdf
     response = HttpResponse(content_type='application/pdf')
     # if you want to download it, uncomment below
     response['Content-Disposition'] = f'attachment; filename="Application_Form_{app.student.name.replace(" ", "_")}.pdf"'
-    
+
     # find the template and render it.
     template = get_template(template_path)
     html = template.render(context)
@@ -918,8 +995,8 @@ def download_application_pdf(request, app_id):
     # create a pdf
     from xhtml2pdf import pisa
     pisa_status = pisa.CreatePDF(
-       html, dest=response)
-       
+       html, dest=response, link_callback=_pdf_link_callback)
+
     # if error then show some funny view
     if pisa_status.err:
        return HttpResponse('We had some errors <pre>' + html + '</pre>')

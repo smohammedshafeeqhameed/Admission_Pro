@@ -37,6 +37,14 @@ class StudentAdmissionForm(forms.ModelForm):
     doc_12th = forms.FileField(required=False, label="12th Marksheet")
     doc_aadhar = forms.FileField(required=True, label="Aadhar Card Copy")
 
+    # Passport-size photo (stored on Student, not Application - it's a
+    # student identity attribute, reused across colleges/applications).
+    photo = forms.ImageField(
+        required=True,
+        label="Passport Size Photo",
+        help_text="JPEG/PNG only, max 2MB, passport-style portrait photo."
+    )
+
     class Meta:
         model = Student
         fields = [
@@ -44,7 +52,7 @@ class StudentAdmissionForm(forms.ModelForm):
             'blood_group', 'category', 'permanent_address', 'correspondence_address',
             'state', 'city', 'father_name', 'father_mobile', 'father_occupation',
             'mother_name', 'mother_mobile', 'mother_occupation',
-            'guardian_name', 'guardian_mobile', 'preferred_contact'
+            'guardian_name', 'guardian_mobile', 'preferred_contact', 'photo'
         ]
         labels = {
             'father_name': '𝐅𝐚𝐭𝐡𝐞𝐫 𝐧𝐚𝐦𝐞:',
@@ -73,6 +81,7 @@ class StudentAdmissionForm(forms.ModelForm):
             self.fields['doc_11th'].required = False
             self.fields['doc_12th'].required = False
             self.fields['doc_aadhar'].required = False
+            self.fields['photo'].required = False
 
         if college:
             self.fields['course'].queryset = college.courses.all()

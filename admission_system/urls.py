@@ -18,6 +18,7 @@ urlpatterns = [
     path('admin-dashboard/colleges/', views.AdminCollegeListView.as_view(), name='admin_college_list'),
     path('admin-dashboard/applications/<int:app_id>/', views.AdminStudentDetailView.as_view(), name='admin_student_detail'),
     path('admin-dashboard/applications/<int:app_id>/download/<str:doc_field>/', views.download_application_document, name='admin_student_download'),
+    path('admin-dashboard/applications/<int:app_id>/photo/download/', views.download_student_photo, name='admin_student_photo_download'),
     path('admin-dashboard/colleges/<int:pk>/', views.AdminCollegeDetailView.as_view(), name='admin_college_detail'),
     path('admin-dashboard/courses/<int:course_id>/students/', views.AdminCourseStudentListView.as_view(), name='admin_course_student_list'),
     path('admin-dashboard/approve/', views.AdminApproveCREView.as_view(), name='admin_approve_cre'),

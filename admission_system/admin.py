@@ -44,9 +44,29 @@ class CREProfileAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    list_display = ('name', 'email', 'phone')
+    list_display = ('photo_thumbnail', 'name', 'email', 'phone')
     search_fields = ('name', 'email')
     actions = [export_as_csv]
+    readonly_fields = ('photo_preview',)
+    fields = ('photo', 'photo_preview', 'name', 'email', 'phone', 'dob', 'gender', 'aadhar_number',
+              'blood_group', 'category', 'permanent_address', 'correspondence_address', 'state', 'city',
+              'father_name', 'father_mobile', 'father_occupation',
+              'mother_name', 'mother_mobile', 'mother_occupation',
+              'guardian_name', 'guardian_mobile', 'preferred_contact')
+
+    @admin.display(description='Photo')
+    def photo_thumbnail(self, obj):
+        from django.utils.html import format_html
+        if obj.photo:
+            return format_html('<img src="{}" style="width:36px;height:36px;border-radius:50%;object-fit:cover;" />', obj.photo.url)
+        return "—"
+
+    @admin.display(description='Photo Preview')
+    def photo_preview(self, obj):
+        from django.utils.html import format_html
+        if obj.photo:
+            return format_html('<img src="{}" style="width:160px;height:160px;border-radius:12px;object-fit:cover;" />', obj.photo.url)
+        return "No photo uploaded"
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):

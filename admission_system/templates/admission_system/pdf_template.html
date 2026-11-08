@@ -64,6 +64,19 @@
             font-size: 9pt;
             color: #64748b;
         }
+        .photo-box {
+            width: 90pt;
+            height: 110pt;
+            border: 1pt solid #cccccc;
+            text-align: center;
+            vertical-align: middle;
+            font-size: 8pt;
+            color: #94a3b8;
+        }
+        .photo-box img {
+            width: 90pt;
+            height: 110pt;
+        }
     </style>
 </head>
 <body>
@@ -73,11 +86,26 @@
         Page <pdf:pagenumber> of <pdf:pagecount>
     </div>
 
-    <div class="header">
-        <h1>{{ app.college.name }}</h1>
-        <div><strong>ADMISSION APPLICATION FORM</strong></div>
-        <div class="meta-info">Application Ref: {{ app.id }} | Date: {{ app.applied_at|date:"d M Y, h:i A" }}</div>
-    </div>
+    <table style="border: none; margin-bottom: 0;">
+        <tr>
+            <td style="border: none; padding: 0; vertical-align: middle;">
+                <div class="header" style="text-align: left; margin-bottom: 0;">
+                    <h1 style="text-align: left;">{{ app.college.name }}</h1>
+                    <div><strong>ADMISSION APPLICATION FORM</strong></div>
+                    <div class="meta-info">Application Ref: {{ app.id }} | Date: {{ app.applied_at|date:"d M Y, h:i A" }}</div>
+                </div>
+            </td>
+            <td style="border: none; padding: 0; width: 100pt; text-align: right; vertical-align: top;">
+                <div class="photo-box">
+                    {% if app.student.photo %}
+                    <img src="{{ app.student.photo.url }}" alt="Passport Photo">
+                    {% else %}
+                    No Photo<br/>Provided
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+    </table>
 
     <h2>Program Details</h2>
     <table>

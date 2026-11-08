@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 import uuid
+from .validators import validate_photo
 
 class College(models.Model):
     name = models.CharField(max_length=255, unique=True)
@@ -93,6 +94,16 @@ class Student(models.Model):
     guardian_name = models.CharField(max_length=255, null=True, blank=True)
     guardian_mobile = models.CharField(max_length=15, null=True, blank=True)
     preferred_contact = models.CharField(max_length=50, choices=[('Student', 'Student'), ('Parent', 'Parent'), ('Guardian', 'Guardian')], default='Student')
+
+    # Passport-size photo, shown across the Super Admin portal. Nullable so
+    # existing students (applied before this field existed) don't break;
+    # the application form makes it mandatory for new submissions.
+    photo = models.ImageField(
+        upload_to='student_photos/',
+        null=True, blank=True,
+        validators=[validate_photo],
+        help_text="Passport-size photo (JPEG/PNG, max 2MB, passport-style portrait dimensions)"
+    )
 
     def __str__(self):
         return self.name

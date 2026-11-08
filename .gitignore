@@ -15,6 +15,19 @@ settings.py
 .env
 staticfiles/.env
 
+# User-uploaded media: student passport photos, marksheets, Aadhar copies,
+# payment screenshots, college QR codes. Contains real personal data and
+# shouldn't be committed - uploads go to S3/local media at runtime instead.
+media/
+documents/
+*.png
+*.jpg
+*.jpeg
+!admission_system/static/**/*.png
+!admission_system/static/**/*.jpg
+!admission_system/static/**/*.jpeg
+!logos/**
+
 # VS Code
 .vscode/
 

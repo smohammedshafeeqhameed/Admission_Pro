@@ -383,6 +383,18 @@
                     <!-- Step 4 -->
                     <div id="step-4" class="step-content hidden space-y-7">
                         <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="mes-upload border-[#FFD700]/40">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-[#FFD700]/15 text-yellow-600 flex items-center justify-center">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-black text-xs uppercase tracking-widest text-yellow-600">Passport
+                                        Size Photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-bold text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
                             <div class="mes-upload">
                                 <div class="flex items-center gap-3 mb-4">
                                     <div

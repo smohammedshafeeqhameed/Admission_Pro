@@ -1,4 +1,5 @@
 {% extends 'admission_system/base.html' %}
+{% load static %}
 
 {% block title %}Applicant Profile: {{ student.name }}{% endblock %}
 
@@ -21,14 +22,31 @@
             </nav>
 
             <div class="flex flex-col md:flex-row md:items-center justify-between gap-8">
-                <div class="flex flex-col gap-2">
-                    <h1 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight">
-                        {{ student.name }}
-                    </h1>
-                    <div class="flex flex-col sm:flex-row sm:items-center gap-4 text-slate-500 font-medium mt-2">
-                        <span class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-primary"></i> {{ student.email }}</span>
-                        <span class="hidden sm:inline">•</span>
-                        <span class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4 text-primary"></i> {{ student.phone }}</span>
+                <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+                    {% if student.photo %}
+                    <button type="button" onclick="openPhotoModal()" title="Click to view and download full photo"
+                        class="shrink-0 group relative outline-none">
+                        <img src="{{ student.photo.url }}" alt="{{ student.name }}"
+                            class="w-24 h-32 rounded-xl object-cover border-4 border-white dark:border-slate-800 shadow-lg group-hover:opacity-90 transition-opacity">
+                        <span
+                            class="absolute inset-0 rounded-xl bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                            <i data-lucide="maximize-2"
+                                class="w-5 h-5 text-white opacity-0 group-hover:opacity-100 transition-opacity"></i>
+                        </span>
+                    </button>
+                    {% else %}
+                    <img src="{% static 'admission_system/images/default-avatar.svg' %}" alt="No photo on file"
+                        class="w-24 h-32 rounded-xl object-cover border-4 border-white dark:border-slate-800 shadow-lg shrink-0 opacity-70">
+                    {% endif %}
+                    <div class="flex flex-col gap-2">
+                        <h1 class="text-4xl lg:text-5xl font-black text-slate-900 dark:text-white leading-tight">
+                            {{ student.name }}
+                        </h1>
+                        <div class="flex flex-col sm:flex-row sm:items-center gap-4 text-slate-500 font-medium mt-2">
+                            <span class="flex items-center gap-2"><i data-lucide="mail" class="w-4 h-4 text-primary"></i> {{ student.email }}</span>
+                            <span class="hidden sm:inline">•</span>
+                            <span class="flex items-center gap-2"><i data-lucide="phone" class="w-4 h-4 text-primary"></i> {{ student.phone }}</span>
+                        </div>
                     </div>
                 </div>
 
@@ -237,6 +255,16 @@
                     </h2>
 
                     <div class="space-y-4">
+                        {% if student.photo %}
+                        <a href="{% url 'admin_student_photo_download' app.id %}" class="group flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:border-pink-300 hover:bg-pink-50 transition-all">
+                            <div class="flex items-center gap-3">
+                                <i data-lucide="user-square" class="text-pink-500 group-hover:scale-110 transition-transform"></i>
+                                <span class="text-sm font-bold text-slate-700 dark:text-slate-300">Passport Size Photo</span>
+                            </div>
+                            <i data-lucide="download" class="w-4 h-4 text-slate-400 group-hover:text-pink-600"></i>
+                        </a>
+                        {% endif %}
+
                         {% if app.doc_10th %}
                         <a href="{% url 'admin_student_download' app.id 'doc_10th' %}" class="group flex items-center justify-between p-4 rounded-2xl bg-slate-50 dark:bg-slate-900/50 border border-slate-100 dark:border-slate-700 hover:border-blue-300 hover:bg-blue-50 transition-all">
                             <div class="flex items-center gap-3">
@@ -283,5 +311,33 @@
         </div>
     </div>
 </div>
+
+{% if student.photo %}
+<!-- Passport Photo View/Download Modal -->
+<div id="photo-modal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-6"
+    onclick="closePhotoModal(event)">
+    <div class="relative max-w-sm w-full bg-white dark:bg-slate-900 rounded-3xl p-6 shadow-2xl" onclick="event.stopPropagation()">
+        <button type="button" onclick="closePhotoModal()"
+            class="absolute top-4 right-4 w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors">
+            <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+        <h3 class="text-lg font-black text-slate-900 dark:text-white mb-4 pr-10">Passport Photo — {{ student.name }}</h3>
+        <img src="{{ student.photo.url }}" alt="{{ student.name }}"
+            class="w-full rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm">
+        <a href="{% url 'admin_student_photo_download' app.id %}"
+            class="mt-6 w-full flex items-center justify-center gap-2 h-14 bg-primary text-white font-black rounded-xl hover:opacity-90 transition-all">
+            <i data-lucide="download" class="w-5 h-5"></i> Download Photo
+        </a>
+    </div>
+</div>
+<script>
+    function openPhotoModal() {
+        document.getElementById('photo-modal').classList.remove('hidden');
+    }
+    function closePhotoModal(e) {
+        document.getElementById('photo-modal').classList.add('hidden');
+    }
+</script>
+{% endif %}
 {% endblock %}
 

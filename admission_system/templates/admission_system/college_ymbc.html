@@ -439,6 +439,11 @@
                     <div id="step-3" class="hidden space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <div class="ymbc-doc-card">
+                                <p class="ymbc-label mb-3">Passport Size Photo</p>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-bold text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
+                            <div class="ymbc-doc-card">
                                 <p class="ymbc-label mb-3">10th Documents</p>
                                 {{ form.doc_10th }}
                             </div>

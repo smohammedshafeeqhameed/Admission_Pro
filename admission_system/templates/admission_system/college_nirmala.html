@@ -347,6 +347,18 @@
                     <!-- ── STEP 4: Documents ── -->
                     <div id="step-4" class="step-content hidden space-y-10">
                         <div class="grid sm:grid-cols-2 gap-7">
+                            <div class="nmc-upload-card border-[#B6E3D4]/60">
+                                <div class="flex items-center gap-3 mb-5">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-[#B6E3D4]/30 text-teal-600 flex items-center justify-center">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-black text-xs uppercase tracking-widest text-teal-600">Passport
+                                        Size Photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-bold text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
                             <div class="nmc-upload-card">
                                 <div class="flex items-center gap-3 mb-5">
                                     <div

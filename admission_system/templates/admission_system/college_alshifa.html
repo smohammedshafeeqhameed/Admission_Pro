@@ -338,6 +338,17 @@
                     <div id="step-4"
                         class="step-content hidden space-y-16 animate-in fade-in slide-in-from-right-8 duration-700">
                         <div class="grid md:grid-cols-2 gap-10">
+                            <div class="acas-file-card border-[#BA8E23]/30">
+                                <div class="flex items-center gap-4 mb-6">
+                                    <div
+                                        class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center shadow-inner">
+                                        <i data-lucide="user-square" class="w-6 h-6"></i>
+                                    </div>
+                                    <span class="font-black text-xs uppercase tracking-widest">Passport Size Photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-bold text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
                             <div class="acas-file-card">
                                 <div class="flex items-center gap-4 mb-6">
                                     <div
