@@ -168,7 +168,7 @@
                     </div>
                 </div>
 
-                <form method="post" action="{% url 'apply_admission' college.slug cre_id %}"
+                <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}"
                     enctype="multipart/form-data" class="p-12 md:p-24 lg:p-32" id="alazhar-form">
                     {% csrf_token %}
 

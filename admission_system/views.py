@@ -572,9 +572,12 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 from .forms import StudentAdmissionForm
 from .models import FinanceProfile
 
-def apply_admission(request, college_slug, cre_id):
+def apply_admission(request, college_slug, username, cre_id):
     college = get_object_or_404(College, slug=college_slug)
-    referrer = get_object_or_404(CREProfile, cre_id=cre_id)
+    # username is validated against the CRE's actual account here so a
+    # mismatched/stale username in the URL doesn't silently attribute the
+    # referral to the wrong CRE.
+    referrer = get_object_or_404(CREProfile, cre_id=cre_id, user__username=username)
     
     # Retrieve pending data from session
     pending_student_data = request.session.get('pending_student_data')
@@ -619,17 +622,17 @@ def apply_admission(request, college_slug, cre_id):
                 if existing_app:
                     if existing_app.payment_status == 'Success':
                         messages.success(request, f"You have already successfully applied for {course.name} at {college.name}.")
-                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                        return redirect('apply_admission', college_slug=college.slug, username=username, cre_id=cre_id)
                     elif existing_app.payment_status == 'Pending Verification':
                         if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
                             messages.error(request, f"This student is already registered through another partner for {course.name}. Duplicate registrations across different partners are not allowed.")
-                            return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                            return redirect('apply_admission', college_slug=college.slug, username=username, cre_id=cre_id)
                         messages.warning(request, "Your previous payment for this course is currently being verified. Please do not pay again.")
-                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
-                    
+                        return redirect('apply_admission', college_slug=college.slug, username=username, cre_id=cre_id)
+
                     if existing_app.referred_by and existing_app.referred_by.cre_id != referrer.cre_id:
                         messages.error(request, f"This student was previously registered through another partner. Please contact the administrator for cross-partner transfers.")
-                        return redirect('apply_admission', college_slug=college.slug, cre_id=cre_id)
+                        return redirect('apply_admission', college_slug=college.slug, username=username, cre_id=cre_id)
 
             # Save application data to session
             course = form.cleaned_data['course']
@@ -664,6 +667,7 @@ def apply_admission(request, college_slug, cre_id):
             request.session['pending_application_data'] = application_data
             request.session['pending_files'] = file_paths
             request.session['pending_college_slug'] = college_slug
+            request.session['pending_username'] = username
             request.session['pending_cre_id'] = str(cre_id)
             
             return redirect('manual_payment')
@@ -701,6 +705,7 @@ def apply_admission(request, college_slug, cre_id):
     return render(request, template_name, {
         'college': college,
         'courses': courses,
+        'username': username,
         'cre_id': cre_id,
         'form': form
     })
@@ -712,9 +717,10 @@ def manual_payment(request):
     pending_application_data = request.session.get('pending_application_data')
     pending_files = request.session.get('pending_files', {})
     college_slug = request.session.get('pending_college_slug')
+    username = request.session.get('pending_username')
     cre_id = request.session.get('pending_cre_id')
 
-    if not all([pending_student_data, pending_application_data, college_slug, cre_id]):
+    if not all([pending_student_data, pending_application_data, college_slug, username, cre_id]):
         messages.error(request, "No pending application found. Please fill out the admission form first.")
         return redirect('home')
 
@@ -732,11 +738,12 @@ def manual_payment(request):
                     'college': college,
                     'course': course,
                     'college_slug': college_slug,
+                    'username': username,
                     'cre_id': cre_id,
                     'upi_id': college.upi_id or settings.UPI_ID,
                     'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
                 })
-                
+
             try:
                 with transaction.atomic():
                     # 1. Save/Update Student
@@ -770,7 +777,7 @@ def manual_payment(request):
                     # 2. Check for duplicate successful application just in case
                     if Application.objects.filter(student=student, college=college, course=course, payment_status='Success').exists():
                         messages.error(request, f"You have already successfully applied for {course.name} at {college.name}.")
-                        return redirect('apply_admission', college_slug=college_slug, cre_id=cre_id)
+                        return redirect('apply_admission', college_slug=college_slug, username=username, cre_id=cre_id)
 
                     # 3. Resolve ForeignKey objects
                     referrer = None
@@ -807,7 +814,7 @@ def manual_payment(request):
                     app.save()
 
                 # Clear pending data from session on success
-                for key in ['pending_student_data', 'pending_application_data', 'pending_files', 'pending_college_slug', 'pending_cre_id']:
+                for key in ['pending_student_data', 'pending_application_data', 'pending_files', 'pending_college_slug', 'pending_username', 'pending_cre_id']:
                     if key in request.session:
                         del request.session[key]
 
@@ -819,17 +826,19 @@ def manual_payment(request):
                     'college': college,
                     'course': course,
                     'college_slug': college_slug,
+                    'username': username,
                     'cre_id': cre_id,
                     'upi_id': college.upi_id or settings.UPI_ID,
                     'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
                 })
         else:
             messages.error(request, "Please provide both Transaction ID and the Payment Screenshot.")
-            
+
     return render(request, 'admission_system/manual_payment.html', {
         'college': college,
         'course': course,
         'college_slug': college_slug,
+        'username': username,
         'cre_id': cre_id,
         'upi_id': college.upi_id or settings.UPI_ID,
         'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME

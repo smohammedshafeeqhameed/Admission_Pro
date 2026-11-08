@@ -116,7 +116,7 @@
                     id="current-step-num">1</span> of 3</div>
         </div>
 
-        <form method="post" action="{% url 'apply_admission' college.slug cre_id %}" enctype="multipart/form-data"
+        <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}" enctype="multipart/form-data"
             class="p-8 lg:p-12" id="multi-step-form">
             {% csrf_token %}
 

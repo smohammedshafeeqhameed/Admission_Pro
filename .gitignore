@@ -1,10 +1,7 @@
 venv
 venv_fixed
+
 # Python
-admission_system/__pycache__/views.cpython-38.pyc
-admission_system/__pycache__/
-admission_system/__pycache__/
-ams_project/__pycache__/
 __pycache__/
 *.pyc
 *.pyo
@@ -12,18 +9,20 @@ __pycache__/
 
 # Django
 db.sqlite3
+settings.py
 
 # Environment
 .env
+staticfiles/.env
 
 # VS Code
 .vscode/
+
+# JetBrains / PyCharm
+.idea/
+*.iml
 
 # Mac/Linux
 .DS_Store
 
 .req.txt
-
-settings.py
-
-staticfiles/.env
