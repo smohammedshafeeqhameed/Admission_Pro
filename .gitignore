@@ -9,7 +9,7 @@ __pycache__/
 
 # Django
 db.sqlite3
-settings.py
+/settings.py
 
 # Environment
 .env
