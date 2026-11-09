@@ -1,3 +1,4 @@
+
 name: Deploy Admission Pro Testing
 
 on:
@@ -35,33 +36,74 @@ jobs:
           script: |
             set -Eeuo pipefail
 
+            echo "======================================"
             echo "Admission Pro Testing Deployment"
+            echo "======================================"
 
             cd /home/ubuntu/Admission_Pro
 
+            echo "Fetching latest stage branch..."
             git fetch origin stage
             git checkout stage
             git reset --hard origin/stage
 
+            echo "Activating Python virtual environment..."
             source venv/bin/activate
 
+            echo "Installing Python requirements..."
             pip install -r requirements.txt
 
+            echo "Checking Django configuration..."
             python manage.py check
 
             echo "Checking migration plan..."
             python manage.py migrate --plan
 
-            echo "Applying migrations to testing database..."
+            echo "Applying migrations to TESTING database..."
             python manage.py migrate --noinput
 
+            echo "Collecting static files..."
             python manage.py collectstatic --noinput
 
+            echo "Restarting testing Gunicorn service..."
             sudo systemctl restart admission-pro-testing
-            sudo systemctl is-active --quiet admission-pro-testing
 
-            curl --fail --silent --show-error \
-              http://127.0.0.1:8000/ \
-              -o /dev/null
+            echo "Checking Gunicorn service status..."
 
+            if ! sudo systemctl is-active --quiet admission-pro-testing; then
+              echo "ERROR: Gunicorn service is not active."
+              sudo systemctl status admission-pro-testing --no-pager -l
+              sudo journalctl -u admission-pro-testing -n 80 --no-pager
+              exit 1
+            fi
+
+            echo "Waiting for Django application health check..."
+
+            HEALTH_CHECK_PASSED=false
+
+            for attempt in $(seq 1 12); do
+              if curl --fail --silent --show-error \
+                http://127.0.0.1:8000/ \
+                -o /dev/null; then
+
+                echo "Django health check passed on attempt ${attempt}."
+                HEALTH_CHECK_PASSED=true
+                break
+              fi
+
+              echo "Attempt ${attempt}/12 failed. Waiting 5 seconds..."
+              sleep 5
+            done
+
+            if [ "$HEALTH_CHECK_PASSED" != "true" ]; then
+              echo "ERROR: Django health check failed."
+
+              sudo systemctl status admission-pro-testing --no-pager -l
+              sudo journalctl -u admission-pro-testing -n 80 --no-pager
+
+              exit 1
+            fi
+
+            echo "======================================"
             echo "Testing deployment successful!"
+            echo "======================================"
