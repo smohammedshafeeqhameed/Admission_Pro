@@ -1,45 +1,109 @@
-name: Deploy to EC2 (Docker)
+
+name: Deploy Admission Pro Testing
 
 on:
   push:
     branches:
-      - prod
+      - stage
+
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: admission-pro-testing-deployment
+  cancel-in-progress: false
 
 jobs:
   deploy:
+    name: Deploy to Testing EC2
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      - name: Checkout stage branch
         uses: actions/checkout@v4
 
-      - name: Deploy via SSH
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy to Testing EC2
+        uses: appleboy/ssh-action@v1.2.2
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.TEST_EC2_HOST }}
+          username: ${{ secrets.TEST_EC2_USER }}
+          key: ${{ secrets.TEST_EC2_SSH_KEY }}
+          port: 22
+          command_timeout: 20m
 
           script: |
-            set -e   # stop if any error
+            set -Eeuo pipefail
 
-            echo "Go to project folder"
-            cd ~/Admission_Pro
+            echo "======================================"
+            echo "Admission Pro Testing Deployment"
+            echo "======================================"
 
-            echo "Pull latest code"
-            git fetch origin
-            git reset --hard origin/prod
+            cd /home/ubuntu/Admission_Pro
 
-            echo "Stop old containers"
-            sudo docker-compose down
+            echo "Fetching latest stage branch..."
+            git fetch origin stage
+            git checkout stage
+            git reset --hard origin/stage
 
-            echo "Build & start containers"
-            sudo docker-compose up -d --build
+            echo "Activating Python virtual environment..."
+            source venv/bin/activate
 
-            echo "Run migrations"
-            sudo docker exec admission_pro_web_1 python manage.py migrate
+            echo "Installing Python requirements..."
+            pip install -r requirements.txt
 
-            echo "Collect static files"
-            sudo docker exec admission_pro_web_1 python manage.py collectstatic --noinput
+            echo "Checking Django configuration..."
+            python manage.py check
 
-            echo "Deployment completed successfully 🚀"
+            echo "Checking migration plan..."
+            python manage.py migrate --plan
+
+            echo "Applying migrations to TESTING database..."
+            python manage.py migrate --noinput
+
+            echo "Collecting static files..."
+            python manage.py collectstatic --noinput
+
+            echo "Restarting testing Gunicorn service..."
+            sudo systemctl restart admission-pro-testing
+
+            echo "Checking Gunicorn service status..."
+
+            if ! sudo systemctl is-active --quiet admission-pro-testing; then
+              echo "ERROR: Gunicorn service is not active."
+              sudo systemctl status admission-pro-testing --no-pager -l
+              sudo journalctl -u admission-pro-testing -n 80 --no-pager
+              exit 1
+            fi
+
+            echo "Waiting for Django application health check..."
+
+            HEALTH_CHECK_PASSED=false
+
+            for attempt in $(seq 1 12); do
+              if curl --fail --silent --show-error \
+                http://127.0.0.1:8000/ \
+                -o /dev/null; then
+
+                echo "Django health check passed on attempt ${attempt}."
+                HEALTH_CHECK_PASSED=true
+                break
+              fi
+
+              echo "Attempt ${attempt}/12 failed. Waiting 5 seconds..."
+              sleep 5
+            done
+
+            if [ "$HEALTH_CHECK_PASSED" != "true" ]; then
+              echo "ERROR: Django health check failed."
+
+              sudo systemctl status admission-pro-testing --no-pager -l
+              sudo journalctl -u admission-pro-testing -n 80 --no-pager
+
+              exit 1
+            fi
+
+            echo "======================================"
+            echo "Testing deployment successful!"
+            echo "======================================"
