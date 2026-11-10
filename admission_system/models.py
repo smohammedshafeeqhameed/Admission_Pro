@@ -162,3 +162,29 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student.name} -> {self.college.name} ({self.course.name})"
+
+
+from django.db.models.signals import m2m_changed
+from django.dispatch import receiver
+
+
+@receiver(m2m_changed, sender=CREProfile.allocated_colleges.through)
+def _notify_cre_on_college_allocation(sender, instance, action, pk_set, **kwargs):
+    """
+    Fires whenever colleges are added to a CRE's allocated_colleges -
+    whether that happens via the custom admin-dashboard "Allocate" view
+    (AdminAllocateCollegeView) or the Django /admin/ CREProfile page's
+    college picker (filter_horizontal). Sends the CRE an email + WhatsApp
+    message with their referral link for each newly-added college.
+
+    Both call sites stash the current request on the CREProfile instance
+    as `_notification_request` before saving, so the referral link can be
+    built as an absolute URL; it's optional (see
+    utils.get_cre_referral_link's SITE_URL fallback).
+    """
+    if action != 'post_add' or not pk_set:
+        return
+    from .utils import notify_cre_college_allocated
+    request = getattr(instance, '_notification_request', None)
+    for college in College.objects.filter(pk__in=pk_set):
+        notify_cre_college_allocated(instance, college, request=request)

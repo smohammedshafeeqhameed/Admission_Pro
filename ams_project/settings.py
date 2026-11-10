@@ -181,6 +181,24 @@ EMAIL_USE_TLS = os.getenv('EMAIL_USE_TLS') == 'True'
 
 EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+DEFAULT_FROM_EMAIL = os.getenv('DEFAULT_FROM_EMAIL', EMAIL_HOST_USER)
+
+# Base URL used to build absolute links (e.g. a CRE's referral link) when
+# no request is available to derive it from - e.g. allocation done via
+# the Django /admin/ page. Example: "https://admissionpro.example.com"
+SITE_URL = os.getenv('SITE_URL', '')
+
+# WhatsApp Cloud API (Meta) - used to notify a CRE when they're allocated
+# to a college. WHATSAPP_PHONE_NUMBER_ID is the Meta phone_number_id tied
+# to the sending number (7736043497), not the phone number itself.
+# WHATSAPP_TEMPLATE_NAME must be a message template already approved in
+# Meta Business Manager, with 3 body placeholders: CRE name, college
+# name, referral link (see utils.send_whatsapp_message).
+WHATSAPP_ACCESS_TOKEN = os.getenv('WHATSAPP_ACCESS_TOKEN')
+WHATSAPP_PHONE_NUMBER_ID = os.getenv('WHATSAPP_PHONE_NUMBER_ID')
+WHATSAPP_TEMPLATE_NAME = os.getenv('WHATSAPP_TEMPLATE_NAME', 'cre_college_allocated')
+WHATSAPP_TEMPLATE_LANG = os.getenv('WHATSAPP_TEMPLATE_LANG', 'en_US')
+
 # AWS S3 Settings
 # IMPORTANT: Replace these placeholders with your actual AWS credentials
 AWS_S3_ENDPOINT_URL = "https://s3.ap-south-1.amazonaws.com"

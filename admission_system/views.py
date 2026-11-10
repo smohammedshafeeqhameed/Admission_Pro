@@ -80,6 +80,10 @@ class AdminAllocateCollegeView(SuperuserRequiredMixin, View):
         cre_id = request.POST.get('cre_id')
         college_ids = request.POST.getlist('colleges')
         cre_profile = get_object_or_404(CREProfile, id=cre_id)
+        # Stashed so the m2m_changed signal (models.py) can build an
+        # absolute referral-link URL for the allocation email/WhatsApp
+        # notification; see get_cre_referral_link in utils.py.
+        cre_profile._notification_request = request
         cre_profile.allocated_colleges.set(college_ids)
         messages.success(request, f"Colleges updated for {cre_profile.user.username}")
         return redirect('admin_dashboard')

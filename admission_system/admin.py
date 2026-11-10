@@ -42,6 +42,13 @@ class CREProfileAdmin(admin.ModelAdmin):
     search_fields = ('user__username', 'cre_id')
     filter_horizontal = ('allocated_colleges',)
 
+    def save_model(self, request, obj, form, change):
+        # Stashed so the m2m_changed signal (models.py) can build an
+        # absolute referral-link URL when allocated_colleges is saved
+        # just after this, via form.save_m2m() in save_related().
+        obj._notification_request = request
+        super().save_model(request, obj, form, change)
+
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
     list_display = ('photo_thumbnail', 'name', 'email', 'phone')
