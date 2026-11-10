@@ -2,6 +2,7 @@ from django import forms
 import datetime
 from django.contrib.auth.models import User
 from .models import CREProfile, Application, Course
+from .utils import is_username_taken, suggest_unique_username
 
 class CRERegistrationForm(forms.ModelForm):
     password = forms.CharField(widget=forms.PasswordInput)
@@ -11,6 +12,22 @@ class CRERegistrationForm(forms.ModelForm):
     class Meta:
         model = User
         fields = ['username', 'email']
+
+    def clean_username(self):
+        # Checked here (at submit time) as a server-side backstop for the
+        # live AJAX check on the registration page - catches duplicates
+        # even if JS is disabled or the username changed between the
+        # live check and the final submit.
+        username = (self.cleaned_data.get('username') or '').strip()
+        if username and is_username_taken(username):
+            suggestion = suggest_unique_username(username)
+            if suggestion:
+                raise forms.ValidationError(
+                    f"The username '{username}' is already taken. "
+                    f"Try '{suggestion}' instead."
+                )
+            raise forms.ValidationError(f"The username '{username}' is already taken.")
+        return username
 
     def clean(self):
         cleaned_data = super().clean()

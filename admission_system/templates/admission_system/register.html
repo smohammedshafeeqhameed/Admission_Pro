@@ -33,6 +33,7 @@
                         class="block text-[10px] font-black uppercase tracking-widest text-slate-500 mb-2 px-1">Username</label>
                     <div class="relative">
                         <input type="text" name="username" id="{{ form.username.id_for_label }}" required
+                            autocomplete="off"
                             value="{{ form.username.value|default:'' }}"
                             class="block w-full px-5 py-4 border border-slate-200 dark:border-slate-700 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary transition-all font-medium"
                             placeholder="johndoe">
@@ -40,6 +41,7 @@
                     {% if form.username.errors %}
                     <p class="mt-2 text-[10px] font-bold text-red-500 px-1">{{ form.username.errors.0 }}</p>
                     {% endif %}
+                    <p id="username-feedback" class="mt-2 text-[10px] font-bold px-1"></p>
                 </div>
 
                 <div>
@@ -120,4 +122,75 @@
         </div>
     </div>
 </div>
+
+{% block extra_js %}
+<script>
+    (function () {
+        const input = document.getElementById('{{ form.username.id_for_label }}');
+        const feedback = document.getElementById('username-feedback');
+        const checkUrl = "{% url 'check_username' %}";
+        let debounceTimer = null;
+        let lastSuggestion = null;
+
+        function render(available, message, suggestion) {
+            lastSuggestion = suggestion || null;
+            if (available === null) {
+                feedback.textContent = '';
+                feedback.className = 'mt-2 text-[10px] font-bold px-1';
+                return;
+            }
+            feedback.className = 'mt-2 text-[10px] font-bold px-1 ' +
+                (available ? 'text-emerald-500' : 'text-red-500');
+            if (available) {
+                feedback.textContent = message;
+                return;
+            }
+            feedback.innerHTML = '';
+            feedback.appendChild(document.createTextNode(message.replace(/Try '.*?'\.$/, '').trim()));
+            if (suggestion) {
+                feedback.appendChild(document.createTextNode(' Use '));
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.textContent = suggestion;
+                btn.className = 'underline underline-offset-2 hover:text-red-700';
+                btn.addEventListener('click', function () {
+                    input.value = suggestion;
+                    render(true, "'" + suggestion + "' is available.", null);
+                });
+                feedback.appendChild(btn);
+                feedback.appendChild(document.createTextNode(' instead?'));
+            }
+        }
+
+        function checkUsername() {
+            const username = input.value.trim();
+            if (!username) {
+                render(null, '', null);
+                return;
+            }
+            fetch(checkUrl + '?username=' + encodeURIComponent(username))
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                    // Guard against the field having changed while the
+                    // request was in flight.
+                    if (input.value.trim() !== username) return;
+                    render(data.available, data.message, data.suggestion);
+                })
+                .catch(function () { /* fail silently - server-side check still runs on submit */ });
+        }
+
+        // Check as the user types (that time itself), debounced so we
+        // don't fire a request on every keystroke, and immediately on
+        // blur so a paste or tab-away is caught right away.
+        input.addEventListener('input', function () {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(checkUsername, 400);
+        });
+        input.addEventListener('blur', function () {
+            clearTimeout(debounceTimer);
+            checkUsername();
+        });
+    })();
+</script>
+{% endblock %}
 {% endblock %}

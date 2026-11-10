@@ -1,12 +1,45 @@
 import logging
+import re
 from datetime import datetime
 
+from django.contrib.auth.models import User
 from django.core.mail import send_mail
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from django.conf import settings
 
 logger = logging.getLogger(__name__)
+
+
+def is_username_taken(username):
+    """Case-insensitive check for whether a username is already in use."""
+    return User.objects.filter(username__iexact=username).exists()
+
+
+def suggest_unique_username(username, max_attempts=1000):
+    """
+    Given a desired username that is already taken, suggest a free
+    alternative using a regex-based numeric-suffix strategy.
+
+    If the username already ends in digits (e.g. "johndoe42"), that
+    numeric suffix is split off with a regex and incremented until a
+    free username is found. Otherwise, digits starting at 1 are appended
+    (e.g. "johndoe" -> "johndoe1", "johndoe2", ...).
+
+    Returns the first free candidate username, or None if nothing opened
+    up within max_attempts (practically never happens).
+    """
+    match = re.match(r'^(.*?)(\d+)$', username)
+    if match:
+        base, start = match.group(1), int(match.group(2)) + 1
+    else:
+        base, start = username, 1
+
+    for counter in range(start, start + max_attempts):
+        candidate = f"{base}{counter}"
+        if not is_username_taken(candidate):
+            return candidate
+    return None
 
 
 def send_payment_slip_email(application):

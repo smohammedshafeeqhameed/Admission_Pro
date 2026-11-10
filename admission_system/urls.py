@@ -31,4 +31,5 @@ urlpatterns = [
     path('campus-manager/export/', views.CampusManagerExportCSVView.as_view(), name='campus_manager_export_csv'),
     path('api/get-addon-courses/', views.get_addon_courses, name='get_addon_courses'),
     path('api/check-duplicate/', views.check_duplicate_application, name='check_duplicate_application'),
+    path('api/check-username/', views.check_username, name='check_username'),
 ]

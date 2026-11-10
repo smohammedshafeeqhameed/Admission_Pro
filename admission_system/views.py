@@ -19,6 +19,7 @@ from django.utils.text import slugify
 from django.http import JsonResponse
 from .models import AddonCourse, CampusManagerProfile
 from django.template.loader import get_template
+from .utils import is_username_taken, suggest_unique_username
 
 
 class CampusManagerRequiredMixin(UserPassesTestMixin):
@@ -918,6 +919,32 @@ def home(request):
     if request.user.is_authenticated and hasattr(request.user, 'cre_profile'):
         return redirect('cre_dashboard')
     return render(request, 'admission_system/home.html')
+
+
+def check_username(request):
+    """API endpoint for live username-availability checking on the CRE
+    registration form. Called as the user types/leaves the username
+    field, so a duplicate is caught right away instead of only after
+    the whole form is submitted. If the username is taken, a free
+    alternative is suggested using a regex-based numeric-suffix scheme
+    (see utils.suggest_unique_username)."""
+    username = request.GET.get('username', '').strip()
+
+    if not username:
+        return JsonResponse({'available': None})
+
+    if is_username_taken(username):
+        suggestion = suggest_unique_username(username)
+        message = f"'{username}' is already taken."
+        if suggestion:
+            message += f" Try '{suggestion}'."
+        return JsonResponse({
+            'available': False,
+            'suggestion': suggestion,
+            'message': message,
+        })
+
+    return JsonResponse({'available': True, 'message': f"'{username}' is available."})
 
 
 def check_duplicate_application(request):
