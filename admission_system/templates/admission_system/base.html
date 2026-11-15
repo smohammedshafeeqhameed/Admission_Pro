@@ -145,6 +145,13 @@
                     <div class="flex items-center gap-4">
                         <div class="hidden md:flex items-center gap-3">
                             {% if user.is_authenticated %}
+                            {% if user.cre_profile.executive_profile %}
+                            <a href="{% url 'executive_dashboard' %}"
+                                class="text-sm font-bold h-10 px-4 flex items-center gap-1.5 rounded-xl text-[#1c1917] shadow-md shadow-amber-900/20 hover:brightness-105 transition-all"
+                                style="background: linear-gradient(135deg, #FFCC00 0%, #FDB913 55%, #D4941F 100%);">
+                                <i data-lucide="crown" class="w-4 h-4"></i> Executive
+                            </a>
+                            {% endif %}
                             {% if user.is_superuser %}
                             <a href="{% url 'admin_dashboard' %}"
                                 class="text-sm font-bold h-10 px-4 flex items-center rounded-xl bg-orange-100 text-orange-700 hover:bg-orange-200 transition-all">
@@ -206,6 +213,13 @@
 
                     <div class="pt-8 border-t border-slate-100 dark:border-slate-800 flex flex-col gap-4">
                         {% if user.is_authenticated %}
+                        {% if user.cre_profile.executive_profile %}
+                        <a href="{% url 'executive_dashboard' %}"
+                            class="h-14 w-full rounded-2xl text-[#1c1917] flex items-center justify-center gap-2 text-lg font-bold shadow-xl shadow-amber-900/20"
+                            style="background: linear-gradient(135deg, #FFCC00 0%, #FDB913 55%, #D4941F 100%);">
+                            <i data-lucide="crown" class="w-5 h-5"></i> Executive Portal
+                        </a>
+                        {% endif %}
                         <a href="{% url 'cre_dashboard' %}"
                             class="h-14 w-full rounded-2xl bg-primary text-white flex items-center justify-center text-lg font-bold shadow-xl shadow-primary/20">
                             Go to Dashboard
@@ -232,7 +246,11 @@
             </div>
         </header>
 
-        {% if messages %}
+        {% if messages and not is_executive %}
+        <!-- Suppressed on Executive-portal pages (is_executive) - those render
+             their own dark-themed message banner matching the command-center
+             palette instead of this light one, so a message isn't shown twice
+             in two clashing styles. -->
         <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 mt-6">
             {% for message in messages %}
             <div

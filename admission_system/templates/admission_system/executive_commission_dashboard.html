@@ -1,0 +1,182 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}Commission Desk - Executive Portal{% endblock %}
+
+{% block extra_css %}
+<style>
+    .exec-root {
+        background: #0d0d0d;
+        color: #f0efec;
+    }
+
+    .exec-surface {
+        background: #1a1a19;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .exec-grid-line {
+        border-color: #2c2c2a;
+    }
+
+    .exec-muted {
+        color: #898781;
+    }
+
+    .exec-secondary {
+        color: #c3c2b7;
+    }
+
+    .exec-hero {
+        background:
+            radial-gradient(circle at 15% 0%, rgba(128, 0, 0, 0.35), transparent 55%),
+            radial-gradient(circle at 100% 20%, rgba(253, 185, 19, 0.12), transparent 50%),
+            #0d0d0d;
+    }
+
+    .exec-gold-text {
+        background: linear-gradient(135deg, #FFCC00 0%, #FDB913 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .exec-card-hover {
+        transition: transform .25s ease, border-color .25s ease;
+    }
+
+    .exec-card-hover:hover {
+        transform: translateY(-3px);
+        border-color: rgba(253, 185, 19, 0.35);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="exec-root min-h-screen py-10 lg:py-14 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-6xl mx-auto space-y-10">
+
+        <!-- ============ HERO ============ -->
+        <div class="exec-hero rounded-[2.5rem] p-8 md:p-12 border border-white/5 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest"
+                         style="color:#FDB913;">
+                        <i data-lucide="badge-percent" class="w-3.5 h-3.5"></i> Commission Desk
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-black tracking-tighter leading-[0.95]">
+                        Final <span class="exec-gold-text">Sign-off</span>
+                    </h1>
+                    <p class="exec-secondary font-medium text-lg leading-relaxed">
+                        Every CRE with a commission payout Finance has already approved, waiting on you to confirm it's paid.
+                    </p>
+                </div>
+                <a href="{% url 'executive_dashboard' %}" class="inline-flex items-center gap-2 h-12 px-5 rounded-xl bg-white/5 border border-white/10 text-sm font-black shrink-0 hover:bg-white/10 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4"></i> Back to Command Center
+                </a>
+            </div>
+        </div>
+
+        <!-- ============ SUMMARY ============ -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            <div class="exec-surface rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">CREs Waiting</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(253,185,19,0.12); color:#FDB913;">
+                        <i data-lucide="users" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ awaiting_cre_count }}</div>
+            </div>
+
+            <div class="exec-surface rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Requests Waiting</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(57,135,229,0.12); color:#3987e5;">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ awaiting_app_count }}</div>
+            </div>
+
+            <div class="exec-surface rounded-[2rem] p-7" style="border-color: rgba(253,185,19,0.25);">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Total Awaiting Payout</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(253,185,19,0.14); color:#FDB913;">
+                        <i data-lucide="indian-rupee" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none" style="color:#FDB913;">₹{{ awaiting_total_amount|floatformat:"0" }}</div>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="space-y-3">
+            {% for message in messages %}
+            <div class="px-6 py-4 rounded-2xl font-bold flex items-center gap-3 exec-surface" style="color:#f0efec;">
+                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}alert-triangle{% else %}info{% endif %}" class="w-5 h-5 shrink-0" style="color:#FDB913;"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ============ CRE LIST ============ -->
+        <div class="exec-surface rounded-[2rem] overflow-hidden">
+            <div class="px-7 md:px-8 py-6 border-b exec-grid-line">
+                <h3 class="text-lg font-black">Partners With Requests Waiting</h3>
+                <p class="exec-muted text-xs font-bold mt-1">Click into a CRE to review and act on each request</p>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm min-w-[640px]">
+                    <thead>
+                        <tr class="exec-muted text-[10px] font-black uppercase tracking-widest border-b exec-grid-line">
+                            <th class="text-left py-4 px-7 md:px-8">CRE</th>
+                            <th class="text-right py-4 px-4">Requests</th>
+                            <th class="text-right py-4 px-4">Total Amount</th>
+                            <th class="text-right py-4 px-4">Waiting Since</th>
+                            <th class="text-right py-4 px-7 md:px-8"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for cre in cre_rows %}
+                        <tr class="border-b exec-grid-line last:border-0 hover:bg-white/[0.03] transition-colors">
+                            <td class="py-5 px-7 md:px-8">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 rounded-full flex items-center justify-center text-xs font-black shrink-0" style="background: rgba(253,185,19,0.14); color:#FDB913;">
+                                        {{ cre.user.username|slice:":2"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold">{{ cre.user.username }}</div>
+                                        <div class="text-xs exec-muted">{{ cre.phone|default:cre.user.email|default:"-" }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="text-right py-5 px-4 font-bold exec-secondary">{{ cre.awaiting_count }}</td>
+                            <td class="text-right py-5 px-4 font-black" style="color:#FDB913;">₹{{ cre.awaiting_total|floatformat:"0" }}</td>
+                            <td class="text-right py-5 px-4 exec-muted font-medium">{{ cre.oldest_awaiting_at|timesince }} ago</td>
+                            <td class="text-right py-5 px-7 md:px-8">
+                                <a href="{% url 'executive_commission_cre_detail' cre.id %}"
+                                   class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black border border-white/10 hover:bg-white/5 transition-colors">
+                                    Review <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="w-20 h-20 rounded-3xl flex items-center justify-center exec-muted mx-auto mb-4" style="background:#0d0d0d; border:1px solid rgba(255,255,255,0.08);">
+                                    <i data-lucide="inbox" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-lg font-black mb-1">All Caught Up</h3>
+                                <p class="exec-muted font-medium">No commission requests are waiting on your sign-off right now.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

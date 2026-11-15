@@ -1,0 +1,555 @@
+{% extends 'admission_system/base.html' %}
+
+{% block title %}Executive Command Center - AdmissionPro{% endblock %}
+
+{% block extra_css %}
+<style>
+    html {
+        scroll-behavior: smooth;
+    }
+
+    .exec-root {
+        background: #0d0d0d;
+        color: #f0efec;
+    }
+
+    .exec-root [id] {
+        scroll-margin-top: 5.5rem;
+    }
+
+    .exec-surface {
+        background: #1a1a19;
+        border: 1px solid rgba(255, 255, 255, 0.10);
+    }
+
+    .exec-grid-line {
+        border-color: #2c2c2a;
+    }
+
+    .exec-muted {
+        color: #898781;
+    }
+
+    .exec-secondary {
+        color: #c3c2b7;
+    }
+
+    .exec-hero {
+        background:
+            radial-gradient(circle at 15% 0%, rgba(128, 0, 0, 0.35), transparent 55%),
+            radial-gradient(circle at 100% 20%, rgba(253, 185, 19, 0.12), transparent 50%),
+            #0d0d0d;
+    }
+
+    .exec-gold-text {
+        background: linear-gradient(135deg, #FFCC00 0%, #FDB913 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .exec-card-hover {
+        transition: transform .25s ease, border-color .25s ease;
+    }
+
+    .exec-card-hover:hover {
+        transform: translateY(-3px);
+        border-color: rgba(253, 185, 19, 0.35);
+    }
+
+    .exec-bar-track {
+        background: #2c2c2a;
+        overflow: hidden;
+    }
+
+    .exec-bar-fill {
+        transition: width 1s cubic-bezier(.16, 1, .3, 1);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="exec-root min-h-screen py-10 lg:py-14 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-12">
+
+        <!-- ============ HERO ============ -->
+        <div class="exec-hero rounded-[2.5rem] p-8 md:p-12 border border-white/5 relative overflow-hidden">
+            <div class="relative z-10 flex flex-col lg:flex-row lg:items-end justify-between gap-8">
+                <div class="space-y-4 max-w-2xl">
+                    <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] font-black uppercase tracking-widest"
+                         style="color:#FDB913;">
+                        <i data-lucide="crown" class="w-3.5 h-3.5"></i> Executive Portal
+                    </div>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tighter leading-[0.95]">
+                        Network <span class="exec-gold-text">Command Center</span>
+                    </h1>
+                    <p class="exec-secondary font-medium text-lg leading-relaxed">
+                        Every institution, partner and rupee on AdmissionPro, in one place — scoped to
+                        <span class="font-bold" style="color:#f0efec;">{{ selected_academic_year.name|default:"all time" }}</span>.
+                    </p>
+                </div>
+                <div class="flex items-center gap-2 h-12 px-5 rounded-xl bg-white/5 border border-white/10 text-sm font-black shrink-0">
+                    <span class="w-2 h-2 rounded-full" style="background:#0ca30c; box-shadow: 0 0 0 3px rgba(12,163,12,0.25);"></span>
+                    Live network view
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+        <!-- base.html's own message banner is suppressed on is_executive pages
+             (see base.html) so it renders here instead, in the dark theme. -->
+        <div class="space-y-3">
+            {% for message in messages %}
+            <div class="px-6 py-4 rounded-2xl font-bold flex items-center gap-3 exec-surface">
+                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}alert-triangle{% elif message.tags == 'error' %}alert-circle{% else %}info{% endif %}" class="w-5 h-5 shrink-0" style="color:#FDB913;"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- ============ ATTENTION BANNER ============ -->
+        {% if attention_count > 0 %}
+        <div class="exec-surface rounded-[2rem] p-6 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6" style="border-color: rgba(250,178,25,0.3);">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0" style="background: rgba(250,178,25,0.12); color:#fab219;">
+                    <i data-lucide="alert-triangle" class="w-7 h-7"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-black mb-1">{{ attention_count }} item{{ attention_count|pluralize }} across the network need{{ attention_count|pluralize:"s," }} attention</h3>
+                    <p class="exec-muted text-sm font-medium">Each is handled by its own team, on its own portal — shown here for visibility only.</p>
+                </div>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                {% if pending_partner_approvals > 0 %}
+                <div class="px-5 py-3 rounded-xl text-sm font-bold flex items-center gap-2 border border-white/10">
+                    <i data-lucide="user-plus" class="w-4 h-4" style="color:#fab219;"></i> {{ pending_partner_approvals }} partner{{ pending_partner_approvals|pluralize }} pending
+                </div>
+                {% endif %}
+                {% if pending_verification_count > 0 %}
+                <div class="px-5 py-3 rounded-xl text-sm font-bold flex items-center gap-2 border border-white/10">
+                    <i data-lucide="receipt" class="w-4 h-4" style="color:#fab219;"></i> {{ pending_verification_count }} payment{{ pending_verification_count|pluralize }} to verify
+                </div>
+                {% endif %}
+                {% if pending_commission_count > 0 %}
+                <div class="px-5 py-3 rounded-xl text-sm font-bold flex items-center gap-2 border border-white/10">
+                    <i data-lucide="badge-percent" class="w-4 h-4" style="color:#fab219;"></i> {{ pending_commission_count }} commission{{ pending_commission_count|pluralize }} pending
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- ============ COMMISSION DESK ============ -->
+        <!-- The one actionable item in this portal: everything else here is
+             read-only. Finance has already reviewed these and set the
+             payout amount - this is the last sign-off before they're paid. -->
+        <a href="{% url 'executive_commission_dashboard' %}"
+           class="exec-card-hover rounded-[2rem] p-7 md:p-8 flex flex-col md:flex-row md:items-center justify-between gap-6 group"
+           style="background: linear-gradient(120deg, rgba(253,185,19,0.12) 0%, rgba(13,13,13,0.4) 60%), #1a1a19; border: 1px solid rgba(253,185,19,0.28);">
+            <div class="flex items-center gap-5">
+                <div class="w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 relative" style="background: rgba(253,185,19,0.14); color:#FDB913;">
+                    <i data-lucide="badge-percent" class="w-7 h-7"></i>
+                    {% if awaiting_executive_commission_count > 0 %}
+                    <span class="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full flex items-center justify-center" style="background:#FDB913;">
+                        <span class="w-2 h-2 rounded-full animate-ping absolute" style="background:#FDB913;"></span>
+                        <span class="w-2 h-2 rounded-full" style="background:#0d0d0d;"></span>
+                    </span>
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="text-xl font-black mb-1">Commission Desk</h3>
+                    {% if awaiting_executive_commission_count > 0 %}
+                    <p class="exec-secondary text-sm font-medium">
+                        <span class="font-black" style="color:#FDB913;">{{ awaiting_executive_commission_count }}</span>
+                        payout{{ awaiting_executive_commission_count|pluralize }} finance-approved and waiting on your final sign-off.
+                    </p>
+                    {% else %}
+                    <p class="exec-muted text-sm font-medium">Nothing waiting on you right now - browse CREs and past sign-offs anytime.</p>
+                    {% endif %}
+                </div>
+            </div>
+            <span class="inline-flex items-center gap-2 h-12 px-6 rounded-xl text-sm font-black shrink-0 transition-all group-hover:gap-3" style="background:#FDB913; color:#1c1917;">
+                Open Commission Desk <i data-lucide="arrow-right" class="w-4 h-4"></i>
+            </span>
+        </a>
+
+        <!-- ============ KPI GRID ============ -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Global Institutions</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(253,185,19,0.12); color:#FDB913;">
+                        <i data-lucide="school" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ total_colleges }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Active Partners</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(57,135,229,0.12); color:#3987e5;">
+                        <i data-lucide="briefcase" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ total_partners }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Student Enrolments</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(25,158,112,0.14); color:#19bf84;">
+                        <i data-lucide="graduation-cap" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ total_students }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Live Applications</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(144,133,233,0.14); color:#9085e9;">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ total_applications }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Admitted</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(12,163,12,0.14); color:#0ca30c;">
+                        <i data-lucide="user-check" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ total_admitted }}</div>
+                {% if total_removed > 0 %}<p class="text-xs exec-muted font-bold mt-2">{{ total_removed }} removed / TC'd</p>{% endif %}
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7 sm:col-span-2 lg:col-span-1" style="border-color: rgba(253,185,19,0.25);">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Verified Revenue</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(253,185,19,0.14); color:#FDB913;">
+                        <i data-lucide="indian-rupee" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none" style="color:#FDB913;">₹{{ verified_revenue|floatformat:"0" }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Approved Commission Payouts</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(213,81,129,0.14); color:#d55181;">
+                        <i data-lucide="badge-percent" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">₹{{ approved_commission_payout|floatformat:"0" }}</div>
+            </div>
+
+            <div class="exec-surface exec-card-hover rounded-[2rem] p-7">
+                <div class="flex items-center justify-between mb-5">
+                    <span class="text-[10px] font-black uppercase tracking-widest exec-muted">Seat Utilization</span>
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background: rgba(217,89,38,0.14); color:#d95926;">
+                        <i data-lucide="layers" class="w-5 h-5"></i>
+                    </div>
+                </div>
+                <div class="text-4xl font-black leading-none">{{ seat_utilization_pct }}<span class="text-xl exec-muted">%</span></div>
+                <div class="exec-bar-track rounded-full h-1.5 mt-3">
+                    <div class="exec-bar-fill h-full rounded-full" style="width: {{ seat_utilization_pct }}%; background:#d95926;"></div>
+                </div>
+                <p class="text-xs exec-muted font-bold mt-2">{{ occupied_seats }} of {{ total_seats }} seats filled</p>
+            </div>
+        </div>
+
+        <!-- ============ TRENDS ============ -->
+        <div id="trends" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-3">
+                <div class="flex items-center justify-between mb-6">
+                    <div>
+                        <h3 class="text-lg font-black">Applications &amp; Admits</h3>
+                        <p class="exec-muted text-xs font-bold mt-1">Monthly volume across every institution</p>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs font-bold">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#3987e5;"></span> Applications</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full" style="background:#0ca30c;"></span> Admitted</span>
+                    </div>
+                </div>
+                <div class="h-72"><canvas id="trendChart"></canvas></div>
+            </div>
+
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-2">
+                <div class="mb-6">
+                    <h3 class="text-lg font-black">Verified Revenue</h3>
+                    <p class="exec-muted text-xs font-bold mt-1">₹ collected &amp; confirmed per month</p>
+                </div>
+                <div class="h-72"><canvas id="revenueChart"></canvas></div>
+            </div>
+        </div>
+
+        <!-- ============ FUNNEL + PAYMENT STATUS ============ -->
+        <div id="funnel-payments" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-2">
+                <h3 class="text-lg font-black mb-1">Admission Funnel</h3>
+                <p class="exec-muted text-xs font-bold mb-6">Applied → verified → admitted</p>
+                <div class="space-y-4">
+                    {% for stage in funnel %}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5 text-sm font-bold">
+                            <span>{{ stage.label }}</span>
+                            <span class="exec-secondary">{{ stage.value }}</span>
+                        </div>
+                        <div class="exec-bar-track rounded-full h-3">
+                            <div class="exec-bar-fill h-full rounded-full" style="width: {{ stage.pct }}%; background: {{ stage.color }};"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-3">
+                <h3 class="text-lg font-black mb-1">Payment Status</h3>
+                <p class="exec-muted text-xs font-bold mb-6">Every application, by where its payment stands</p>
+                <div class="space-y-4">
+                    {% for row in payment_breakdown %}
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5 text-sm font-bold">
+                            <span>{{ row.payment_status }}</span>
+                            <span class="exec-secondary">{{ row.count }}</span>
+                        </div>
+                        <div class="exec-bar-track rounded-full h-3">
+                            <div class="exec-bar-fill h-full rounded-full" style="width: {{ row.pct }}%; background: {{ row.color }};"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ INSTITUTION PERFORMANCE ============ -->
+        <div id="institutions" class="exec-surface rounded-[2rem] p-7 md:p-8">
+            <div class="mb-6">
+                <h3 class="text-lg font-black">Institution Performance</h3>
+                <p class="exec-muted text-xs font-bold mt-1">Every campus, ranked by verified revenue</p>
+            </div>
+            <div class="overflow-x-auto -mx-2">
+                <table class="w-full text-sm min-w-[720px]">
+                    <thead>
+                        <tr class="exec-muted text-[10px] font-black uppercase tracking-widest border-b exec-grid-line">
+                            <th class="text-left py-3 px-2">Institution</th>
+                            <th class="text-right py-3 px-2">Applications</th>
+                            <th class="text-right py-3 px-2">Admitted</th>
+                            <th class="text-right py-3 px-2">Seat Utilization</th>
+                            <th class="text-right py-3 px-2">Verified Revenue</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in institutions %}
+                        <tr class="border-b exec-grid-line last:border-0 hover:bg-white/[0.03] transition-colors">
+                            <td class="py-4 px-2">
+                                <div class="flex items-center gap-3 font-bold">
+                                    <div class="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 overflow-hidden" style="background:#0d0d0d; border:1px solid rgba(255,255,255,0.08);">
+                                        {% if row.college.logo_url %}
+                                        <img src="{{ row.college.logo_url }}" alt="" class="w-full h-full object-contain p-1">
+                                        {% else %}
+                                        <i data-lucide="building-2" class="w-4 h-4 exec-muted"></i>
+                                        {% endif %}
+                                    </div>
+                                    {{ row.college.name }}
+                                </div>
+                            </td>
+                            <td class="text-right py-4 px-2 font-bold exec-secondary">{{ row.total_applications }}</td>
+                            <td class="text-right py-4 px-2 font-bold" style="color:#0ca30c;">{{ row.admitted }}</td>
+                            <td class="text-right py-4 px-2">
+                                <div class="flex items-center justify-end gap-2">
+                                    <div class="exec-bar-track rounded-full h-1.5 w-20">
+                                        <div class="exec-bar-fill h-full rounded-full" style="width: {{ row.utilization_pct }}%; background:#3987e5;"></div>
+                                    </div>
+                                    <span class="font-bold exec-secondary w-10 text-right">{{ row.utilization_pct }}%</span>
+                                </div>
+                            </td>
+                            <td class="text-right py-4 px-2 font-black" style="color:#FDB913;">₹{{ row.revenue|floatformat:"0" }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- ============ LEADERBOARD + ACTIVITY ============ -->
+        <div id="leaderboard-activity" class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-3">
+                <h3 class="text-lg font-black mb-1">Top Performing Partners</h3>
+                <p class="exec-muted text-xs font-bold mb-6">Ranked by verified revenue generated</p>
+                <div class="space-y-3">
+                    {% for cre in leaderboard %}
+                    <div class="flex items-center gap-4">
+                        <span class="w-6 text-sm font-black exec-muted text-right">{{ cre.rank }}</span>
+                        <div class="w-9 h-9 rounded-full flex items-center justify-center text-xs font-black shrink-0" style="background: rgba(253,185,19,0.14); color:#FDB913;">
+                            {{ cre.user.username|slice:":2"|upper }}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <div class="flex items-center justify-between gap-3 mb-1">
+                                <span class="font-bold truncate">{{ cre.user.username }}</span>
+                                <span class="text-xs font-black whitespace-nowrap" style="color:#FDB913;">₹{{ cre.revenue_value|floatformat:"0" }}</span>
+                            </div>
+                            <div class="exec-bar-track rounded-full h-1.5">
+                                <div class="exec-bar-fill h-full rounded-full" style="width: {{ cre.revenue_pct }}%; background: linear-gradient(90deg, #FFCC00, #FDB913);"></div>
+                            </div>
+                        </div>
+                        <span class="text-xs font-bold exec-muted whitespace-nowrap">{{ cre.successful_referrals }} enrol{{ cre.successful_referrals|pluralize:"ment,ments" }}</span>
+                    </div>
+                    {% empty %}
+                    <p class="exec-muted text-sm font-medium">No verified referrals yet for this academic year.</p>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="exec-surface rounded-[2rem] p-7 lg:col-span-2">
+                <h3 class="text-lg font-black mb-1">Live Activity</h3>
+                <p class="exec-muted text-xs font-bold mb-6">Most recent network-wide events</p>
+                <div class="space-y-4 max-h-[420px] overflow-y-auto pr-1">
+                    {% for item in activity %}
+                    <div class="flex items-start gap-3">
+                        <div class="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5" style="background: {{ item.bg }}; color: {{ item.fg }};">
+                            <i data-lucide="{{ item.icon }}" class="w-4 h-4"></i>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-sm font-bold leading-snug">{{ item.text }}</p>
+                            <p class="text-xs exec-muted font-medium mt-0.5">{{ item.at|timesince }} ago{% if item.by %} · by {{ item.by }}{% endif %}</p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <p class="exec-muted text-sm font-medium">No activity recorded yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- ============ ON THIS PAGE ============ -->
+        <div class="flex flex-wrap items-center gap-3 pt-2">
+            <span class="text-[10px] font-black uppercase tracking-widest exec-muted mr-1">Jump to</span>
+            <a href="#trends" class="px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/5 transition-all">Trends</a>
+            <a href="#funnel-payments" class="px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/5 transition-all">Funnel &amp; Payments</a>
+            <a href="#institutions" class="px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/5 transition-all">Institutions</a>
+            <a href="#leaderboard-activity" class="px-4 py-2 rounded-full text-xs font-bold border border-white/10 hover:bg-white/5 transition-all">Leaderboard &amp; Activity</a>
+        </div>
+
+    </div>
+</div>
+
+{{ trend_labels|json_script:"trend-labels" }}
+{{ trend_applications|json_script:"trend-applications" }}
+{{ trend_admitted|json_script:"trend-admitted" }}
+{{ trend_revenue|json_script:"trend-revenue" }}
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4/dist/chart.umd.min.js"></script>
+<script>
+    (function () {
+        if (typeof Chart === 'undefined') return;
+
+        var labels = JSON.parse(document.getElementById('trend-labels').textContent);
+        var applications = JSON.parse(document.getElementById('trend-applications').textContent);
+        var admitted = JSON.parse(document.getElementById('trend-admitted').textContent);
+        var revenue = JSON.parse(document.getElementById('trend-revenue').textContent);
+
+        Chart.defaults.color = '#898781';
+        Chart.defaults.font.family = 'Inter, sans-serif';
+        Chart.defaults.font.weight = '600';
+
+        var gridOpts = { color: '#2c2c2a', drawTicks: false };
+        var tooltipOpts = {
+            backgroundColor: '#1a1a19',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            titleColor: '#f0efec',
+            bodyColor: '#c3c2b7',
+            padding: 10,
+            cornerRadius: 10,
+            titleFont: { weight: '700' },
+        };
+
+        new Chart(document.getElementById('trendChart'), {
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        type: 'bar',
+                        label: 'Applications',
+                        data: applications,
+                        backgroundColor: '#3987e5',
+                        borderRadius: 4,
+                        maxBarThickness: 28,
+                        order: 2,
+                    },
+                    {
+                        type: 'line',
+                        label: 'Admitted',
+                        data: admitted,
+                        borderColor: '#0ca30c',
+                        backgroundColor: '#0ca30c',
+                        borderWidth: 2,
+                        pointRadius: 3,
+                        pointBackgroundColor: '#0ca30c',
+                        tension: 0.35,
+                        order: 1,
+                    },
+                ],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: { legend: { display: false }, tooltip: tooltipOpts },
+                scales: {
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: { beginAtZero: true, grid: gridOpts, border: { display: false }, ticks: { precision: 0 } },
+                },
+            },
+        });
+
+        new Chart(document.getElementById('revenueChart'), {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Verified Revenue',
+                    data: revenue,
+                    borderColor: '#FDB913',
+                    borderWidth: 2,
+                    pointRadius: 3,
+                    pointBackgroundColor: '#FDB913',
+                    tension: 0.35,
+                    fill: true,
+                    backgroundColor: function (ctx) {
+                        var c = ctx.chart.ctx;
+                        var g = c.createLinearGradient(0, 0, 0, ctx.chart.height);
+                        g.addColorStop(0, 'rgba(253,185,19,0.35)');
+                        g.addColorStop(1, 'rgba(253,185,19,0.0)');
+                        return g;
+                    },
+                }],
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: Object.assign({}, tooltipOpts, {
+                        callbacks: { label: function (c) { return '₹' + c.parsed.y.toLocaleString('en-IN'); } },
+                    }),
+                },
+                scales: {
+                    x: { grid: { display: false }, border: { display: false } },
+                    y: {
+                        beginAtZero: true, grid: gridOpts, border: { display: false },
+                        ticks: { callback: function (v) { return '₹' + v.toLocaleString('en-IN'); } },
+                    },
+                },
+            },
+        });
+    })();
+</script>
+{% endblock %}

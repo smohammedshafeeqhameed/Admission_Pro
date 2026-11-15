@@ -31,7 +31,7 @@
         </div>
 
         <!-- Metric Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
             <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
                 <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
                 <div class="relative z-10 flex gap-4">
@@ -41,6 +41,19 @@
                     <div>
                         <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Pending Review</p>
                         <p class="text-4xl font-black text-slate-900 dark:text-white">{{ pending_commission_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-blue-50 dark:bg-blue-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center text-blue-600 shrink-0">
+                        <i data-lucide="send" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">With Executive</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ awaiting_executive_count }}</p>
                     </div>
                 </div>
             </div>
@@ -191,6 +204,74 @@
             </div>
         </div>
 
+        <!-- Awaiting Executive Approval: Finance has already approved these and set the payout amount - they now sit with the Executive for the final sign-off, so this section is read-only. -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between gap-4">
+                <h2 class="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white">
+                    <i data-lucide="send" class="text-blue-500"></i> Awaiting Executive Approval
+                </h2>
+                <p class="text-xs font-bold text-slate-400 max-w-xs text-right">Approved by Finance and sent on - the Executive gives the final sign-off before these are payable.</p>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50">
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-blue-600 dark:text-blue-400">Referred By (CRE)</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Student</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">College & Course</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Approved by You</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for app in awaiting_executive_apps %}
+                        <tr class="hover:bg-blue-50/40 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm uppercase shrink-0 shadow-sm">
+                                        {{ app.referred_by.user.username|default:"DR"|slice:":2"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-black text-slate-900 dark:text-white text-lg leading-none mb-1">{{ app.referred_by.user.username|default:"Direct" }}</div>
+                                        <div class="text-xs text-slate-500 font-medium">{{ app.referred_by.user.email|default:"-" }} {% if app.referred_by.phone %}&bull; {{ app.referred_by.phone }}{% endif %}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="text-sm font-medium text-slate-500 dark:text-slate-400 leading-tight">{{ app.student.name }}</div>
+                                <div class="text-[11px] text-slate-400 dark:text-slate-500">{{ app.student.email }} &bull; {{ app.student.phone }}</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="inline-block px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-lg mb-2 uppercase tracking-wide">{{ app.college.name }}</span>
+                                <div class="font-medium text-xs text-slate-500 dark:text-slate-400 leading-tight">{{ app.course.name }}</div>
+                            </td>
+                            <td class="px-8 py-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                {{ app.commission_reviewed_at|date:"M j, Y" }}
+                                <div class="text-xs">{{ app.commission_reviewed_at|time:"g:i A" }}</div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg text-sm font-black">
+                                    ₹{{ app.commission_amount|floatformat:"0" }}
+                                </span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 mx-auto mb-4">
+                                    <i data-lucide="send" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">Nothing With the Executive Right Now</h3>
+                                <p class="text-slate-500 font-medium">Applications you approve above will show here until the Executive signs off.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
         <!-- History -->
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden mb-8">
             <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
@@ -205,8 +286,8 @@
                         <tr class="bg-slate-50 dark:bg-slate-900/50">
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Referred By (CRE)</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Student</th>
-                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Reviewed By</th>
-                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Reviewed On</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Finance Reviewer</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Executive Sign-off</th>
                             <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Status</th>
                         </tr>
                     </thead>
@@ -215,8 +296,18 @@
                         <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
                             <td class="px-8 py-4 font-black text-sm text-slate-900 dark:text-white">{{ app.referred_by.user.username|default:"Direct" }}</td>
                             <td class="px-8 py-4 font-medium text-xs text-slate-500 dark:text-slate-400">{{ app.student.name }}</td>
-                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">{{ app.commission_reviewed_by.get_full_name|default:app.commission_reviewed_by.username|default:"-" }}</td>
-                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">{{ app.commission_reviewed_at|date:"M j, Y" }}</td>
+                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                {{ app.commission_reviewed_by.get_full_name|default:app.commission_reviewed_by.username|default:"-" }}
+                                <div class="text-xs text-slate-400">{{ app.commission_reviewed_at|date:"M j, Y" }}</div>
+                            </td>
+                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">
+                                {% if app.commission_executive_reviewed_by %}
+                                {{ app.commission_executive_reviewed_by.get_full_name|default:app.commission_executive_reviewed_by.username }}
+                                <div class="text-xs text-slate-400">{{ app.commission_executive_reviewed_at|date:"M j, Y" }}</div>
+                                {% else %}
+                                <span class="text-slate-300 dark:text-slate-600">&mdash;</span>
+                                {% endif %}
+                            </td>
                             <td class="px-8 py-4 text-right">
                                 {% if app.commission_status == 'Approved' %}
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-black uppercase tracking-widest">
@@ -226,6 +317,7 @@
                                 {% else %}
                                 <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-black uppercase tracking-widest">
                                     <i data-lucide="x" class="w-3.5 h-3.5"></i> Rejected
+                                    {% if app.commission_executive_reviewed_by %}&bull; by Executive{% endif %}
                                 </span>
                                 {% endif %}
                             </td>

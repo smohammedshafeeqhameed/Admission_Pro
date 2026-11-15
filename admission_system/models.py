@@ -87,6 +87,31 @@ class CampusManagerProfile(models.Model):
     def __str__(self):
         return f"Campus Manager: {self.user.username} ({self.college.name})"
 
+class ExecutiveProfile(models.Model):
+    """
+    Promotes an existing CRE account to Executive: a network-wide,
+    read-only analytics command center that sees every institution,
+    student and rupee at once.
+
+    Deliberately keyed to CREProfile, not User - there is no separate
+    Executive login. The Django super admin grants this entirely from
+    /admin/: open "Executive Profiles" -> "Add", pick the CRE Profile to
+    promote, and save. The moment that row exists, that CRE's own account
+    is redirected to the Executive Portal instead of its normal referral
+    dashboard (see ExecutiveRequiredMixin and the login/dispatch routing
+    in views.py); deleting the row revokes it immediately. This is not
+    related to is_superuser and does not appear anywhere in the Admin
+    Control Center - it is a separate portal for a separate purpose.
+    """
+    cre_profile = models.OneToOneField(CREProfile, on_delete=models.CASCADE, related_name='executive_profile')
+    title = models.CharField(
+        max_length=100, blank=True,
+        help_text="e.g. 'Chief Executive Officer', 'Director of Operations' - shown on the Executive Portal."
+    )
+
+    def __str__(self):
+        return f"Executive: {self.cre_profile.user.username}"
+
 class Student(models.Model):
     GENDER_CHOICES = [('', '----------'), ('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
     BLOOD_GROUP_CHOICES = [('', '----------'), ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')]
@@ -257,7 +282,8 @@ class Application(models.Model):
     payment_screenshot = models.ImageField(upload_to='payments/screenshots/', null=True, blank=True, help_text="Screenshot of the successful payment")
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    # Commission workflow:
+    # Commission workflow (two sign-offs required before a payout is
+    # final - Finance's own approval is no longer the last word):
     #   1. Campus Manager marks an Admitted application "Eligible for
     #      Commission" (mark_eligible_for_commission below). This is what
     #      makes the "Apply for Commission" button appear for the
@@ -266,11 +292,22 @@ class Application(models.Model):
     #      (apply_for_commission below), moving commission_status to
     #      'Pending' and sending it to the Finance Manager's Commission
     #      Applications dashboard.
-    #   3. The Finance Manager approves or rejects it (approve_commission /
-    #      reject_commission below).
+    #   3. The Finance Manager reviews it and either rejects it outright
+    #      (reject_commission below, -> 'Rejected') or sets the payout
+    #      amount and approves it (finance_approve_commission below,
+    #      -> 'Finance Approved'). This is a recommendation, not a final
+    #      approval - the application now moves to the Executive's
+    #      Commission Desk instead of being payable yet.
+    #   4. The Executive gives (or withholds) the final sign-off
+    #      (executive_approve_commission / executive_reject_commission
+    #      below). Only executive_approve_commission moves it to
+    #      'Approved' - the terminal, payable state - which is what
+    #      surfaces back on the Finance Manager's own Commission
+    #      Applications dashboard as fully approved.
     COMMISSION_STATUS_CHOICES = [
         ('Not Applied', 'Not Applied'),
-        ('Pending', 'Pending Review'),
+        ('Pending', 'Pending Finance Review'),
+        ('Finance Approved', 'Pending Executive Approval'),
         ('Approved', 'Approved'),
         ('Rejected', 'Rejected'),
     ]
@@ -291,13 +328,19 @@ class Application(models.Model):
     commission_reviewed_by = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True,
         related_name='commission_reviews',
-        help_text="Finance Manager who approved/rejected this commission application."
+        help_text="Finance Manager who approved/rejected this commission application at the Finance stage."
     )
     commission_reviewed_at = models.DateTimeField(null=True, blank=True)
     commission_amount = models.DecimalField(
         max_digits=10, decimal_places=2, null=True, blank=True,
-        help_text="Amount approved by the Finance Manager to be paid to the referring CRE, entered when approving the commission application."
+        help_text="Amount set by the Finance Manager to be paid to the referring CRE, entered when approving the commission application. Unchanged by the Executive's later sign-off."
     )
+    commission_executive_reviewed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='commission_executive_reviews',
+        help_text="Executive who gave the final approval/rejection, after Finance's own approval. Only set once the application has reached 'Finance Approved'."
+    )
+    commission_executive_reviewed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('student', 'college', 'course')
@@ -396,8 +439,11 @@ class Application(models.Model):
         CRE action: submits this application's commission for Finance
         Manager review. Only possible once the Campus Manager has marked
         it eligible, and only from the 'Not Applied' or 'Rejected' state
-        (a Rejected application can be re-submitted; an already
-        Pending/Approved one can't be re-applied for).
+        (a Rejected application can be re-submitted; one already in
+        Pending, Finance Approved or Approved can't be re-applied for).
+        Also clears any stale executive review fields from a previous,
+        since-rejected cycle, so a re-submission starts the two-stage
+        approval clean.
         """
         if not self.eligible_for_commission or self.commission_status not in ('Not Applied', 'Rejected'):
             return False
@@ -405,18 +451,28 @@ class Application(models.Model):
         self.commission_applied_at = timezone.now()
         self.commission_reviewed_by = None
         self.commission_reviewed_at = None
-        self.save(update_fields=['commission_status', 'commission_applied_at', 'commission_reviewed_by', 'commission_reviewed_at'])
+        self.commission_executive_reviewed_by = None
+        self.commission_executive_reviewed_at = None
+        self.save(update_fields=[
+            'commission_status', 'commission_applied_at',
+            'commission_reviewed_by', 'commission_reviewed_at',
+            'commission_executive_reviewed_by', 'commission_executive_reviewed_at',
+        ])
         return True
 
-    def approve_commission(self, user=None, amount=None):
+    def finance_approve_commission(self, user=None, amount=None):
         """
         Finance Manager action: approves a Pending commission application,
         recording the payout amount entered in the approval pop-up as
-        commission_amount.
+        commission_amount. This is a recommendation, not the final word -
+        it moves the application to 'Finance Approved' and onto the
+        Executive's Commission Desk for final sign-off
+        (executive_approve_commission / executive_reject_commission
+        below), rather than straight to the terminal 'Approved' state.
         """
         if self.commission_status != 'Pending':
             return False
-        self.commission_status = 'Approved'
+        self.commission_status = 'Finance Approved'
         self.commission_reviewed_by = user
         self.commission_reviewed_at = timezone.now()
         self.commission_amount = amount
@@ -424,13 +480,47 @@ class Application(models.Model):
         return True
 
     def reject_commission(self, user=None):
-        """Finance Manager action: rejects a Pending commission application."""
+        """Finance Manager action: rejects a Pending commission application outright, without it ever reaching the Executive."""
         if self.commission_status != 'Pending':
             return False
         self.commission_status = 'Rejected'
         self.commission_reviewed_by = user
         self.commission_reviewed_at = timezone.now()
         self.save(update_fields=['commission_status', 'commission_reviewed_by', 'commission_reviewed_at'])
+        return True
+
+    def executive_approve_commission(self, user=None):
+        """
+        Executive action: final sign-off on a commission application
+        Finance has already approved (commission_status ==
+        'Finance Approved'). Moves it to 'Approved' - the terminal,
+        payable state - at the same commission_amount Finance set; the
+        Executive confirms the amount rather than re-entering it. This is
+        what makes the application show as fully approved back on the
+        Finance Manager's own Commission Applications dashboard.
+        """
+        if self.commission_status != 'Finance Approved':
+            return False
+        self.commission_status = 'Approved'
+        self.commission_executive_reviewed_by = user
+        self.commission_executive_reviewed_at = timezone.now()
+        self.save(update_fields=['commission_status', 'commission_executive_reviewed_by', 'commission_executive_reviewed_at'])
+        return True
+
+    def executive_reject_commission(self, user=None):
+        """
+        Executive action: rejects a commission application Finance had
+        already approved (commission_status == 'Finance Approved'),
+        e.g. on further scrutiny. Goes straight to 'Rejected' rather than
+        back to Finance, the same terminal state a direct Finance
+        rejection reaches.
+        """
+        if self.commission_status != 'Finance Approved':
+            return False
+        self.commission_status = 'Rejected'
+        self.commission_executive_reviewed_by = user
+        self.commission_executive_reviewed_at = timezone.now()
+        self.save(update_fields=['commission_status', 'commission_executive_reviewed_by', 'commission_executive_reviewed_at'])
         return True
 
 

@@ -1,7 +1,7 @@
 import csv
 from django.http import HttpResponse
 from django.contrib import admin
-from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse, CampusManagerProfile, AcademicYear
+from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse, CampusManagerProfile, ExecutiveProfile, AcademicYear
 
 # ... (rest of the code)
 
@@ -10,6 +10,23 @@ class CampusManagerProfileAdmin(admin.ModelAdmin):
     list_display = ('user', 'college', 'phone')
     list_filter = ('college',)
     search_fields = ('user__username', 'phone')
+
+@admin.register(ExecutiveProfile)
+class ExecutiveProfileAdmin(admin.ModelAdmin):
+    """
+    This is the only place Executive access is granted or revoked: pick
+    an existing CRE Profile (search box below, backed by
+    CREProfileAdmin.search_fields) and save. That CRE's own account is
+    immediately promoted - no separate login, no separate user to create.
+    Deleting the row here revokes it immediately.
+    """
+    list_display = ('cre_username', 'title')
+    search_fields = ('cre_profile__user__username', 'title')
+    autocomplete_fields = ('cre_profile',)
+
+    @admin.display(description='CRE Account')
+    def cre_username(self, obj):
+        return obj.cre_profile.user.username
 
 @admin.action(description="Export Selected as CSV")
 def export_as_csv(modeladmin, request, queryset):

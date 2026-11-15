@@ -1,6 +1,9 @@
 import os
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db.models import Q, Count, Sum
+from django.db.models import Q, Count, Sum, Min
+from django.db.models.functions import TruncMonth
+from django.utils import timezone
+from datetime import timedelta
 from django.views import View
 from django.views.generic import CreateView, TemplateView
 from django.contrib.auth.views import LoginView, LogoutView
@@ -36,6 +39,27 @@ def get_addon_courses(request):
 class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_superuser
+
+class ExecutiveRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        # Executive access is granted purely by linking a CREProfile to an
+        # ExecutiveProfile from the Django admin (see ExecutiveProfile in
+        # models.py) - deliberately not tied to is_superuser, and not
+        # checked on request.user directly, since there is no separate
+        # Executive login: it's always "this CRE account, promoted".
+        return is_executive_user(self.request.user)
+
+
+def is_executive_user(user):
+    """
+    True iff `user` is a CRE account whose CREProfile has been linked to
+    an ExecutiveProfile from the Django admin. Shared by
+    ExecutiveRequiredMixin, the login/dashboard redirect logic, and the
+    CRE-approval gate below (an executive doesn't need separate CRE
+    approval - being promoted here is itself the approval).
+    """
+    cre_profile = getattr(user, 'cre_profile', None)
+    return bool(cre_profile and hasattr(cre_profile, 'executive_profile'))
 
 class AcademicYearFilterMixin:
     """
@@ -403,9 +427,12 @@ class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMix
     Separate dashboard (inside the Finance Manager portal) listing every
     commission application submitted by a CRE - i.e. every Application
     with commission_status != 'Not Applied'. Pending ones surface first
-    for review/approve/reject; Approved/Rejected ones are kept below as
-    history, mirroring the Verification Queue / History split on the
-    main Finance dashboard.
+    for review/approve/reject; once approved here they move to
+    'Finance Approved' and sit in a read-only "Awaiting Executive
+    Approval" section - Finance's own approval is a recommendation, not
+    the final word (see Application.finance_approve_commission in
+    models.py) - and only reach History below, as 'Approved', once the
+    Executive gives the final sign-off from their own Commission Desk.
     """
     template_name = 'admission_system/finance_commission_dashboard.html'
 
@@ -414,21 +441,26 @@ class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMix
         college_id = self.request.GET.get('college')
 
         base_apps = Application.objects.select_related(
-            'student', 'college', 'course', 'referred_by__user', 'commission_reviewed_by'
+            'student', 'college', 'course', 'referred_by__user',
+            'commission_reviewed_by', 'commission_executive_reviewed_by',
         ).exclude(commission_status='Not Applied')
 
         pending_apps = base_apps.filter(commission_status='Pending').order_by('commission_applied_at')
+        awaiting_executive_apps = base_apps.filter(commission_status='Finance Approved').order_by('commission_reviewed_at')
         reviewed_apps = base_apps.filter(commission_status__in=['Approved', 'Rejected']).order_by('-commission_reviewed_at')
 
         if college_id:
             pending_apps = pending_apps.filter(college_id=college_id)
+            awaiting_executive_apps = awaiting_executive_apps.filter(college_id=college_id)
             reviewed_apps = reviewed_apps.filter(college_id=college_id)
             context['active_college'] = get_object_or_404(College, id=college_id)
 
         context.update({
             'pending_commission_apps': pending_apps,
+            'awaiting_executive_apps': awaiting_executive_apps,
             'reviewed_commission_apps': reviewed_apps[:50],
             'pending_commission_count': pending_apps.count(),
+            'awaiting_executive_count': awaiting_executive_apps.count(),
             'approved_commission_count': base_apps.filter(commission_status='Approved').count(),
             'rejected_commission_count': base_apps.filter(commission_status='Rejected').count(),
             'all_colleges': College.objects.all().order_by('name'),
@@ -440,12 +472,14 @@ class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMix
 class FinanceCommissionActionView(FinanceRequiredMixin, View):
     """
     Handles the Approve/Reject buttons on the Commission Applications
-    dashboard. Delegates to Application.approve_commission() /
+    dashboard. Delegates to Application.finance_approve_commission() /
     reject_commission() (models.py) so a Pending-only guard can't drift
     between call sites. Approving requires an "amount" field in the POST
     body - the payout entered by the Finance Manager in the "Approve
     Commission" pop-up (see finance_commission_dashboard.html) - which is
-    recorded as Application.commission_amount.
+    recorded as Application.commission_amount. Approving here does not
+    finalise the payout: it moves the application to 'Finance Approved'
+    and onto the Executive's own Commission Desk for the last sign-off.
     """
     def post(self, request, *args, **kwargs):
         from decimal import Decimal, InvalidOperation
@@ -465,8 +499,8 @@ class FinanceCommissionActionView(FinanceRequiredMixin, View):
                 messages.error(request, "Enter a valid commission amount (greater than 0) before approving.")
                 return redirect('finance_commission_dashboard')
 
-            application.approve_commission(user=request.user, amount=amount)
-            messages.success(request, f"Commission of ₹{amount} approved for {application.student.name}.")
+            application.finance_approve_commission(user=request.user, amount=amount)
+            messages.success(request, f"₹{amount} commission for {application.student.name} sent to the Executive for final approval.")
         elif action == 'reject':
             application.reject_commission(user=request.user)
             messages.warning(request, f"Commission rejected for {application.student.name}.")
@@ -834,9 +868,12 @@ class CRELoginView(LoginView):
         remember_me = self.request.POST.get('remember_me')
         user = form.get_user()
         
-        # Check if it's a CRE and if they are approved
+        # Check if it's a CRE and if they are approved. A CRE promoted to
+        # Executive (see ExecutiveProfile) skips this gate - being linked
+        # there from the Django admin is itself the approval.
         cre_profile = getattr(user, 'cre_profile', None)
-        if cre_profile and not cre_profile.is_approved and not user.is_superuser:
+        if (cre_profile and not cre_profile.is_approved
+                and not user.is_superuser and not is_executive_user(user)):
             from django.contrib.auth import logout
             logout(self.request)
             messages.error(self.request, "Your account is pending approval from the administrator.")
@@ -851,6 +888,8 @@ class CRELoginView(LoginView):
         return super().form_valid(form)
 
     def get_success_url(self):
+        if is_executive_user(self.request.user):
+            return reverse_lazy('executive_dashboard')
         if self.request.user.is_superuser:
             return reverse_lazy('admin_dashboard')
         if hasattr(self.request.user, 'finance_profile'):
@@ -901,23 +940,31 @@ class DashboardView(AcademicYearFilterMixin, LoginRequiredMixin, TemplateView):
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated:
+            # Resolved once, up front: an Executive is a CRE account whose
+            # CREProfile has been linked to an ExecutiveProfile from the
+            # Django admin - checked before the finance/campus-manager
+            # branches and before the CRE-approval gate below, since being
+            # promoted here is itself the approval (see is_executive_user).
+            cre_profile = getattr(request.user, 'cre_profile', None)
+            if cre_profile and hasattr(cre_profile, 'executive_profile'):
+                return redirect('executive_dashboard')
+
             if hasattr(request.user, 'finance_profile'):
                 return redirect('finance_dashboard')
-            
+
             if hasattr(request.user, 'campus_manager_profile'):
                 return redirect('campus_manager_dashboard')
-            
-            cre_profile = getattr(request.user, 'cre_profile', None)
+
             if cre_profile and not cre_profile.is_approved and not request.user.is_superuser:
                 from django.contrib.auth import logout
                 logout(request)
                 messages.error(request, "Your account is pending approval. Please contact the administrator.")
                 return redirect('login')
-                
+
             if not cre_profile and not request.user.is_superuser:
                 messages.error(request, "This account is not registered as a CRE.")
                 return render(request, 'admission_system/home.html', {'error': True})
-                
+
         return super().dispatch(request, *args, **kwargs)
 
 
@@ -947,6 +994,8 @@ class CREApplyCommissionView(LoginRequiredMixin, View):
             messages.error(request, f"{application.student.name} has not been marked eligible for commission yet.")
         elif application.commission_status == 'Pending':
             messages.info(request, f"Your commission application for {application.student.name} is already pending review.")
+        elif application.commission_status == 'Finance Approved':
+            messages.info(request, f"Your commission application for {application.student.name} has been approved by Finance and is awaiting the Executive's final sign-off.")
         elif application.commission_status == 'Approved':
             messages.info(request, f"Your commission application for {application.student.name} has already been approved.")
         else:
@@ -954,6 +1003,385 @@ class CREApplyCommissionView(LoginRequiredMixin, View):
             messages.success(request, f"Commission application for {application.student.name} submitted. The finance team will review it.")
 
         return redirect('cre_dashboard')
+
+
+class ExecutiveDashboardView(AcademicYearFilterMixin, ExecutiveRequiredMixin, TemplateView):
+    """
+    The Executive Portal: one network-wide command center for whoever
+    holds ExecutiveProfile (a CRE account promoted from the Django admin
+    - see ExecutiveProfile in models.py) to see every institution,
+    student, application, rupee and partner across the whole platform at
+    a glance.
+
+    Deliberately read-only and self-contained: every action (approving a
+    partner, verifying a payment, admitting a student, approving a
+    commission) still happens on the existing Admin / Finance / Campus
+    Manager portals, but this page does not link out to them - an
+    Executive-promoted CRE has no access to those role-gated views. This
+    view only aggregates what those already record, scoped by the same
+    selected Academic Year as every other dashboard (see
+    AcademicYearFilterMixin).
+    """
+    template_name = 'admission_system/executive_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        ay_filter = self.academic_year_date_filter('applied_at')
+        apps_qs = Application.objects.filter(**ay_filter)
+
+        # ---- Headline KPIs -------------------------------------------------
+        total_students = Student.objects.filter(
+            **self.academic_year_date_filter('applications__applied_at')
+        ).distinct().count()
+        total_applications = apps_qs.count()
+        total_admitted = apps_qs.filter(status='Admitted').count()
+        total_removed = apps_qs.filter(status='Removed').count()
+        verified_revenue = apps_qs.filter(payment_status='Success').aggregate(
+            total=Sum('amount_paid'))['total'] or 0
+        pending_verification_count = apps_qs.filter(payment_status='Pending Verification').count()
+        approved_commission_payout = apps_qs.filter(commission_status='Approved').aggregate(
+            total=Sum('commission_amount'))['total'] or 0
+        pending_commission_count = apps_qs.filter(commission_status='Pending').count()
+        # Deliberately not scoped by apps_qs's Academic Year filter: this is
+        # the Commission Desk's own actionable queue (see
+        # ExecutiveCommissionDashboardView below), so the count on this tile
+        # must always match what that portal actually shows, whichever
+        # academic year happens to be selected here.
+        awaiting_executive_commission_count = Application.objects.filter(commission_status='Finance Approved').count()
+
+        total_colleges = College.objects.count()
+        total_partners = CREProfile.objects.count()
+        pending_partner_approvals = CREProfile.objects.filter(is_approved=False).count()
+
+        seat_totals = Course.objects.aggregate(total=Sum('total_seats'), occupied=Sum('occupied_seats'))
+        total_seats = seat_totals['total'] or 0
+        occupied_seats = seat_totals['occupied'] or 0
+        seat_utilization_pct = round((occupied_seats / total_seats) * 100, 1) if total_seats else 0
+
+        attention_count = pending_partner_approvals + pending_verification_count + pending_commission_count
+
+        # ---- Monthly trend (applications, admits, verified revenue) -------
+        # Scoped to the selected Academic Year's own calendar so the chart
+        # always matches the year picked in the filter bar; falls back to
+        # the trailing 12 months when no Academic Year has been configured.
+        if self.academic_year:
+            trend_start = self.academic_year.start_date
+            trend_end = self.academic_year.end_date
+        else:
+            today = timezone.localdate()
+            trend_start = today.replace(day=1) - timedelta(days=365)
+            trend_end = today
+
+        monthly = list(
+            Application.objects.filter(applied_at__date__gte=trend_start, applied_at__date__lte=trend_end)
+            .annotate(month=TruncMonth('applied_at'))
+            .values('month')
+            .annotate(
+                applications=Count('id'),
+                revenue=Sum('amount_paid', filter=Q(payment_status='Success')),
+                admitted=Count('id', filter=Q(status='Admitted')),
+            )
+            .order_by('month')
+        )
+        trend_labels = [m['month'].strftime('%b %Y') for m in monthly]
+        trend_applications = [m['applications'] for m in monthly]
+        trend_revenue = [float(m['revenue'] or 0) for m in monthly]
+        trend_admitted = [m['admitted'] for m in monthly]
+
+        # ---- Payment status breakdown --------------------------------------
+        payment_status_colors = {
+            'Success': '#0ca30c',
+            'Pending': '#fab219',
+            'Pending Verification': '#3987e5',
+            'Failed': '#d03b3b',
+            'Rejected': '#ec835a',
+        }
+        payment_breakdown = list(
+            apps_qs.values('payment_status').annotate(count=Count('id')).order_by('-count')
+        )
+        max_payment_count = max((row['count'] for row in payment_breakdown), default=0)
+        for row in payment_breakdown:
+            row['color'] = payment_status_colors.get(row['payment_status'], '#9085e9')
+            row['pct'] = round((row['count'] / max_payment_count) * 100, 1) if max_payment_count else 0
+
+        # ---- Institution-wise breakdown -------------------------------------
+        # Looped rather than one heavily-annotated queryset: each college
+        # needs independent Sum()/Count() aggregates across two different
+        # related sets (applications and courses), which a single annotated
+        # queryset would fan out/duplicate across. Institution count is
+        # small, so this stays cheap.
+        institutions = []
+        for college in College.objects.all():
+            college_apps = Application.objects.filter(college=college, **ay_filter)
+            seats = Course.objects.filter(college=college).aggregate(
+                total=Sum('total_seats'), occupied=Sum('occupied_seats'))
+            c_total_seats = seats['total'] or 0
+            c_occupied = seats['occupied'] or 0
+            institutions.append({
+                'college': college,
+                'total_applications': college_apps.count(),
+                'admitted': college_apps.filter(status='Admitted').count(),
+                'revenue': college_apps.filter(payment_status='Success').aggregate(
+                    total=Sum('amount_paid'))['total'] or 0,
+                'total_seats': c_total_seats,
+                'occupied_seats': c_occupied,
+                'utilization_pct': round((c_occupied / c_total_seats) * 100, 1) if c_total_seats else 0,
+            })
+        institutions.sort(key=lambda d: d['revenue'], reverse=True)
+        max_institution_revenue = max((d['revenue'] for d in institutions), default=0) or 1
+        for d in institutions:
+            d['revenue_pct'] = round((d['revenue'] / max_institution_revenue) * 100, 1)
+
+        # ---- Partner (CRE) leaderboard --------------------------------------
+        referral_ay_filter = {f'referrals__{k}': v for k, v in ay_filter.items()}
+        leaderboard = (
+            CREProfile.objects.select_related('user')
+            .annotate(
+                successful_referrals=Count(
+                    'referrals',
+                    filter=Q(referrals__payment_status='Success', **referral_ay_filter)
+                ),
+                revenue_generated=Sum(
+                    'referrals__amount_paid',
+                    filter=Q(referrals__payment_status='Success', **referral_ay_filter)
+                ),
+            )
+            .filter(successful_referrals__gt=0)
+            .order_by('-revenue_generated')[:8]
+        )
+
+        # ---- Admission funnel -------------------------------------------------
+        payment_success_count = apps_qs.filter(payment_status='Success').count()
+        funnel_stage_colors = ['#86b6ef', '#2a78d6', '#184f95']
+        funnel_raw = [
+            ('Applied', total_applications),
+            ('Payment Verified', payment_success_count),
+            ('Admitted', total_admitted),
+        ]
+        funnel_max = funnel_raw[0][1] or 1
+        funnel = [
+            {
+                'label': label, 'value': value,
+                'pct': round((value / funnel_max) * 100, 1),
+                'color': funnel_stage_colors[i],
+            }
+            for i, (label, value) in enumerate(funnel_raw)
+        ]
+        funnel_labels = [f['label'] for f in funnel]
+        funnel_values = [f['value'] for f in funnel]
+
+        leaderboard_list = list(leaderboard)
+        max_leaderboard_revenue = max((float(cre.revenue_generated or 0) for cre in leaderboard_list), default=0) or 1
+        for rank, cre in enumerate(leaderboard_list, start=1):
+            cre.rank = rank
+            cre.revenue_value = float(cre.revenue_generated or 0)
+            cre.revenue_pct = round((cre.revenue_value / max_leaderboard_revenue) * 100, 1)
+        leaderboard_names = [cre.user.username for cre in leaderboard_list]
+        leaderboard_revenue = [cre.revenue_value for cre in leaderboard_list]
+        leaderboard_referrals = [cre.successful_referrals for cre in leaderboard_list]
+
+        # ---- Live activity feed -------------------------------------------
+        # Merges three real, timestamped event sources network-wide
+        # (nothing fabricated) and shows the most recent across all of them.
+        # bg/fg are precomputed here (rather than branching in the template)
+        # so the template only ever writes one unconditional style value.
+        tone_styles = {
+            'good': ('rgba(12,163,12,0.14)', '#0ca30c'),
+            'serious': ('rgba(236,131,90,0.14)', '#ec835a'),
+            'info': ('rgba(57,135,229,0.14)', '#3987e5'),
+        }
+
+        def _activity_item(at, icon, tone, text, by):
+            bg, fg = tone_styles[tone]
+            return {'at': at, 'icon': icon, 'text': text, 'by': by, 'bg': bg, 'fg': fg}
+
+        activity = []
+        for app in (Application.objects.filter(status='Admitted', admitted_at__isnull=False)
+                    .select_related('student', 'college', 'closed_by').order_by('-admitted_at')[:6]):
+            activity.append(_activity_item(
+                app.admitted_at, 'user-check', 'good',
+                f"{app.student.name} admitted to {app.college.name}",
+                app.closed_by.username if app.closed_by else None,
+            ))
+        for app in (Application.objects.filter(commission_reviewed_at__isnull=False)
+                    .select_related('student', 'commission_reviewed_by').order_by('-commission_reviewed_at')[:6]):
+            approved = app.commission_status == 'Approved'
+            activity.append(_activity_item(
+                app.commission_reviewed_at,
+                'badge-check' if approved else 'badge-x',
+                'good' if approved else 'serious',
+                (f"Commission approved for {app.student.name} (₹{app.commission_amount})" if approved
+                 else f"Commission rejected for {app.student.name}"),
+                app.commission_reviewed_by.username if app.commission_reviewed_by else None,
+            ))
+        for cre in CREProfile.objects.select_related('user').order_by('-user__date_joined')[:6]:
+            activity.append(_activity_item(
+                cre.user.date_joined, 'user-plus', 'info',
+                f"{cre.user.username} joined the partner network",
+                None,
+            ))
+        activity.sort(key=lambda a: a['at'], reverse=True)
+        activity = activity[:10]
+
+        context.update({
+            'is_dashboard': True,
+            'is_executive': True,
+            'total_students': total_students,
+            'total_applications': total_applications,
+            'total_admitted': total_admitted,
+            'total_removed': total_removed,
+            'verified_revenue': verified_revenue,
+            'approved_commission_payout': approved_commission_payout,
+            'pending_commission_count': pending_commission_count,
+            'awaiting_executive_commission_count': awaiting_executive_commission_count,
+            'pending_verification_count': pending_verification_count,
+            'total_colleges': total_colleges,
+            'total_partners': total_partners,
+            'pending_partner_approvals': pending_partner_approvals,
+            'attention_count': attention_count,
+            'total_seats': total_seats,
+            'occupied_seats': occupied_seats,
+            'seat_utilization_pct': seat_utilization_pct,
+            'trend_labels': trend_labels,
+            'trend_applications': trend_applications,
+            'trend_revenue': trend_revenue,
+            'trend_admitted': trend_admitted,
+            'payment_breakdown': payment_breakdown,
+            'institutions': institutions,
+            'leaderboard': leaderboard_list,
+            'leaderboard_names': leaderboard_names,
+            'leaderboard_revenue': leaderboard_revenue,
+            'leaderboard_referrals': leaderboard_referrals,
+            'funnel': funnel,
+            'funnel_labels': funnel_labels,
+            'funnel_values': funnel_values,
+            'payment_success_count': payment_success_count,
+            'activity': activity,
+        })
+        return context
+
+
+class ExecutiveCommissionDashboardView(AcademicYearFilterMixin, ExecutiveRequiredMixin, TemplateView):
+    """
+    The Executive's Commission Desk: the final sign-off stage of the
+    commission workflow. By the time an application lands here, Finance
+    has already reviewed it and set the payout amount
+    (commission_status == 'Finance Approved' - see
+    Application.finance_approve_commission in models.py); nothing is
+    payable until the Executive also signs off.
+
+    Lists every CRE who currently has at least one application waiting
+    at this stage - grouped by CRE, not a flat list of applications,
+    since the Executive reviews a partner's whole outstanding book at
+    once. Click into a CRE (see ExecutiveCommissionCREDetailView) for
+    the itemised list to actually approve or reject.
+
+    Deliberately not scoped by the globally-selected Academic Year (the
+    mixin is only mixed in so the filter bar in base.html still renders
+    correctly on this page) - a payout waiting on sign-off doesn't stop
+    waiting just because a different year is selected elsewhere.
+    """
+    template_name = 'admission_system/executive_commission_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Annotate over the full (unfiltered) 'referrals' relation, with the
+        # 'Finance Approved' condition applied inside each aggregate's own
+        # filter= - not as an outer .filter(referrals__...) on the base
+        # queryset beforehand. Pre-filtering the base queryset by the same
+        # relation the aggregates also reference creates a second join,
+        # which inflates Count/Sum beyond the correct per-CRE totals.
+        # Matches the same pattern already used for the leaderboard above.
+        awaiting_filter = Q(referrals__commission_status='Finance Approved')
+        cre_rows = (
+            CREProfile.objects.select_related('user')
+            .annotate(
+                awaiting_count=Count('referrals', filter=awaiting_filter, distinct=True),
+                awaiting_total=Sum('referrals__commission_amount', filter=awaiting_filter),
+                oldest_awaiting_at=Min('referrals__commission_reviewed_at', filter=awaiting_filter),
+            )
+            .filter(awaiting_count__gt=0)
+            .order_by('oldest_awaiting_at')
+        )
+
+        pending_apps = Application.objects.filter(commission_status='Finance Approved')
+
+        context.update({
+            'cre_rows': cre_rows,
+            'awaiting_cre_count': cre_rows.count(),
+            'awaiting_app_count': pending_apps.count(),
+            'awaiting_total_amount': pending_apps.aggregate(total=Sum('commission_amount'))['total'] or 0,
+            'is_dashboard': True,
+            'is_executive': True,
+        })
+        return context
+
+
+class ExecutiveCommissionCREDetailView(AcademicYearFilterMixin, ExecutiveRequiredMixin, TemplateView):
+    """
+    Drill-down from ExecutiveCommissionDashboardView: every commission
+    application from one specific CRE, split into the ones awaiting the
+    Executive's final sign-off (commission_status == 'Finance Approved'
+    - actionable, with Approve/Reject buttons) and that CRE's own past
+    commission history (Approved/Rejected - read-only context).
+
+    Deliberately not scoped by the globally-selected Academic Year, for
+    the same reason as ExecutiveCommissionDashboardView above.
+    """
+    template_name = 'admission_system/executive_commission_cre_detail.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        cre_profile = get_object_or_404(CREProfile.objects.select_related('user'), id=kwargs.get('cre_id'))
+
+        awaiting_apps = Application.objects.filter(
+            referred_by=cre_profile, commission_status='Finance Approved'
+        ).select_related('student', 'college', 'course', 'commission_reviewed_by').order_by('commission_reviewed_at')
+
+        history_apps = Application.objects.filter(
+            referred_by=cre_profile, commission_status__in=['Approved', 'Rejected']
+        ).select_related(
+            'student', 'college', 'course', 'commission_reviewed_by', 'commission_executive_reviewed_by',
+        ).order_by('-commission_reviewed_at')[:25]
+
+        context.update({
+            'cre_profile': cre_profile,
+            'awaiting_apps': awaiting_apps,
+            'awaiting_total': awaiting_apps.aggregate(total=Sum('commission_amount'))['total'] or 0,
+            'history_apps': history_apps,
+            'is_dashboard': True,
+            'is_executive': True,
+        })
+        return context
+
+
+class ExecutiveCommissionActionView(ExecutiveRequiredMixin, View):
+    """
+    Handles the Approve/Reject buttons on the Executive's Commission
+    Desk (CRE detail page). Delegates to
+    Application.executive_approve_commission() /
+    executive_reject_commission() (models.py), which only act on
+    applications still at the 'Finance Approved' stage, so a double
+    click or a stale page can't double-process one. Always redirects
+    back to the CRE detail page the action was taken from.
+    """
+    def post(self, request, *args, **kwargs):
+        application = get_object_or_404(
+            Application.objects.select_related('student', 'referred_by'), id=kwargs.get('app_id')
+        )
+        action = request.POST.get('action')
+
+        if application.commission_status != 'Finance Approved':
+            messages.info(request, f"The commission application for {application.student.name} has already moved on.")
+        elif action == 'approve':
+            application.executive_approve_commission(user=request.user)
+            messages.success(request, f"Final approval given for {application.student.name}'s ₹{application.commission_amount} commission.")
+        elif action == 'reject':
+            application.executive_reject_commission(user=request.user)
+            messages.warning(request, f"Commission rejected for {application.student.name}.")
+
+        return redirect('executive_commission_cre_detail', cre_id=application.referred_by_id)
 
 
 from .forms import StudentAdmissionForm
