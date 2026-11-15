@@ -1,4 +1,5 @@
-from django.db import models
+from django.db import models, transaction
+from django.db.models import F
 from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
@@ -28,11 +29,31 @@ class Course(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
 
+    # Seat tracking for the Campus Manager portal's Admit action. These
+    # live directly on Course (not per academic year) - set/reset
+    # total_seats from the Django admin at the start of each intake cycle.
+    # occupied_seats is only ever changed by Application.admit() via an
+    # atomic F() update; don't edit it by hand.
+    total_seats = models.PositiveIntegerField(
+        default=0,
+        help_text="Total intake capacity for this course. Leave 0 if seats aren't tracked yet."
+    )
+    occupied_seats = models.PositiveIntegerField(
+        default=0,
+        help_text="Seats filled by admitted students. Updated automatically when a student is admitted - don't edit directly."
+    )
+
     class Meta:
         unique_together = ('college', 'name')
 
     def __str__(self):
         return f"{self.name} - {self.college.name}"
+
+    @property
+    def available_seats(self):
+        """Seats left to fill. Never negative, even if occupied_seats was
+        ever pushed past total_seats (e.g. capacity lowered after admits)."""
+        return max(self.total_seats - self.occupied_seats, 0)
 
 class AddonCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='addon_courses')
@@ -191,7 +212,12 @@ class Application(models.Model):
         ('Failed', 'Failed'),
         ('Rejected', 'Rejected')
     ]
-    
+
+    STATUS_CHOICES = [
+        ('Applied', 'Applied'),
+        ('Admitted', 'Admitted'),
+    ]
+
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='applications')
     college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='applications')
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='applications')
@@ -199,6 +225,18 @@ class Application(models.Model):
     source = models.CharField(max_length=255, null=True, blank=True, verbose_name="Reference Source")
     referred_by = models.ForeignKey(CREProfile, on_delete=models.SET_NULL, null=True, related_name='referrals')
     applied_at = models.DateTimeField(auto_now_add=True)
+
+    # Admission status, set by the Campus Manager portal's "Admit" action
+    # (see admit() below). closed_by is the staff member (typically the
+    # campus manager) who performed that action - the "Counselor / Staff
+    # member responsible for closing the lead".
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Applied')
+    closed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='closed_applications',
+        help_text="Staff member who admitted/closed this application."
+    )
+    admitted_at = models.DateTimeField(null=True, blank=True)
     
     # Documents
     doc_10th = models.FileField(upload_to='documents/10th/', null=True, blank=True)
@@ -229,6 +267,29 @@ class Application(models.Model):
 
     def __str__(self):
         return f"{self.student.name} -> {self.college.name} ({self.course.name})"
+
+    def admit(self, user=None):
+        """
+        Marks this application Admitted and atomically increments the
+        course's occupied_seats by 1 (so available_seats drops by 1 right
+        away for every other view reading it). Uses an F() expression
+        rather than read-modify-write so concurrent admits across
+        campus-manager sessions can't race each other into overcounting
+        seats.
+
+        Returns False without doing anything if the application was
+        already admitted, so calling this twice (e.g. a double-submitted
+        form) never double-deducts a seat.
+        """
+        if self.status == 'Admitted':
+            return False
+        with transaction.atomic():
+            self.status = 'Admitted'
+            self.closed_by = user
+            self.admitted_at = timezone.now()
+            self.save(update_fields=['status', 'closed_by', 'admitted_at'])
+            Course.objects.filter(pk=self.course_id).update(occupied_seats=F('occupied_seats') + 1)
+        return True
 
 
 from django.db.models.signals import m2m_changed

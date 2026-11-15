@@ -400,7 +400,7 @@ class CampusManagerDashboardView(AcademicYearFilterMixin, CampusManagerRequiredM
         # Base Querysets for this campus, scoped to the selected academic year
         campus_apps = Application.objects.filter(
             college=college, **self.academic_year_date_filter('applied_at')
-        ).select_related('student', 'course', 'referred_by')
+        ).select_related('student', 'course', 'referred_by', 'closed_by')
         success_apps = campus_apps.filter(payment_status='Success')
         
         # Stats
@@ -484,6 +484,63 @@ class CampusManagerExportCSVView(AcademicYearFilterMixin, CampusManagerRequiredM
             ])
             
         return response
+
+class CampusManagerCourseStudentListView(AcademicYearFilterMixin, CampusManagerRequiredMixin, TemplateView):
+    """
+    The dedicated Student List View opened by clicking a Course/Department
+    card on the Campus Manager dashboard. Scoped to the manager's own
+    college via get_object_or_404(..., college=manager_profile.college) so
+    a manager can't view (or admit into) another campus's course by
+    guessing a course_id in the URL.
+    """
+    template_name = 'admission_system/campus_manager_course_student_list.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        manager_profile = self.request.user.campus_manager_profile
+        course = get_object_or_404(Course, id=self.kwargs.get('course_id'), college=manager_profile.college)
+
+        applications = Application.objects.filter(
+            course=course, **self.academic_year_date_filter('applied_at')
+        ).select_related('student', 'referred_by__user', 'closed_by').order_by('-applied_at')
+
+        context.update({
+            'course': course,
+            'college': manager_profile.college,
+            'applications': applications,
+            'total_applications': applications.count(),
+            'admitted_count': applications.filter(status='Admitted').count(),
+            'is_dashboard': True
+        })
+        return context
+
+
+class CampusManagerAdmitStudentView(CampusManagerRequiredMixin, View):
+    """
+    Handles the "Admit" button on the course student list. Delegates the
+    actual status change + atomic seat decrement to Application.admit()
+    (models.py) so the same logic can't drift between call sites.
+    """
+    def post(self, request, *args, **kwargs):
+        manager_profile = request.user.campus_manager_profile
+        application = get_object_or_404(
+            Application.objects.select_related('course', 'student'),
+            id=kwargs.get('app_id'), college=manager_profile.college
+        )
+
+        if application.status == 'Admitted':
+            messages.info(request, f"{application.student.name} is already admitted.")
+        elif application.course.total_seats > 0 and application.course.available_seats <= 0:
+            messages.error(
+                request,
+                f"No seats available in {application.course.name} - increase the seat capacity in Django admin to admit more students."
+            )
+        else:
+            application.admit(user=request.user)
+            messages.success(request, f"{application.student.name} has been admitted to {application.course.name}.")
+
+        return redirect('campus_manager_course_student_list', course_id=application.course_id)
+
 
 class VerifyPaymentActionView(FinanceRequiredMixin, View):
     def post(self, request, *args, **kwargs):

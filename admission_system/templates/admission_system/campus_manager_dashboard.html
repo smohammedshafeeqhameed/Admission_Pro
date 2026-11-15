@@ -86,10 +86,13 @@
             <h3 class="text-sm font-black uppercase tracking-[0.3em] text-slate-400 dark:text-slate-500">Department Performance</h3>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {% for data in courses_data %}
-                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-6 shadow-sm group/card">
+                <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-[2rem] p-6 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all group/card">
                     <div class="flex justify-between items-start mb-4 border-b border-slate-50 dark:border-slate-700 pb-3">
-                        <h4 class="text-lg font-black text-slate-900 dark:text-white leading-tight">{{ data.course.name }}</h4>
-                        <a href="{% url 'campus_manager_export_csv' %}?course_id={{ data.course.id }}" class="p-2 bg-slate-50 dark:bg-slate-900 rounded-xl text-slate-400 hover:text-primary transition-colors" title="Download Course List">
+                        <a href="{% url 'campus_manager_course_student_list' data.course.id %}"
+                            class="text-lg font-black text-slate-900 dark:text-white leading-tight hover:text-primary transition-colors">
+                            {{ data.course.name }}
+                        </a>
+                        <a href="{% url 'campus_manager_export_csv' %}?course_id={{ data.course.id }}" class="p-2 bg-slate-50 dark:bg-slate-900 rounded-xl text-slate-400 hover:text-primary transition-colors shrink-0" title="Download Course List">
                             <i data-lucide="download" class="w-4 h-4"></i>
                         </a>
                     </div>
@@ -102,11 +105,26 @@
                             <span class="text-slate-500 font-bold uppercase tracking-wider">Paid Admissions</span>
                             <span class="font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">{{ data.paid }}</span>
                         </div>
+                        <div class="flex justify-between items-center text-xs">
+                            <span class="text-slate-500 font-bold uppercase tracking-wider">Seats Available</span>
+                            {% if data.course.total_seats > 0 %}
+                            <span
+                                class="font-black px-2 py-1 rounded-lg {% if data.course.available_seats <= 0 %}text-red-600 bg-red-50{% else %}text-primary bg-primary/10{% endif %}">
+                                {{ data.course.available_seats }} / {{ data.course.total_seats }}
+                            </span>
+                            {% else %}
+                            <span class="font-bold text-slate-400 italic">Not set</span>
+                            {% endif %}
+                        </div>
                         <div class="flex justify-between items-center text-xs pt-2 border-t border-slate-50 dark:border-slate-700/50">
                             <span class="text-slate-500 font-bold uppercase tracking-wider">Revenue</span>
                             <span class="font-black text-slate-900 dark:text-white">₹{{ data.revenue|floatformat:"0" }}</span>
                         </div>
                     </div>
+                    <a href="{% url 'campus_manager_course_student_list' data.course.id %}"
+                        class="mt-5 w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-900 text-primary text-xs font-black uppercase tracking-widest hover:bg-primary hover:text-white transition-all">
+                        View Students <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </a>
                 </div>
                 {% endfor %}
             </div>
@@ -155,9 +173,13 @@
                                 <div class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Partner Portal</div>
                             </td>
                             <td class="px-8 py-6">
+                                {% if app.closed_by %}
                                 <div class="text-xs font-bold text-slate-600 dark:text-slate-300">
-                                    {{ app.source|default:"-" }}
+                                    {{ app.closed_by.get_full_name|default:app.closed_by.username }}
                                 </div>
+                                {% else %}
+                                <div class="text-xs text-slate-400 italic font-medium">Not closed yet</div>
+                                {% endif %}
                             </td>
                             <td class="px-8 py-6">
                                 {% if app.payment_status == 'Success' %}

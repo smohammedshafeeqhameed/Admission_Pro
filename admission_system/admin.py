@@ -33,8 +33,14 @@ class CollegeAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'college')
+    list_display = ('name', 'college', 'total_seats', 'occupied_seats', 'available_seats_display')
     list_filter = ('college',)
+    list_editable = ('total_seats',)
+    readonly_fields = ('occupied_seats',)
+
+    @admin.display(description='Available Seats')
+    def available_seats_display(self, obj):
+        return obj.available_seats
 
 @admin.register(CREProfile)
 class CREProfileAdmin(admin.ModelAdmin):
@@ -77,8 +83,8 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('student', 'college', 'course', 'referred_by', 'applied_at')
-    list_filter = ('college', 'referred_by', 'applied_at')
+    list_display = ('student', 'college', 'course', 'referred_by', 'closed_by', 'status', 'payment_status', 'applied_at')
+    list_filter = ('college', 'status', 'payment_status', 'referred_by', 'applied_at')
     search_fields = ('student__name', 'referred_by__user__username')
     actions = [export_as_csv]
 
