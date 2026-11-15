@@ -83,8 +83,8 @@ class StudentAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('student', 'college', 'course', 'referred_by', 'closed_by', 'status', 'payment_status', 'applied_at')
-    list_filter = ('college', 'status', 'payment_status', 'referred_by', 'applied_at')
+    list_display = ('student', 'college', 'course', 'referred_by', 'closed_by', 'status', 'payment_status', 'eligible_for_commission', 'commission_status', 'commission_amount', 'applied_at')
+    list_filter = ('college', 'status', 'payment_status', 'eligible_for_commission', 'commission_status', 'referred_by', 'applied_at')
     search_fields = ('student__name', 'referred_by__user__username')
     actions = [export_as_csv]
 

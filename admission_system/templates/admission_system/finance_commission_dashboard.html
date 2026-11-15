@@ -1,0 +1,339 @@
+{% extends 'admission_system/base.html' %}
+{% load static %}
+
+{% block title %}Commission Applications - Finance{% endblock %}
+
+{% block content %}
+<div class="min-h-screen bg-slate-50/50 dark:bg-slate-900/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto space-y-10">
+
+        <!-- Initial Headings & Stats -->
+        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+            <div class="space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 text-xs font-black uppercase tracking-widest">
+                    <i data-lucide="badge-percent" class="w-4 h-4"></i> Commission Applications
+                </div>
+                <h1 class="text-4xl md:text-5xl font-black text-slate-900 dark:text-white leading-none tracking-tight">
+                    CRE Commission Review
+                </h1>
+                <p class="text-slate-500 font-medium text-lg flex items-center gap-2">
+                    <i data-lucide="calendar" class="w-5 h-5 text-slate-400"></i>
+                    {% now "l, F j, Y" %}
+                </p>
+            </div>
+
+            <div class="flex items-center gap-4">
+                <a href="{% url 'finance_dashboard' %}" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-bold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors">
+                    <i data-lucide="arrow-left" class="w-4 h-4 text-slate-400"></i>
+                    Back to Finance Dashboard
+                </a>
+            </div>
+        </div>
+
+        <!-- Metric Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-amber-50 dark:bg-amber-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-amber-100 dark:bg-amber-900/30 rounded-2xl flex items-center justify-center text-amber-600 shrink-0">
+                        <i data-lucide="clock" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Pending Review</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ pending_commission_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-emerald-50 dark:bg-emerald-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-emerald-100 dark:bg-emerald-900/30 rounded-2xl flex items-center justify-center text-emerald-600 shrink-0">
+                        <i data-lucide="check-circle" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Approved</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ approved_commission_count }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-white dark:bg-slate-800 rounded-3xl p-8 border border-slate-200 dark:border-slate-700 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-rose-50 dark:bg-rose-900/10 rounded-full group-hover:scale-150 transition-transform duration-500"></div>
+                <div class="relative z-10 flex gap-4">
+                    <div class="w-14 h-14 bg-rose-100 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center text-rose-600 shrink-0">
+                        <i data-lucide="x-circle" class="w-7 h-7"></i>
+                    </div>
+                    <div>
+                        <p class="text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 mb-1">Rejected</p>
+                        <p class="text-4xl font-black text-slate-900 dark:text-white">{{ rejected_commission_count }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="space-y-4">
+            {% for message in messages %}
+            <div class="px-6 py-4 rounded-2xl font-bold flex items-center gap-3 animate-in fade-in slide-in-from-top-2 {% if message.tags == 'success' %}bg-emerald-50 text-emerald-700 border border-emerald-200{% elif message.tags == 'warning' %}bg-amber-50 text-amber-700 border border-amber-200{% else %}bg-blue-50 text-blue-700 border border-blue-200{% endif %}">
+                <i data-lucide="{% if message.tags == 'success' %}check-circle{% elif message.tags == 'warning' %}alert-triangle{% else %}info{% endif %}" class="w-5 h-5 shrink-0"></i>
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Pending Commission Applications -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <h2 class="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white">
+                    <i data-lucide="bell-ring" class="text-amber-500"></i> Pending Commission Applications
+                </h2>
+                <div class="flex flex-col sm:flex-row items-center gap-4">
+                    {% if pending_commission_count > 0 %}
+                    <span class="px-3 py-1 rounded-full bg-amber-100 text-amber-600 text-[10px] font-black uppercase tracking-widest animate-pulse">
+                        Action Required
+                    </span>
+                    {% endif %}
+
+                    <form method="get" class="flex items-center gap-3">
+                        <div class="relative">
+                            <select name="college" onchange="this.form.submit()" class="pl-4 pr-10 py-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold text-slate-900 dark:text-white appearance-none focus:ring-2 focus:ring-primary outline-none min-w-[180px]">
+                                <option value="">All Institutions</option>
+                                {% for college in all_colleges %}
+                                <option value="{{ college.id }}" {% if request.GET.college == college.id|stringformat:"i" %}selected{% endif %}>{{ college.name }}</option>
+                                {% endfor %}
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none"></i>
+                        </div>
+                        {% if request.GET.college %}
+                        <a href="?" class="p-2.5 bg-slate-100 dark:bg-slate-700 text-slate-500 rounded-xl hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors" title="Clear Filter">
+                            <i data-lucide="filter-x" class="w-4 h-4"></i>
+                        </a>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50">
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Referred By (CRE)</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Student</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">College & Course</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500">Applied On</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 dark:text-slate-500 text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for app in pending_commission_apps %}
+                        <tr class="hover:bg-amber-50/40 dark:hover:bg-slate-800/50 transition-colors group">
+                            <td class="px-8 py-6">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-11 h-11 rounded-2xl bg-primary/10 text-primary flex items-center justify-center font-black text-sm uppercase shrink-0 shadow-sm">
+                                        {{ app.referred_by.user.username|default:"DR"|slice:":2"|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-black text-slate-900 dark:text-white text-lg leading-none mb-1">{{ app.referred_by.user.username|default:"Direct" }}</div>
+                                        <div class="text-xs text-slate-500 font-medium">{{ app.referred_by.user.email|default:"-" }} {% if app.referred_by.phone %}&bull; {{ app.referred_by.phone }}{% endif %}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="text-sm font-medium text-slate-500 dark:text-slate-400 leading-tight">{{ app.student.name }}</div>
+                                <div class="text-[11px] text-slate-400 dark:text-slate-500">{{ app.student.email }} &bull; {{ app.student.phone }}</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span class="inline-block px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 text-[10px] font-bold rounded-lg mb-2 uppercase tracking-wide">{{ app.college.name }}</span>
+                                <div class="font-medium text-xs text-slate-500 dark:text-slate-400 leading-tight">{{ app.course.name }}</div>
+                            </td>
+                            <td class="px-8 py-6 text-sm font-medium text-slate-500 dark:text-slate-400">
+                                {{ app.commission_applied_at|date:"M j, Y" }}
+                                <div class="text-xs">{{ app.commission_applied_at|time:"g:i A" }}</div>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex items-center justify-end gap-2">
+                                    <form method="post" action="{% url 'finance_commission_action' app.id %}" class="js-commission-form">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="approve">
+                                        <input type="hidden" name="amount" class="js-commission-amount-field">
+
+                                        <button type="button"
+                                            onclick="openCommissionApproveModal(this, '{{ app.student.name|escapejs }}', '{{ app.referred_by.user.username|default:'Direct'|escapejs }}')"
+                                            class="bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="Approve &amp; set commission amount">
+                                            <i data-lucide="check" class="w-5 h-5"></i>
+                                        </button>
+                                    </form>
+
+                                    <form method="post" action="{% url 'finance_commission_action' app.id %}">
+                                        {% csrf_token %}
+                                        <button type="submit" name="action" value="reject" onclick="return confirm('Reject this commission application?');" class="bg-red-50 text-red-600 hover:bg-red-600 hover:text-white p-2 rounded-xl transition-colors shadow-sm" title="Reject">
+                                            <i data-lucide="x" class="w-5 h-5"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="py-16 text-center">
+                                <div class="w-20 h-20 bg-slate-50 dark:bg-slate-800 rounded-3xl flex items-center justify-center text-slate-300 dark:text-slate-600 mx-auto mb-4">
+                                    <i data-lucide="inbox" class="w-8 h-8"></i>
+                                </div>
+                                <h3 class="text-lg font-black text-slate-900 dark:text-white mb-1">Queue Empty</h3>
+                                <p class="text-slate-500 font-medium">No commission applications currently pending review.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- History -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-3xl shadow-sm overflow-hidden mb-8">
+            <div class="px-8 py-6 border-b border-slate-200 dark:border-slate-700 flex justify-between items-center">
+                <h2 class="text-xl font-black flex items-center gap-3 text-slate-900 dark:text-white">
+                    <i data-lucide="history" class="text-primary"></i> Review History (Recent 50)
+                </h2>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-slate-50 dark:bg-slate-900/50">
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-amber-600 dark:text-amber-400">Referred By (CRE)</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Student</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Reviewed By</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400">Reviewed On</th>
+                            <th class="px-8 py-5 text-[10px] font-black uppercase tracking-widest text-slate-400 text-right">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100 dark:divide-slate-700">
+                        {% for app in reviewed_commission_apps %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                            <td class="px-8 py-4 font-black text-sm text-slate-900 dark:text-white">{{ app.referred_by.user.username|default:"Direct" }}</td>
+                            <td class="px-8 py-4 font-medium text-xs text-slate-500 dark:text-slate-400">{{ app.student.name }}</td>
+                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">{{ app.commission_reviewed_by.get_full_name|default:app.commission_reviewed_by.username|default:"-" }}</td>
+                            <td class="px-8 py-4 text-sm text-slate-500 dark:text-slate-400">{{ app.commission_reviewed_at|date:"M j, Y" }}</td>
+                            <td class="px-8 py-4 text-right">
+                                {% if app.commission_status == 'Approved' %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-50 text-emerald-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    <i data-lucide="check" class="w-3.5 h-3.5"></i> Approved
+                                    {% if app.commission_amount %}&bull; ₹{{ app.commission_amount|floatformat:"0" }}{% endif %}
+                                </span>
+                                {% else %}
+                                <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-700 rounded-lg text-xs font-black uppercase tracking-widest">
+                                    <i data-lucide="x" class="w-3.5 h-3.5"></i> Rejected
+                                </span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="5" class="px-8 py-8 text-center text-slate-500 font-medium text-sm italic">
+                                No reviewed commission applications yet.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Approve Commission modal: Finance Manager enters the payout amount for the CRE before the approval is submitted -->
+<div id="commission_approve_modal" class="fixed inset-0 z-[200] flex items-center justify-center p-4 bg-slate-900/80 backdrop-blur-sm opacity-0 pointer-events-none" style="transition: all 0.2s ease-in-out;">
+    <div class="relative bg-white dark:bg-slate-800 rounded-2xl max-w-sm w-full overflow-hidden shadow-2xl scale-95 transform transition-transform" id="commission_approve_modal_content">
+        <div class="px-6 py-4 flex justify-between items-center border-b border-slate-100 dark:border-slate-700">
+            <h3 class="font-black text-slate-900 dark:text-white flex items-center gap-2">
+                <i data-lucide="badge-percent" class="w-5 h-5 text-emerald-600"></i> Approve Commission
+            </h3>
+            <button type="button" onclick="closeCommissionApproveModal()" class="text-slate-400 hover:text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-full p-2 transition-colors">
+                <i data-lucide="x" class="w-5 h-5"></i>
+            </button>
+        </div>
+        <div class="p-6 space-y-4">
+            <div class="text-sm text-slate-500 dark:text-slate-400">
+                Approving commission for <span id="commission_modal_cre" class="font-black text-slate-900 dark:text-white"></span>
+                &mdash; referral: <span id="commission_modal_student" class="font-bold text-slate-700 dark:text-slate-300"></span>
+            </div>
+            <div>
+                <label class="block text-[10px] font-black uppercase tracking-widest text-slate-400 mb-2">Amount to pay the CRE</label>
+                <div class="relative">
+                    <span class="absolute left-4 top-1/2 -translate-y-1/2 font-black text-slate-400">₹</span>
+                    <input type="number" id="commission_amount_input" min="0.01" step="0.01" placeholder="0.00"
+                        class="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-4 py-3 text-lg font-black text-slate-900 dark:text-white focus:ring-2 focus:ring-emerald-500 outline-none transition-all">
+                </div>
+                <p id="commission_amount_error" class="hidden text-xs font-bold text-red-500 mt-2">Enter a valid amount greater than 0.</p>
+            </div>
+        </div>
+        <div class="px-6 py-4 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-700 flex items-center justify-end gap-3">
+            <button type="button" onclick="closeCommissionApproveModal()" class="px-5 py-2.5 rounded-xl font-bold text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                Cancel
+            </button>
+            <button type="button" onclick="confirmCommissionApproval()" class="px-5 py-2.5 rounded-xl font-bold text-sm bg-emerald-600 text-white hover:bg-emerald-700 shadow-lg shadow-emerald-600/20 transition-colors flex items-center gap-2">
+                <i data-lucide="check" class="w-4 h-4"></i> Confirm Approval
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const commissionApproveModal = document.getElementById('commission_approve_modal');
+    const commissionApproveModalContent = document.getElementById('commission_approve_modal_content');
+    const commissionAmountInput = document.getElementById('commission_amount_input');
+    const commissionAmountError = document.getElementById('commission_amount_error');
+    let activeCommissionForm = null;
+
+    function openCommissionApproveModal(button, studentName, creName) {
+        activeCommissionForm = button.closest('form');
+        document.getElementById('commission_modal_cre').textContent = creName;
+        document.getElementById('commission_modal_student').textContent = studentName;
+        commissionAmountInput.value = '';
+        commissionAmountError.classList.add('hidden');
+        commissionAmountInput.classList.remove('ring-2', 'ring-red-500');
+
+        commissionApproveModal.classList.remove('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+            commissionApproveModalContent.classList.remove('scale-95');
+            commissionApproveModalContent.classList.add('scale-100');
+            commissionAmountInput.focus();
+        }, 10);
+    }
+
+    function closeCommissionApproveModal() {
+        commissionApproveModalContent.classList.remove('scale-100');
+        commissionApproveModalContent.classList.add('scale-95');
+        setTimeout(() => {
+            commissionApproveModal.classList.add('opacity-0', 'pointer-events-none');
+        }, 150);
+        activeCommissionForm = null;
+    }
+
+    function confirmCommissionApproval() {
+        const amount = parseFloat(commissionAmountInput.value);
+        if (!commissionAmountInput.value || isNaN(amount) || amount <= 0) {
+            commissionAmountError.classList.remove('hidden');
+            commissionAmountInput.classList.add('ring-2', 'ring-red-500');
+            commissionAmountInput.focus();
+            return;
+        }
+        if (activeCommissionForm) {
+            activeCommissionForm.querySelector('.js-commission-amount-field').value = commissionAmountInput.value;
+            activeCommissionForm.submit();
+        }
+    }
+
+    // Let Enter in the amount field confirm, instead of doing nothing
+    commissionAmountInput?.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            confirmCommissionApproval();
+        }
+    });
+</script>
+{% endblock %}

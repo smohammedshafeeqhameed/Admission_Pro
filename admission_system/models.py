@@ -257,6 +257,48 @@ class Application(models.Model):
     payment_screenshot = models.ImageField(upload_to='payments/screenshots/', null=True, blank=True, help_text="Screenshot of the successful payment")
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
+    # Commission workflow:
+    #   1. Campus Manager marks an Admitted application "Eligible for
+    #      Commission" (mark_eligible_for_commission below). This is what
+    #      makes the "Apply for Commission" button appear for the
+    #      referring CRE on their dashboard.
+    #   2. The CRE who referred the student clicks "Apply for Commission"
+    #      (apply_for_commission below), moving commission_status to
+    #      'Pending' and sending it to the Finance Manager's Commission
+    #      Applications dashboard.
+    #   3. The Finance Manager approves or rejects it (approve_commission /
+    #      reject_commission below).
+    COMMISSION_STATUS_CHOICES = [
+        ('Not Applied', 'Not Applied'),
+        ('Pending', 'Pending Review'),
+        ('Approved', 'Approved'),
+        ('Rejected', 'Rejected'),
+    ]
+
+    eligible_for_commission = models.BooleanField(
+        default=False,
+        help_text="Set by the Campus Manager once a student is admitted. Makes the 'Apply for Commission' action visible to the referring CRE."
+    )
+    eligible_for_commission_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='commission_eligibility_marks',
+        help_text="Campus Manager who marked this application eligible for commission."
+    )
+    eligible_for_commission_at = models.DateTimeField(null=True, blank=True)
+
+    commission_status = models.CharField(max_length=20, choices=COMMISSION_STATUS_CHOICES, default='Not Applied')
+    commission_applied_at = models.DateTimeField(null=True, blank=True)
+    commission_reviewed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='commission_reviews',
+        help_text="Finance Manager who approved/rejected this commission application."
+    )
+    commission_reviewed_at = models.DateTimeField(null=True, blank=True)
+    commission_amount = models.DecimalField(
+        max_digits=10, decimal_places=2, null=True, blank=True,
+        help_text="Amount approved by the Finance Manager to be paid to the referring CRE, entered when approving the commission application."
+    )
+
     class Meta:
         unique_together = ('student', 'college', 'course')
 
@@ -328,6 +370,67 @@ class Application(models.Model):
             self.removed_at = timezone.now()
             self.save(update_fields=['status', 'removed_by', 'removed_at'])
             Course.objects.filter(pk=self.course_id, occupied_seats__gt=0).update(occupied_seats=F('occupied_seats') - 1)
+        return True
+
+    def mark_eligible_for_commission(self, user=None):
+        """
+        Campus Manager action: flags this (already Admitted) application as
+        eligible for commission, which is what makes the "Apply for
+        Commission" button appear on the referring CRE's dashboard.
+
+        Returns False without doing anything if the application isn't
+        currently Admitted, or if it's already marked eligible, so the
+        button can't be double-submitted into clobbering the original
+        marked-by/marked-at record.
+        """
+        if self.status != 'Admitted' or self.eligible_for_commission:
+            return False
+        self.eligible_for_commission = True
+        self.eligible_for_commission_by = user
+        self.eligible_for_commission_at = timezone.now()
+        self.save(update_fields=['eligible_for_commission', 'eligible_for_commission_by', 'eligible_for_commission_at'])
+        return True
+
+    def apply_for_commission(self):
+        """
+        CRE action: submits this application's commission for Finance
+        Manager review. Only possible once the Campus Manager has marked
+        it eligible, and only from the 'Not Applied' or 'Rejected' state
+        (a Rejected application can be re-submitted; an already
+        Pending/Approved one can't be re-applied for).
+        """
+        if not self.eligible_for_commission or self.commission_status not in ('Not Applied', 'Rejected'):
+            return False
+        self.commission_status = 'Pending'
+        self.commission_applied_at = timezone.now()
+        self.commission_reviewed_by = None
+        self.commission_reviewed_at = None
+        self.save(update_fields=['commission_status', 'commission_applied_at', 'commission_reviewed_by', 'commission_reviewed_at'])
+        return True
+
+    def approve_commission(self, user=None, amount=None):
+        """
+        Finance Manager action: approves a Pending commission application,
+        recording the payout amount entered in the approval pop-up as
+        commission_amount.
+        """
+        if self.commission_status != 'Pending':
+            return False
+        self.commission_status = 'Approved'
+        self.commission_reviewed_by = user
+        self.commission_reviewed_at = timezone.now()
+        self.commission_amount = amount
+        self.save(update_fields=['commission_status', 'commission_reviewed_by', 'commission_reviewed_at', 'commission_amount'])
+        return True
+
+    def reject_commission(self, user=None):
+        """Finance Manager action: rejects a Pending commission application."""
+        if self.commission_status != 'Pending':
+            return False
+        self.commission_status = 'Rejected'
+        self.commission_reviewed_by = user
+        self.commission_reviewed_at = timezone.now()
+        self.save(update_fields=['commission_status', 'commission_reviewed_by', 'commission_reviewed_at'])
         return True
 
 

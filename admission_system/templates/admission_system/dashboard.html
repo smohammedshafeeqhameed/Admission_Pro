@@ -150,6 +150,7 @@
                                 <th class="px-8 lg:px-10 py-6">Referred By</th>
                                 <th class="px-8 lg:px-10 py-6">Closed By</th>
                                 <th class="px-8 lg:px-10 py-6">Timeline</th>
+                                <th class="px-8 lg:px-10 py-6 text-right">Commission</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100 dark:divide-slate-800/50">
@@ -190,10 +191,48 @@
                                     {{ referral.source|default:"-" }}
                                 </td>
                                 <td class="px-8 lg:px-10 py-8 text-xs text-slate-400 font-black uppercase">{{ referral.applied_at|date:"M d, Y" }}</td>
+                                <td class="px-8 lg:px-10 py-8 text-right">
+                                    {% if referral.eligible_for_commission %}
+                                        {% if referral.commission_status == 'Not Applied' %}
+                                        <form method="post" action="{% url 'cre_apply_commission' referral.id %}"
+                                            onsubmit="return confirm('Apply for commission on {{ referral.student.name|escapejs }}? This will be sent to the Finance team for review.');">
+                                            {% csrf_token %}
+                                            <button type="submit"
+                                                class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-primary text-white hover:bg-primary/90 shadow-md shadow-primary/20 active:scale-95">
+                                                <i data-lucide="badge-percent" class="w-3.5 h-3.5"></i> Apply for Commission
+                                            </button>
+                                        </form>
+                                        {% elif referral.commission_status == 'Pending' %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                            <i data-lucide="clock" class="w-3 h-3"></i> Pending Review
+                                        </span>
+                                        {% elif referral.commission_status == 'Approved' %}
+                                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-emerald-50 text-emerald-700 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                            <i data-lucide="check-circle" class="w-3 h-3"></i> Approved
+                                        </span>
+                                        {% elif referral.commission_status == 'Rejected' %}
+                                        <div class="inline-flex items-center gap-2">
+                                            <span class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
+                                                <i data-lucide="x-circle" class="w-3 h-3"></i> Rejected
+                                            </span>
+                                            <form method="post" action="{% url 'cre_apply_commission' referral.id %}"
+                                                onsubmit="return confirm('Re-apply for commission on {{ referral.student.name|escapejs }}?');">
+                                                {% csrf_token %}
+                                                <button type="submit" title="Re-apply"
+                                                    class="inline-flex items-center gap-1 px-2 py-1.5 rounded-lg text-[10px] font-black uppercase tracking-widest transition-all bg-slate-100 text-slate-600 hover:bg-slate-200">
+                                                    <i data-lucide="rotate-ccw" class="w-3 h-3"></i> Re-apply
+                                                </button>
+                                            </form>
+                                        </div>
+                                        {% endif %}
+                                    {% else %}
+                                    <span class="text-xs text-slate-300 font-bold">&mdash;</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% empty %}
                             <tr>
-                                <td colspan="4" class="px-8 py-32 text-center">
+                                <td colspan="7" class="px-8 py-32 text-center">
                                     <div class="flex flex-col items-center gap-6 text-slate-300">
                                         <i data-lucide="package-search" class="w-16 h-16 opacity-20"></i>
                                         <div>

@@ -178,10 +178,26 @@
                             </td>
                             <td class="px-8 py-6 text-right">
                                 {% if app.status == 'Admitted' %}
-                                <div class="inline-flex items-center gap-2">
+                                <div class="inline-flex flex-wrap items-center justify-end gap-2">
                                     <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-slate-50 dark:bg-slate-900 text-slate-400 rounded-xl text-xs font-black uppercase tracking-widest">
                                         <i data-lucide="check" class="w-3.5 h-3.5"></i> Admitted
                                     </span>
+
+                                    {% if app.eligible_for_commission %}
+                                    <span class="inline-flex items-center gap-1.5 px-4 py-2 bg-amber-50 text-amber-600 rounded-xl text-xs font-black uppercase tracking-widest" title="Eligible for commission">
+                                        <i data-lucide="badge-percent" class="w-3.5 h-3.5"></i> Commission Eligible
+                                    </span>
+                                    {% else %}
+                                    <form method="post" action="{% url 'campus_manager_mark_commission_eligible' app.id %}"
+                                        onsubmit="return confirm('Mark this student eligible for commission? This lets the referring CRE apply for commission.');">
+                                        {% csrf_token %}
+                                        <button type="submit" title="Eligible for Commission"
+                                            class="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl text-xs font-black uppercase tracking-widest transition-all bg-amber-50 text-amber-600 hover:bg-amber-100 active:scale-95">
+                                            <i data-lucide="badge-percent" class="w-3.5 h-3.5"></i> Eligible for Commission
+                                        </button>
+                                    </form>
+                                    {% endif %}
+
                                     <form method="post" action="{% url 'campus_manager_remove_student' app.id %}"
                                         onsubmit="return confirm('Remove this student from the course? This will free up their seat.');">
                                         {% csrf_token %}

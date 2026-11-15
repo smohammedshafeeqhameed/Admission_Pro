@@ -397,6 +397,83 @@ class FinanceDashboardView(AcademicYearFilterMixin, FinanceRequiredMixin, Templa
         })
         return context
 
+
+class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMixin, TemplateView):
+    """
+    Separate dashboard (inside the Finance Manager portal) listing every
+    commission application submitted by a CRE - i.e. every Application
+    with commission_status != 'Not Applied'. Pending ones surface first
+    for review/approve/reject; Approved/Rejected ones are kept below as
+    history, mirroring the Verification Queue / History split on the
+    main Finance dashboard.
+    """
+    template_name = 'admission_system/finance_commission_dashboard.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        college_id = self.request.GET.get('college')
+
+        base_apps = Application.objects.select_related(
+            'student', 'college', 'course', 'referred_by__user', 'commission_reviewed_by'
+        ).exclude(commission_status='Not Applied')
+
+        pending_apps = base_apps.filter(commission_status='Pending').order_by('commission_applied_at')
+        reviewed_apps = base_apps.filter(commission_status__in=['Approved', 'Rejected']).order_by('-commission_reviewed_at')
+
+        if college_id:
+            pending_apps = pending_apps.filter(college_id=college_id)
+            reviewed_apps = reviewed_apps.filter(college_id=college_id)
+            context['active_college'] = get_object_or_404(College, id=college_id)
+
+        context.update({
+            'pending_commission_apps': pending_apps,
+            'reviewed_commission_apps': reviewed_apps[:50],
+            'pending_commission_count': pending_apps.count(),
+            'approved_commission_count': base_apps.filter(commission_status='Approved').count(),
+            'rejected_commission_count': base_apps.filter(commission_status='Rejected').count(),
+            'all_colleges': College.objects.all().order_by('name'),
+            'is_dashboard': True,
+        })
+        return context
+
+
+class FinanceCommissionActionView(FinanceRequiredMixin, View):
+    """
+    Handles the Approve/Reject buttons on the Commission Applications
+    dashboard. Delegates to Application.approve_commission() /
+    reject_commission() (models.py) so a Pending-only guard can't drift
+    between call sites. Approving requires an "amount" field in the POST
+    body - the payout entered by the Finance Manager in the "Approve
+    Commission" pop-up (see finance_commission_dashboard.html) - which is
+    recorded as Application.commission_amount.
+    """
+    def post(self, request, *args, **kwargs):
+        from decimal import Decimal, InvalidOperation
+
+        application = get_object_or_404(Application.objects.select_related('student'), id=kwargs.get('app_id'))
+        action = request.POST.get('action')
+
+        if application.commission_status != 'Pending':
+            messages.info(request, f"The commission application for {application.student.name} has already been reviewed.")
+        elif action == 'approve':
+            raw_amount = (request.POST.get('amount') or '').strip()
+            try:
+                amount = Decimal(raw_amount)
+                if amount <= 0:
+                    raise InvalidOperation
+            except InvalidOperation:
+                messages.error(request, "Enter a valid commission amount (greater than 0) before approving.")
+                return redirect('finance_commission_dashboard')
+
+            application.approve_commission(user=request.user, amount=amount)
+            messages.success(request, f"Commission of ₹{amount} approved for {application.student.name}.")
+        elif action == 'reject':
+            application.reject_commission(user=request.user)
+            messages.warning(request, f"Commission rejected for {application.student.name}.")
+
+        return redirect('finance_commission_dashboard')
+
+
 class CampusManagerDashboardView(AcademicYearFilterMixin, CampusManagerRequiredMixin, TemplateView):
     template_name = 'admission_system/campus_manager_dashboard.html'
 
@@ -611,6 +688,40 @@ class CampusManagerRemoveStudentView(CampusManagerRequiredMixin, View):
         return redirect('campus_manager_course_student_list', course_id=application.course_id)
 
 
+class CampusManagerMarkCommissionEligibleView(CampusManagerRequiredMixin, View):
+    """
+    Handles the "Eligible for Commission" button on the course student
+    list - shown next to an Admitted application. Delegates to
+    Application.mark_eligible_for_commission() (models.py) so the same
+    eligibility rules (must be Admitted, can't double-mark) live in one
+    place. Marking an application eligible is what makes the "Apply for
+    Commission" button appear on the referring CRE's dashboard.
+    """
+    def post(self, request, *args, **kwargs):
+        manager_profile = request.user.campus_manager_profile
+        application = get_object_or_404(
+            Application.objects.select_related('course', 'student', 'referred_by__user'),
+            id=kwargs.get('app_id'), college=manager_profile.college
+        )
+
+        if application.status != 'Admitted':
+            messages.error(request, f"{application.student.name} must be admitted before being marked eligible for commission.")
+        elif application.eligible_for_commission:
+            messages.info(request, f"{application.student.name} is already eligible for commission.")
+        else:
+            application.mark_eligible_for_commission(user=request.user)
+            if application.referred_by:
+                messages.success(
+                    request,
+                    f"{application.student.name} marked eligible for commission. "
+                    f"{application.referred_by.user.username} can now apply for commission from their dashboard."
+                )
+            else:
+                messages.success(request, f"{application.student.name} marked eligible for commission.")
+
+        return redirect('campus_manager_course_student_list', course_id=application.course_id)
+
+
 class VerifyPaymentActionView(FinanceRequiredMixin, View):
     def post(self, request, *args, **kwargs):
         from .utils import send_payment_slip_email
@@ -808,6 +919,42 @@ class DashboardView(AcademicYearFilterMixin, LoginRequiredMixin, TemplateView):
                 return render(request, 'admission_system/home.html', {'error': True})
                 
         return super().dispatch(request, *args, **kwargs)
+
+
+class CREApplyCommissionView(LoginRequiredMixin, View):
+    """
+    Handles the "Apply for Commission" button on the CRE dashboard's
+    referral list. Only visible/actionable for the CRE who actually made
+    the referral (filtered by referred_by=request.user.cre_profile below,
+    so a CRE can't apply for commission on someone else's referral), and
+    only once the Campus Manager has marked that application eligible.
+    Delegates the actual state change to Application.apply_for_commission()
+    (models.py), which is what puts it on the Finance Manager's Commission
+    Applications dashboard.
+    """
+    def post(self, request, *args, **kwargs):
+        cre_profile = getattr(request.user, 'cre_profile', None)
+        if not cre_profile:
+            messages.error(request, "Only CRE accounts can apply for commission.")
+            return redirect('cre_dashboard')
+
+        application = get_object_or_404(
+            Application.objects.select_related('student'),
+            id=kwargs.get('app_id'), referred_by=cre_profile
+        )
+
+        if not application.eligible_for_commission:
+            messages.error(request, f"{application.student.name} has not been marked eligible for commission yet.")
+        elif application.commission_status == 'Pending':
+            messages.info(request, f"Your commission application for {application.student.name} is already pending review.")
+        elif application.commission_status == 'Approved':
+            messages.info(request, f"Your commission application for {application.student.name} has already been approved.")
+        else:
+            application.apply_for_commission()
+            messages.success(request, f"Commission application for {application.student.name} submitted. The finance team will review it.")
+
+        return redirect('cre_dashboard')
+
 
 from .forms import StudentAdmissionForm
 from .models import FinanceProfile
