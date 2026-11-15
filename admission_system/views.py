@@ -241,7 +241,7 @@ class AdminCourseStudentListView(AcademicYearFilterMixin, SuperuserRequiredMixin
 
         applications = Application.objects.filter(
             course=course, **self.academic_year_date_filter('applied_at')
-        ).select_related('student', 'college', 'referred_by__user').order_by('-applied_at')
+        ).select_related('student', 'college', 'referred_by__user', 'closed_by', 'removed_by').order_by('-applied_at')
 
         context.update({
             'course': course,
@@ -510,7 +510,7 @@ class CampusManagerCourseStudentListView(AcademicYearFilterMixin, CampusManagerR
 
         applications = Application.objects.filter(
             course=course, **self.academic_year_date_filter('applied_at')
-        ).select_related('student', 'referred_by__user', 'closed_by').order_by('-applied_at')
+        ).select_related('student', 'referred_by__user', 'closed_by', 'removed_by').order_by('-applied_at')
 
         context.update({
             'course': course,
@@ -602,7 +602,7 @@ class CampusManagerRemoveStudentView(CampusManagerRequiredMixin, View):
         if application.status != 'Admitted':
             messages.info(request, f"{application.student.name} is not currently admitted.")
         else:
-            application.unadmit()
+            application.unadmit(user=request.user)
             messages.success(
                 request,
                 f"{application.student.name} has been removed from {application.course.name}. The seat is available again."

@@ -238,6 +238,12 @@ class Application(models.Model):
         help_text="Staff member who admitted/closed this application."
     )
     admitted_at = models.DateTimeField(null=True, blank=True)
+    removed_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='removed_applications',
+        help_text="Staff member who removed this student from the course (e.g. after a TC)."
+    )
+    removed_at = models.DateTimeField(null=True, blank=True)
     
     # Documents
     doc_10th = models.FileField(upload_to='documents/10th/', null=True, blank=True)
@@ -288,11 +294,16 @@ class Application(models.Model):
             self.status = 'Admitted'
             self.closed_by = user
             self.admitted_at = timezone.now()
-            self.save(update_fields=['status', 'closed_by', 'admitted_at'])
+            # Clear any earlier removal record - this is a fresh admit (or a
+            # re-admit of a previously Removed application), so the old
+            # "Removed By" details no longer describe the current state.
+            self.removed_by = None
+            self.removed_at = None
+            self.save(update_fields=['status', 'closed_by', 'admitted_at', 'removed_by', 'removed_at'])
             Course.objects.filter(pk=self.course_id).update(occupied_seats=F('occupied_seats') + 1)
         return True
 
-    def unadmit(self):
+    def unadmit(self, user=None):
         """
         Reverses admit() - for when an admitted student leaves the course
         (e.g. takes a transfer certificate) and their seat needs to go
@@ -304,17 +315,18 @@ class Application(models.Model):
         currently Admitted, so this can't be used to free a seat that
         was never actually taken.
 
-        Clears closed_by/admitted_at rather than leaving the previous
-        admission's details in place - a later re-admit (via admit(),
-        same whether status was 'Applied' or 'Removed') sets them again.
+        closed_by/admitted_at are left untouched so "Admitted By" stays
+        visible as history even after removal; removed_by/removed_at
+        record who performed the removal and when, for a "Removed By"
+        column alongside it.
         """
         if self.status != 'Admitted':
             return False
         with transaction.atomic():
             self.status = 'Removed'
-            self.closed_by = None
-            self.admitted_at = None
-            self.save(update_fields=['status', 'closed_by', 'admitted_at'])
+            self.removed_by = user
+            self.removed_at = timezone.now()
+            self.save(update_fields=['status', 'removed_by', 'removed_at'])
             Course.objects.filter(pk=self.course_id, occupied_seats__gt=0).update(occupied_seats=F('occupied_seats') - 1)
         return True
 
