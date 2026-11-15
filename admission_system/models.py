@@ -216,6 +216,7 @@ class Application(models.Model):
     STATUS_CHOICES = [
         ('Applied', 'Applied'),
         ('Admitted', 'Admitted'),
+        ('Removed', 'Removed'),
     ]
 
     student = models.ForeignKey(Student, on_delete=models.CASCADE, related_name='applications')
@@ -289,6 +290,32 @@ class Application(models.Model):
             self.admitted_at = timezone.now()
             self.save(update_fields=['status', 'closed_by', 'admitted_at'])
             Course.objects.filter(pk=self.course_id).update(occupied_seats=F('occupied_seats') + 1)
+        return True
+
+    def unadmit(self):
+        """
+        Reverses admit() - for when an admitted student leaves the course
+        (e.g. takes a transfer certificate) and their seat needs to go
+        back into the pool. Sets status to 'Removed' and atomically
+        decrements the course's occupied_seats by 1, using the same
+        F()-expression pattern as admit() to stay race-safe.
+
+        Returns False without doing anything if the application isn't
+        currently Admitted, so this can't be used to free a seat that
+        was never actually taken.
+
+        Clears closed_by/admitted_at rather than leaving the previous
+        admission's details in place - a later re-admit (via admit(),
+        same whether status was 'Applied' or 'Removed') sets them again.
+        """
+        if self.status != 'Admitted':
+            return False
+        with transaction.atomic():
+            self.status = 'Removed'
+            self.closed_by = None
+            self.admitted_at = None
+            self.save(update_fields=['status', 'closed_by', 'admitted_at'])
+            Course.objects.filter(pk=self.course_id, occupied_seats__gt=0).update(occupied_seats=F('occupied_seats') - 1)
         return True
 
 

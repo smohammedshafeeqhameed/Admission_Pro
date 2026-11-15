@@ -211,6 +211,13 @@ class AdminCollegeDetailView(AcademicYearFilterMixin, SuperuserRequiredMixin, Te
             applicant_count=Count(
                 'applications',
                 filter=Q(**self.academic_year_date_filter('applications__applied_at'))
+            ),
+            admitted_count=Count(
+                'applications',
+                filter=Q(
+                    applications__status='Admitted',
+                    **self.academic_year_date_filter('applications__applied_at')
+                )
             )
         )
 
@@ -243,6 +250,7 @@ class AdminCourseStudentListView(AcademicYearFilterMixin, SuperuserRequiredMixin
             'total_enrollments': applications.count(),
             'successful_enrollments': applications.filter(payment_status='Success').count(),
             'pending_enrollments': applications.filter(payment_status='Pending').count(),
+            'admitted_count': applications.filter(status='Admitted').count(),
             'is_dashboard': True
         })
         return context
@@ -515,6 +523,41 @@ class CampusManagerCourseStudentListView(AcademicYearFilterMixin, CampusManagerR
         return context
 
 
+class CampusManagerUpdateSeatsView(CampusManagerRequiredMixin, View):
+    """
+    Lets a Campus Manager set their own course's seat capacity
+    (Course.total_seats) directly from the portal, instead of needing
+    Django admin access. occupied_seats is never touched here - it only
+    ever moves via Application.admit()'s atomic F() update.
+    """
+    def post(self, request, *args, **kwargs):
+        manager_profile = request.user.campus_manager_profile
+        course = get_object_or_404(Course, id=kwargs.get('course_id'), college=manager_profile.college)
+
+        raw_value = request.POST.get('total_seats', '').strip()
+        try:
+            total_seats = int(raw_value)
+            if total_seats < 0:
+                raise ValueError
+        except (TypeError, ValueError):
+            messages.error(request, "Enter a valid, non-negative number of seats.")
+            return redirect('campus_manager_course_student_list', course_id=course.id)
+
+        course.total_seats = total_seats
+        course.save(update_fields=['total_seats'])
+
+        if total_seats < course.occupied_seats:
+            messages.warning(
+                request,
+                f"{course.name}: capacity set to {total_seats}, which is below the {course.occupied_seats} students already admitted. "
+                f"Available seats will show as 0 until capacity is raised again."
+            )
+        else:
+            messages.success(request, f"Seat capacity for {course.name} updated to {total_seats}.")
+
+        return redirect('campus_manager_course_student_list', course_id=course.id)
+
+
 class CampusManagerAdmitStudentView(CampusManagerRequiredMixin, View):
     """
     Handles the "Admit" button on the course student list. Delegates the
@@ -538,6 +581,32 @@ class CampusManagerAdmitStudentView(CampusManagerRequiredMixin, View):
         else:
             application.admit(user=request.user)
             messages.success(request, f"{application.student.name} has been admitted to {application.course.name}.")
+
+        return redirect('campus_manager_course_student_list', course_id=application.course_id)
+
+
+class CampusManagerRemoveStudentView(CampusManagerRequiredMixin, View):
+    """
+    Handles the "Remove" button that appears once a student is Admitted -
+    covers cases like a student taking a transfer certificate and leaving
+    the course. Delegates to Application.unadmit() (models.py) so the
+    seat-freeing logic lives in exactly one place, same as admit().
+    """
+    def post(self, request, *args, **kwargs):
+        manager_profile = request.user.campus_manager_profile
+        application = get_object_or_404(
+            Application.objects.select_related('course', 'student'),
+            id=kwargs.get('app_id'), college=manager_profile.college
+        )
+
+        if application.status != 'Admitted':
+            messages.info(request, f"{application.student.name} is not currently admitted.")
+        else:
+            application.unadmit()
+            messages.success(
+                request,
+                f"{application.student.name} has been removed from {application.course.name}. The seat is available again."
+            )
 
         return redirect('campus_manager_course_student_list', course_id=application.course_id)
 

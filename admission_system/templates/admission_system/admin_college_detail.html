@@ -87,6 +87,8 @@
                         <tr>
                             <th class="px-8 py-6">Course Title</th>
                             <th class="px-8 py-6">Description</th>
+                            <th class="px-8 py-6 text-center">Admitted</th>
+                            <th class="px-8 py-6 text-center">Available Seats</th>
                             <th class="px-8 py-6 text-center">Enrollments</th>
                         </tr>
                     </thead>
@@ -100,9 +102,23 @@
                                 <p class="text-slate-500 text-sm leading-relaxed">{{ course.description }}</p>
                             </td>
                             <td class="px-8 py-8 text-center">
+                                <span class="inline-flex items-center justify-center px-4 h-10 rounded-xl bg-emerald-50 text-emerald-700 font-black text-sm">
+                                    {{ course.admitted_count }}
+                                </span>
+                            </td>
+                            <td class="px-8 py-8 text-center">
+                                {% if course.total_seats > 0 %}
+                                <span class="inline-flex items-center justify-center px-4 h-10 rounded-xl font-black text-sm {% if course.available_seats <= 0 %}bg-rose-50 text-rose-600{% else %}bg-secondary/10 text-primary{% endif %}">
+                                    {{ course.available_seats }} / {{ course.total_seats }}
+                                </span>
+                                {% else %}
+                                <span class="text-slate-400 italic text-sm font-medium">Not tracked</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-8 text-center">
                                 <a href="{% url 'admin_course_student_list' course.id %}"
                                     class="inline-flex items-center justify-center px-4 h-12 rounded-2xl bg-primary/10 text-primary hover:bg-primary hover:text-white font-black transition-all group">
-                                    {{ course.applicant_count }} 
+                                    {{ course.applicant_count }}
                                     <i data-lucide="arrow-right" class="w-4 h-4 ml-2 opacity-0 group-hover:opacity-100 transition-opacity"></i>
                                 </a>
                             </td>
