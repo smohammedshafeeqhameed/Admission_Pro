@@ -1,7 +1,7 @@
 import csv
 from django.http import HttpResponse
 from django.contrib import admin
-from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse, CampusManagerProfile
+from .models import College, Course, CREProfile, FinanceProfile, Student, Application, ApplicationSource, AddonCourse, CampusManagerProfile, AcademicYear
 
 # ... (rest of the code)
 
@@ -94,3 +94,16 @@ class ApplicationSourceAdmin(admin.ModelAdmin):
 @admin.register(AddonCourse)
 class AddonCourseAdmin(admin.ModelAdmin):
     list_display = ('name', 'course')
+
+@admin.register(AcademicYear)
+class AcademicYearAdmin(admin.ModelAdmin):
+    list_display = ('name', 'start_date', 'end_date', 'is_currently_active', 'is_current')
+    ordering = ('-start_date',)
+    list_editable = ('is_current',)
+
+    @admin.display(description='Active Now?', boolean=True)
+    def is_currently_active(self, obj):
+        # The year actually picked by AcademicYear.get_current() right now -
+        # i.e. what the portal's "Current Academic Year" default resolves
+        # to - as distinct from the manually-set `is_current` fallback flag.
+        return obj == AcademicYear.get_current()

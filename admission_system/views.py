@@ -37,34 +37,76 @@ class SuperuserRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_superuser
 
-class AdminDashboardView(SuperuserRequiredMixin, TemplateView):
+class AcademicYearFilterMixin:
+    """
+    Resolves the globally-selected Academic Year (see
+    utils.resolve_selected_academic_year) once per request and:
+
+    - exposes it as `self.academic_year` (an AcademicYear or None) so a
+      view's get_context_data/get can scope its own querysets with
+      `self.academic_year_date_filter(...)`;
+    - injects `academic_years` (all, for the dropdown), `selected_academic_year`,
+      and `current_academic_year_id` into the template context, so the
+      Academic Year filter in base.html has what it needs on every
+      portal page that mixes this in.
+
+    Mix this into any dashboard/portal View or TemplateView; it does not
+    change behaviour for a view that doesn't call academic_year_date_filter.
+    """
+    def dispatch(self, request, *args, **kwargs):
+        from .models import AcademicYear
+        from .utils import resolve_selected_academic_year
+        self.academic_year = resolve_selected_academic_year(request)
+        self.current_academic_year = AcademicYear.get_current()
+        return super().dispatch(request, *args, **kwargs)
+
+    def academic_year_date_filter(self, field_path='applied_at'):
+        from .utils import academic_year_date_filter as _build_filter
+        return _build_filter(self.academic_year, field_path)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from .models import AcademicYear
+        context['academic_years'] = AcademicYear.objects.all()
+        context['selected_academic_year'] = self.academic_year
+        context['current_academic_year_id'] = self.current_academic_year.id if self.current_academic_year else None
+        return context
+
+class AdminDashboardView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        
+
         search_query = self.request.GET.get('search', '')
         college_id = self.request.GET.get('college', '')
-        
+
         cres = CREProfile.objects.select_related('user').prefetch_related('allocated_colleges').order_by('-user__date_joined')
-        
+
         if search_query:
             cres = cres.filter(
-                Q(user__username__icontains=search_query) | 
-                Q(phone__icontains=search_query) | 
+                Q(user__username__icontains=search_query) |
+                Q(phone__icontains=search_query) |
                 Q(user__email__icontains=search_query)
             )
-            
+
         if college_id:
             cres = cres.filter(allocated_colleges__id=college_id)
-            
+
         pending_cres = CREProfile.objects.filter(is_approved=False).select_related('user').order_by('-user__date_joined')
-        
+
+        # Students/applications are scoped to the selected academic year
+        # (by Application.applied_at); CRE/college counts are catalog
+        # totals and stay global - they aren't a per-year "performance"
+        # metric the way enrollments/revenue are.
+        total_students = Student.objects.filter(**self.academic_year_date_filter('applications__applied_at')).distinct().count()
+        total_applications = Application.objects.filter(**self.academic_year_date_filter('applied_at')).count()
+
         context.update({
-            'total_students': Student.objects.count(),
+            'total_students': total_students,
             'total_cres': CREProfile.objects.count(),
             'total_colleges': College.objects.count(),
-            'total_applications': Application.objects.count(),
+            'total_applications': total_applications,
             'all_cres': cres.distinct(),
             'pending_cres': pending_cres,
             'pending_count': pending_cres.count(),
@@ -104,7 +146,7 @@ class AdminApproveCREView(SuperuserRequiredMixin, View):
         cre_profile.save()
         return redirect('admin_dashboard')
 
-class AdminCREDetailView(SuperuserRequiredMixin, TemplateView):
+class AdminCREDetailView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_cre_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -113,9 +155,12 @@ class AdminCREDetailView(SuperuserRequiredMixin, TemplateView):
         cre_profile = None
         if cre_id:
             cre_profile = get_object_or_404(CREProfile, id=cre_id)
-        
-        # All referrals (students applied through this CRE)
-        referrals = Application.objects.filter(referred_by=cre_profile).select_related('student', 'college', 'course').order_by('-applied_at')
+
+        # All referrals (students applied through this CRE), scoped to the
+        # selected academic year
+        referrals = Application.objects.filter(
+            referred_by=cre_profile, **self.academic_year_date_filter('applied_at')
+        ).select_related('student', 'college', 'course').order_by('-applied_at')
         
         context.update({
             'cre': cre_profile,
@@ -136,20 +181,26 @@ class BenefitsView(TemplateView):
 class SupportView(TemplateView):
     template_name = 'admission_system/support.html'
 
-class AdminCollegeListView(SuperuserRequiredMixin, TemplateView):
+class AdminCollegeListView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_college_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        # student_count is a per-year "seat" metric (applications in the
+        # selected academic year); course_count is a catalog total and
+        # stays global.
         colleges = College.objects.annotate(
-            student_count=Count('applications', distinct=True),
+            student_count=Count(
+                'applications', distinct=True,
+                filter=Q(**self.academic_year_date_filter('applications__applied_at'))
+            ),
             course_count=Count('courses', distinct=True)
         )
         context['colleges'] = colleges
         context['is_dashboard'] = True
         return context
 
-class AdminCollegeDetailView(SuperuserRequiredMixin, TemplateView):
+class AdminCollegeDetailView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_college_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -157,27 +208,34 @@ class AdminCollegeDetailView(SuperuserRequiredMixin, TemplateView):
         college_id = self.kwargs.get('pk')
         college = get_object_or_404(College, id=college_id)
         courses = college.courses.all().annotate(
-            applicant_count=Count('applications')
+            applicant_count=Count(
+                'applications',
+                filter=Q(**self.academic_year_date_filter('applications__applied_at'))
+            )
         )
-        
+
         context.update({
             'college': college,
             'courses': courses,
-            'total_students': Application.objects.filter(college=college).count(),
+            'total_students': Application.objects.filter(
+                college=college, **self.academic_year_date_filter('applied_at')
+            ).count(),
             'is_dashboard': True
         })
         return context
 
-class AdminCourseStudentListView(SuperuserRequiredMixin, TemplateView):
+class AdminCourseStudentListView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_course_student_list.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         course_id = self.kwargs.get('course_id')
         course = get_object_or_404(Course, id=course_id)
-        
-        applications = Application.objects.filter(course=course).select_related('student', 'college', 'referred_by__user').order_by('-applied_at')
-        
+
+        applications = Application.objects.filter(
+            course=course, **self.academic_year_date_filter('applied_at')
+        ).select_related('student', 'college', 'referred_by__user').order_by('-applied_at')
+
         context.update({
             'course': course,
             'college': course.college,
@@ -189,7 +247,7 @@ class AdminCourseStudentListView(SuperuserRequiredMixin, TemplateView):
         })
         return context
 
-class AdminStudentDetailView(SuperuserRequiredMixin, TemplateView):
+class AdminStudentDetailView(AcademicYearFilterMixin, SuperuserRequiredMixin, TemplateView):
     template_name = 'admission_system/admin_student_detail.html'
 
     def get_context_data(self, **kwargs):
@@ -273,39 +331,41 @@ class FinanceRequiredMixin(UserPassesTestMixin):
     def test_func(self):
         return self.request.user.is_superuser or hasattr(self.request.user, 'finance_profile')
 
-class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
+class FinanceDashboardView(AcademicYearFilterMixin, FinanceRequiredMixin, TemplateView):
     template_name = 'admission_system/finance_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         college_id = self.request.GET.get('college')
-        
+        ay_filter = self.academic_year_date_filter('applied_at')
+
         # Use a base queryset with select_related to avoid additional student/college/course lookups
-        base_apps = Application.objects.select_related('student', 'college', 'course')
-        
+        base_apps = Application.objects.select_related('student', 'college', 'course').filter(**ay_filter)
+
         # Pending verifications - prioritize these
         pending_apps = base_apps.filter(payment_status='Pending Verification')
-        
+
         # History - limit to last 50 for performance
         history_apps = base_apps.exclude(payment_status__in=['Pending', 'Pending Verification']).order_by('-applied_at')
-        
+
         if college_id:
             pending_apps = pending_apps.filter(college_id=college_id)
             history_apps = history_apps.filter(college_id=college_id)
             context['active_college'] = get_object_or_404(College, id=college_id)
-            
-        # Global Stats - Single aggregate query
-        stats = Application.objects.filter(payment_status='Success').aggregate(
+
+        # Global Stats - Single aggregate query, scoped to the selected academic year
+        stats = Application.objects.filter(payment_status='Success', **ay_filter).aggregate(
             total_revenue=Sum('amount_paid'),
             total_verified=Count('id')
         )
         total_revenue = stats['total_revenue'] or 0
         total_verified = stats['total_verified'] or 0
-        
+
         # College Breakdown - Optimized with conditional annotation to replace N+1 loop
+        rel_ay_filter = self.academic_year_date_filter('applications__applied_at')
         colleges_with_stats = College.objects.annotate(
-            revenue=Sum('applications__amount_paid', filter=Q(applications__payment_status='Success')),
-            app_count=Count('applications', filter=Q(applications__payment_status='Success'))
+            revenue=Sum('applications__amount_paid', filter=Q(applications__payment_status='Success', **rel_ay_filter)),
+            app_count=Count('applications', filter=Q(applications__payment_status='Success', **rel_ay_filter))
         ).order_by('name')
         
         colleges_data = [
@@ -329,16 +389,18 @@ class FinanceDashboardView(FinanceRequiredMixin, TemplateView):
         })
         return context
 
-class CampusManagerDashboardView(CampusManagerRequiredMixin, TemplateView):
+class CampusManagerDashboardView(AcademicYearFilterMixin, CampusManagerRequiredMixin, TemplateView):
     template_name = 'admission_system/campus_manager_dashboard.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         manager_profile = self.request.user.campus_manager_profile
         college = manager_profile.college
-        
-        # Base Querysets for this campus
-        campus_apps = Application.objects.filter(college=college).select_related('student', 'course', 'referred_by')
+
+        # Base Querysets for this campus, scoped to the selected academic year
+        campus_apps = Application.objects.filter(
+            college=college, **self.academic_year_date_filter('applied_at')
+        ).select_related('student', 'course', 'referred_by')
         success_apps = campus_apps.filter(payment_status='Success')
         
         # Stats
@@ -368,13 +430,18 @@ class CampusManagerDashboardView(CampusManagerRequiredMixin, TemplateView):
         })
         return context
 
-class CampusManagerExportCSVView(CampusManagerRequiredMixin, View):
+class CampusManagerExportCSVView(AcademicYearFilterMixin, CampusManagerRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         manager_profile = request.user.campus_manager_profile
         college = manager_profile.college
         course_id = request.GET.get('course_id')
-        
-        apps = Application.objects.filter(college=college).select_related('student', 'course', 'referred_by__user')
+
+        # Matches whichever academic year is currently selected on the
+        # dashboard (resolved from the session by AcademicYearFilterMixin),
+        # so the export always lines up with what's on screen.
+        apps = Application.objects.filter(
+            college=college, **self.academic_year_date_filter('applied_at')
+        ).select_related('student', 'course', 'referred_by__user')
         
         if course_id:
             apps = apps.filter(course_id=course_id)
@@ -446,13 +513,17 @@ class VerifyPaymentActionView(FinanceRequiredMixin, View):
             
         return redirect('finance_dashboard')
 
-class AdminExportCSVView(SuperuserRequiredMixin, View):
+class AdminExportCSVView(AcademicYearFilterMixin, SuperuserRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         export_type = request.GET.get('type', 'students')
         course_id = request.GET.get('course_id')
-        
+
         if export_type == 'students':
-            apps = Application.objects.select_related('student', 'college', 'course', 'referred_by__user').all()
+            # Matches whichever academic year is currently selected on the
+            # dashboard (resolved from the session by AcademicYearFilterMixin).
+            apps = Application.objects.select_related(
+                'student', 'college', 'course', 'referred_by__user'
+            ).filter(**self.academic_year_date_filter('applied_at'))
             
             response = HttpResponse(content_type='text/csv')
             if course_id:
@@ -551,7 +622,7 @@ class CRELoginView(LoginView):
             return reverse_lazy('campus_manager_dashboard')
         return reverse_lazy('cre_dashboard')
 
-class DashboardView(LoginRequiredMixin, TemplateView):
+class DashboardView(AcademicYearFilterMixin, LoginRequiredMixin, TemplateView):
     def get_template_names(self):
         if self.request.user.is_superuser:
             # We could have a separate admin dashboard if needed
@@ -576,8 +647,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         else:
             colleges = cre_profile.allocated_colleges.all()
             
-        referrals = Application.objects.filter(referred_by=cre_profile).order_by('-applied_at')
-        
+        referrals = Application.objects.filter(
+            referred_by=cre_profile, **self.academic_year_date_filter('applied_at')
+        ).order_by('-applied_at')
+
         context.update({
             'cre_profile': cre_profile,
             'colleges': colleges,

@@ -18,6 +18,67 @@ def is_username_taken(username):
     return User.objects.filter(username__iexact=username).exists()
 
 
+def resolve_selected_academic_year(request):
+    """
+    Resolves the globally-selected Academic Year for the whole portal.
+
+    Precedence:
+      1. `?academic_year=<id>` query param, if it names a real AcademicYear.
+         Persists the choice into the session so it carries across every
+         other portal page without needing to be repeated on every link.
+      2. The id stashed in the session from an earlier selection on this
+         or any other portal page.
+      3. AcademicYear.get_current() - date-range match, else the
+         is_current flag, else the most recently-started year.
+
+    Returns the selected AcademicYear instance, or None if no academic
+    years have been configured yet in the Django admin (every caller
+    that builds a date filter from this treats None as "no filter").
+    """
+    from .models import AcademicYear
+
+    requested_id = request.GET.get('academic_year')
+    if requested_id:
+        try:
+            selected = AcademicYear.objects.filter(pk=requested_id).first()
+        except (ValueError, TypeError):
+            selected = None
+        if selected:
+            request.session['selected_academic_year_id'] = selected.pk
+            return selected
+
+    session_id = request.session.get('selected_academic_year_id')
+    if session_id:
+        selected = AcademicYear.objects.filter(pk=session_id).first()
+        if selected:
+            return selected
+        # Stale session value (e.g. that year was deleted) - clear it and
+        # fall through to the default below.
+        del request.session['selected_academic_year_id']
+
+    return AcademicYear.get_current()
+
+
+def academic_year_date_filter(academic_year, field_path='applied_at'):
+    """
+    Builds a Django ORM filter dict scoping `field_path` - a DateTimeField
+    name, e.g. 'applied_at', or a relation-traversal like
+    'applications__applied_at' - to `academic_year`'s [start_date, end_date]
+    range (inclusive, by calendar date).
+
+    Returns {} (a no-op filter) when `academic_year` is None, so callers
+    can always do `.filter(**academic_year_date_filter(ay, ...))` safely -
+    including before any AcademicYear has been configured, when every
+    dashboard should keep showing all-time data rather than nothing.
+    """
+    if not academic_year:
+        return {}
+    return {
+        f'{field_path}__date__gte': academic_year.start_date,
+        f'{field_path}__date__lte': academic_year.end_date,
+    }
+
+
 def suggest_unique_username(username, max_attempts=1000):
     """
     Given a desired username that is already taken, suggest a free

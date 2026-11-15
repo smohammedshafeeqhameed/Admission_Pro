@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 import uuid
 from .validators import validate_photo
 
@@ -110,11 +111,77 @@ class Student(models.Model):
 
 class ApplicationSource(models.Model):
     name = models.CharField(max_length=255, unique=True)
-    
+
     def __str__(self):
         return self.name
 
 from django.core.exceptions import ValidationError
+
+
+class AcademicYear(models.Model):
+    """
+    A single academic year/session (e.g. "2026-2027"), configured by the
+    Django admin with a start and end date. This is the global period
+    used across every portal dashboard to slice performance data: cards,
+    seat/enrollment counts, revenue, and student lists are all scoped by
+    matching Application.applied_at against [start_date, end_date].
+
+    See utils.resolve_selected_academic_year and
+    views.AcademicYearFilterMixin for how a request's selected year is
+    resolved and applied to querysets.
+    """
+    name = models.CharField(max_length=20, unique=True, help_text='e.g. "2026-2027"')
+    start_date = models.DateField(help_text="First day of this academic year.")
+    end_date = models.DateField(help_text="Last day of this academic year.")
+    is_current = models.BooleanField(
+        default=False,
+        help_text=(
+            "Manual fallback only. The portal automatically treats the "
+            "academic year whose start/end date contains today as current; "
+            "this flag is only used as a fallback when no year's date range "
+            "covers today (e.g. a gap between two years)."
+        )
+    )
+
+    class Meta:
+        ordering = ['-start_date']
+
+    def __str__(self):
+        return self.name
+
+    def clean(self):
+        if self.start_date and self.end_date and self.start_date >= self.end_date:
+            raise ValidationError({'end_date': "End date must be after the start date."})
+        if self.start_date and self.end_date:
+            overlapping = AcademicYear.objects.filter(
+                start_date__lte=self.end_date,
+                end_date__gte=self.start_date,
+            )
+            if self.pk:
+                overlapping = overlapping.exclude(pk=self.pk)
+            clash = overlapping.first()
+            if clash:
+                raise ValidationError(
+                    f"This date range overlaps with another academic year ({clash})."
+                )
+
+    @classmethod
+    def get_current(cls):
+        """
+        The 'current' academic year: the one whose [start_date, end_date]
+        contains today, if any; otherwise the one manually flagged
+        is_current=True; otherwise the most recently-started year;
+        otherwise None if no academic years have been configured yet.
+        """
+        today = timezone.localdate()
+        ay = cls.objects.filter(start_date__lte=today, end_date__gte=today).first()
+        if ay:
+            return ay
+        ay = cls.objects.filter(is_current=True).first()
+        if ay:
+            return ay
+        return cls.objects.order_by('-start_date').first()
+
 
 class Application(models.Model):
     PAYMENT_STATUS_CHOICES = [

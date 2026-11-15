@@ -246,6 +246,7 @@
         {% endif %}
 
         <main class="flex-1">
+            {% if is_dashboard %}{% include 'admission_system/_academic_year_filter.html' %}{% endif %}
             {% block content %}{% endblock %}
         </main>
 

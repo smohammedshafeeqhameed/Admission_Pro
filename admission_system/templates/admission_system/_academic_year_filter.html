@@ -1,0 +1,138 @@
+<!--{# Global Academic Year filter, shown at the top of every portal/dashboard-->
+<!--   page (included from base.html whenever is_dashboard is set). Selecting a-->
+<!--   year navigates to the current URL with ?academic_year=<id>; the view's-->
+<!--   AcademicYearFilterMixin stores that choice in the session, so every-->
+<!--   other portal page the user visits afterwards stays on the same year-->
+<!--   without needing the query param repeated. #}-->
+<div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="flex flex-wrap items-center justify-between gap-3 glass-card rounded-2xl px-5 py-3 border border-slate-200/60 dark:border-slate-800/60">
+        <div class="flex items-center gap-2 text-sm font-bold text-slate-600 dark:text-slate-400">
+            <i data-lucide="calendar-range" class="w-4 h-4"></i>
+            <span>Academic Year</span>
+        </div>
+        {% if academic_years %}
+        <div class="relative" id="academic-year-dropdown">
+            <button type="button" id="academic-year-trigger" aria-haspopup="listbox" aria-expanded="false"
+                class="flex items-center gap-2.5 text-sm font-bold rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 pl-4 pr-3 py-2 hover:border-primary/40 hover:bg-white dark:hover:bg-slate-800 focus:ring-2 focus:ring-primary focus:border-transparent outline-none transition-all">
+                <span id="academic-year-trigger-label">{{ selected_academic_year.name }}</span>
+                {% if selected_academic_year.id == current_academic_year_id %}
+                <span
+                    class="px-1.5 py-0.5 rounded-full bg-primary/10 text-primary text-[9px] font-black uppercase tracking-wide">Current</span>
+                {% endif %}
+                <span id="academic-year-chevron" class="shrink-0 text-slate-400 transition-transform duration-200">
+                    <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                </span>
+            </button>
+
+            <div id="academic-year-menu" role="listbox" aria-label="Select academic year" tabindex="-1"
+                class="hidden absolute right-0 z-20 mt-2 w-60 origin-top-right rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-xl shadow-slate-900/10 p-1.5 opacity-0 scale-95 transition-all duration-150 ease-out">
+                {% for ay in academic_years %}
+                <button type="button" role="option" data-value="{{ ay.id }}"
+                    aria-selected="{% if selected_academic_year.id == ay.id %}true{% else %}false{% endif %}"
+                    class="w-full flex items-center justify-between gap-3 px-3 py-2.5 rounded-xl text-sm font-bold text-left transition-colors outline-none focus:bg-slate-50 dark:focus:bg-slate-700 {% if selected_academic_year.id == ay.id %}bg-primary/10 text-primary{% else %}text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700{% endif %}">
+                    <span class="flex items-center gap-2">
+                        {{ ay.name }}
+                        {% if ay.id == current_academic_year_id %}
+                        <span
+                            class="px-1.5 py-0.5 rounded-full bg-secondary/20 text-amber-700 dark:text-secondary text-[9px] font-black uppercase tracking-wide">Current</span>
+                        {% endif %}
+                    </span>
+                    {% if selected_academic_year.id == ay.id %}
+                    <i data-lucide="check" class="w-4 h-4 text-primary shrink-0"></i>
+                    {% endif %}
+                </button>
+                {% endfor %}
+            </div>
+        </div>
+
+        <script>
+            (function () {
+                var wrapper = document.getElementById('academic-year-dropdown');
+                var trigger = document.getElementById('academic-year-trigger');
+                var menu = document.getElementById('academic-year-menu');
+                var chevron = document.getElementById('academic-year-chevron');
+                if (!wrapper || !trigger || !menu) return;
+
+                var options = Array.prototype.slice.call(menu.querySelectorAll('[role="option"]'));
+
+                function isOpen() {
+                    return trigger.getAttribute('aria-expanded') === 'true';
+                }
+
+                function openMenu(focusFirst) {
+                    menu.classList.remove('hidden');
+                    // Force a reflow so the transition below actually animates in.
+                    void menu.offsetWidth;
+                    menu.classList.remove('opacity-0', 'scale-95');
+                    menu.classList.add('opacity-100', 'scale-100');
+                    trigger.setAttribute('aria-expanded', 'true');
+                    if (chevron) chevron.classList.add('rotate-180');
+                    if (focusFirst) {
+                        var selected = options.filter(function (o) { return o.getAttribute('aria-selected') === 'true'; })[0];
+                        (selected || options[0] || menu).focus();
+                    }
+                }
+
+                function closeMenu(focusTrigger) {
+                    menu.classList.add('opacity-0', 'scale-95');
+                    menu.classList.remove('opacity-100', 'scale-100');
+                    trigger.setAttribute('aria-expanded', 'false');
+                    if (chevron) chevron.classList.remove('rotate-180');
+                    window.setTimeout(function () {
+                        menu.classList.add('hidden');
+                    }, 150);
+                    if (focusTrigger) trigger.focus();
+                }
+
+                trigger.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    isOpen() ? closeMenu(false) : openMenu(false);
+                });
+
+                trigger.addEventListener('keydown', function (e) {
+                    if (e.key === 'ArrowDown' || e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openMenu(true);
+                    }
+                });
+
+                options.forEach(function (opt, idx) {
+                    opt.addEventListener('click', function () {
+                        var value = opt.getAttribute('data-value');
+                        var url = new URL(window.location.href);
+                        url.searchParams.set('academic_year', value);
+                        window.location.href = url.toString();
+                    });
+
+                    opt.addEventListener('keydown', function (e) {
+                        if (e.key === 'ArrowDown') {
+                            e.preventDefault();
+                            (options[idx + 1] || options[0]).focus();
+                        } else if (e.key === 'ArrowUp') {
+                            e.preventDefault();
+                            (options[idx - 1] || options[options.length - 1]).focus();
+                        } else if (e.key === 'Escape') {
+                            e.preventDefault();
+                            closeMenu(true);
+                        } else if (e.key === 'Tab') {
+                            closeMenu(false);
+                        }
+                    });
+                });
+
+                document.addEventListener('click', function (e) {
+                    if (isOpen() && !wrapper.contains(e.target)) closeMenu(false);
+                });
+
+                document.addEventListener('keydown', function (e) {
+                    if (e.key === 'Escape' && isOpen()) closeMenu(true);
+                });
+            })();
+        </script>
+        {% else %}
+        <span class="text-sm text-slate-400 dark:text-slate-500">
+            No academic years configured yet — add one in the Django admin.
+        </span>
+        {% endif %}
+    </div>
+</div>
