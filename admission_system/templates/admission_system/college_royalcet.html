@@ -1,0 +1,602 @@
+{% extends 'admission_system/college_base.html' %}
+{% load static %}
+
+{% block footer_contact %}
+<a href="tel:+919048599995" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#2FA75C]"></i> +91 90485 99995
+</a>
+{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+
+<div class="bg-white dark:bg-slate-950 selection:bg-[#2FA75C] selection:text-white" style="--rc-navy:#1C2A4A;--rc-navy-deep:#0F1830;--rc-green:#2FA75C;--rc-green-deep:#1E7F43;--rc-gold:#D9A94E;--rc-paper:#F6F7F9;">
+
+    <!-- Rebrand the shared header for RCET's own navy / green identity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+                header.style.background = '#FFFFFF';
+                header.style.borderBottom = '1px solid #e7e9ee';
+                header.querySelectorAll('h2').forEach(el => { el.style.color = 'var(--rc-navy)'; });
+                header.querySelectorAll('nav a').forEach(el => { el.style.color = '#334155'; });
+                const navApply = header.querySelector('a[href="#apply"]');
+                if (navApply) {
+                    navApply.style.background = 'var(--rc-green)';
+                    navApply.style.boxShadow = '0 10px 24px -8px rgba(47,167,92,0.55)';
+                }
+            }
+        });
+    </script>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="relative overflow-hidden pt-28 pb-20 md:pt-32 md:pb-28" id="about"
+        style="background:radial-gradient(ellipse 120% 90% at 85% 0%, #24365c 0%, var(--rc-navy) 46%, var(--rc-navy-deep) 100%);">
+
+        <!-- Blueprint grid -->
+        <div class="absolute inset-0 opacity-[0.12]"
+            style="background-image:linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 46px 46px;">
+        </div>
+        <!-- Corner brackets -->
+        <div class="hidden md:block absolute top-10 left-10 w-14 h-14 border-t-2 border-l-2 border-white/20"></div>
+        <div class="hidden md:block absolute bottom-10 right-10 w-14 h-14 border-b-2 border-r-2 border-white/20"></div>
+
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 grid lg:grid-cols-[1.05fr_0.95fr] gap-16 items-center">
+
+            <!-- Left: copy -->
+            <div>
+                <div class="flex flex-wrap items-center gap-3 mb-10">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#2FA75C]"></span> 2027 Batch Admissions Open
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        Approved by AICTE
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#D9A94E]/40 bg-[#D9A94E]/10 text-[#f0d9a8] text-xs font-semibold tracking-wide">
+                        College Code: RCE
+                    </span>
+                </div>
+
+                <img src="{% static 'admission_system/images/logos/royalcet_logo_white.png' %}" alt="Royal College of Engineering & Technology"
+                    class="h-16 md:h-20 w-auto object-contain mb-8 drop-shadow-[0_8px_30px_rgba(0,0,0,0.35)]">
+
+                <h1 class="font-bold text-white leading-[1.03] tracking-tight mb-7"
+                    style="font-family:'Space Grotesk',sans-serif; font-size:clamp(2.4rem,4.6vw,3.9rem);">
+                    Engineering careers built on a 21-acre campus in Thrissur
+                </h1>
+
+                <p class="text-slate-300/90 text-lg leading-relaxed mb-10 max-w-xl">
+                    NAAC-accredited and affiliated to the APJ Abdul Kalam Technological University (KTU), Royal
+                    College of Engineering &amp; Technology, Akkikavu, has spent over a decade turning out
+                    industry-ready graduates &mdash; supported by modern labs, an active Innovation &amp;
+                    Entrepreneurship Development Cell and a dedicated placement team.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 mb-14">
+                    <a href="#apply"
+                        class="inline-flex items-center gap-3 bg-[#2FA75C] hover:bg-[#268f4d] text-white font-bold py-4 px-9 rounded-xl text-base transition-all hover:-translate-y-0.5 shadow-[0_18px_36px_-12px_rgba(47,167,92,0.55)]">
+                        Apply for 2027 Batch <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#programs"
+                        class="inline-flex items-center gap-3 text-white/90 border border-white/25 hover:bg-white/10 font-semibold py-4 px-8 rounded-xl text-base transition-all">
+                        View Programmes
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/10 max-w-xl">
+                    <div class="bg-[#17233e] px-4 py-5 text-center">
+                        <div class="text-2xl font-bold text-white" style="font-family:'Space Grotesk',sans-serif;">21</div>
+                        <div class="text-[11px] text-slate-400 font-medium mt-1">Acre Campus</div>
+                    </div>
+                    <div class="bg-[#17233e] px-4 py-5 text-center">
+                        <div class="text-2xl font-bold text-white" style="font-family:'Space Grotesk',sans-serif;">NAAC</div>
+                        <div class="text-[11px] text-slate-400 font-medium mt-1">Accredited</div>
+                    </div>
+                    <div class="bg-[#17233e] px-4 py-5 text-center">
+                        <div class="text-2xl font-bold text-white" style="font-family:'Space Grotesk',sans-serif;">KTU</div>
+                        <div class="text-[11px] text-slate-400 font-medium mt-1">Affiliated</div>
+                    </div>
+                    <div class="bg-[#17233e] px-4 py-5 text-center">
+                        <div class="text-2xl font-bold text-white" style="font-family:'Space Grotesk',sans-serif;">2</div>
+                        <div class="text-[11px] text-slate-400 font-medium mt-1">2027 Programmes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: blueprint / circuit illustration -->
+            <div class="relative hidden lg:block">
+                <svg viewBox="0 0 520 560" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="20" y="20" width="480" height="520" rx="18" stroke="#ffffff" stroke-opacity="0.15" stroke-width="1.5"/>
+                    <path d="M60 480 V320 H160 V200" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+                    <path d="M160 200 H300" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+                    <path d="M300 200 V90 H440" stroke="#2FA75C" stroke-opacity="0.85" stroke-width="2.5"/>
+                    <path d="M160 200 V120" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+                    <path d="M300 200 V300 H420 V400" stroke="#ffffff" stroke-opacity="0.25" stroke-width="2"/>
+                    <path d="M60 480 H260" stroke="#D9A94E" stroke-opacity="0.8" stroke-width="2.5"/>
+                    <rect x="130" y="175" width="60" height="50" rx="6" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5"/>
+                    <rect x="270" y="275" width="60" height="50" rx="6" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5"/>
+                    <rect x="390" y="375" width="60" height="50" rx="6" stroke="#ffffff" stroke-opacity="0.4" stroke-width="1.5"/>
+                    <circle cx="60" cy="480" r="7" fill="#D9A94E"/>
+                    <circle cx="260" cy="480" r="7" fill="#D9A94E"/>
+                    <circle cx="440" cy="90" r="7" fill="#2FA75C"/>
+                    <circle cx="300" cy="90" r="5" fill="#ffffff" fill-opacity="0.6"/>
+                    <circle cx="160" cy="120" r="5" fill="#ffffff" fill-opacity="0.6"/>
+                    <g>
+                        <circle cx="250" cy="250" r="86" stroke="#ffffff" stroke-opacity="0.12" stroke-width="1"/>
+                        <circle cx="250" cy="250" r="118" stroke="#ffffff" stroke-opacity="0.08" stroke-width="1"/>
+                    </g>
+                    <text x="48" y="505" fill="#ffffff" fill-opacity="0.35" font-size="11" font-family="monospace">RCE &middot; AKKIKAVU</text>
+                    <text x="330" y="80" fill="#ffffff" fill-opacity="0.35" font-size="11" font-family="monospace">EST. BATCH 2027</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MISSION / VISION STRIP ═══ -->
+    <section class="py-20 px-6 md:px-10" style="background:var(--rc-paper);">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-2xl p-9 border border-slate-200/80 shadow-sm">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(28,42,74,0.08);">
+                    <i data-lucide="target" class="w-5 h-5" style="color:var(--rc-navy);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Space Grotesk',sans-serif; color:var(--rc-navy);">Mission</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    To groom students into capable technocrats with lifelong learning skills, a strong sense of
+                    social responsibility and a global outlook &mdash; ready for a changing world of work.
+                </p>
+            </div>
+            <div class="bg-white rounded-2xl p-9 border border-slate-200/80 shadow-sm">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(47,167,92,0.1);">
+                    <i data-lucide="compass" class="w-5 h-5" style="color:var(--rc-green);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Space Grotesk',sans-serif; color:var(--rc-navy);">Vision</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    To keep growing as a resourceful, outstanding and adaptive institution in engineering and
+                    technology, built around the habit of lifelong learning.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROGRAMMES ═══ -->
+    <section class="py-24 px-6 md:px-10" id="programs">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+                <div>
+                    <h2 class="font-bold tracking-tight mb-3" style="font-family:'Space Grotesk',sans-serif; color:var(--rc-navy); font-size:clamp(2rem,4vw,3rem);">
+                        2027 Batch Programmes
+                    </h2>
+                    <p class="text-slate-500 text-lg max-w-xl">Two undergraduate degrees, each with a choice of
+                        industry-aligned specialization.</p>
+                </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8" id="courses">
+                {% for course in courses %}
+                <div class="relative bg-white rounded-[1.75rem] border border-slate-200 p-10 hover:border-[#2FA75C]/40 hover:shadow-[0_30px_60px_-24px_rgba(28,42,74,0.25)] transition-all duration-300">
+                    <div class="absolute top-6 right-6 w-8 h-8 border-t-2 border-r-2 rounded-tr-lg" style="border-color:#e2e8f0;"></div>
+                    <div class="absolute bottom-6 left-6 w-8 h-8 border-b-2 border-l-2 rounded-bl-lg" style="border-color:#e2e8f0;"></div>
+
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center mb-7 text-white" style="background:var(--rc-navy);">
+                        <i data-lucide="graduation-cap" class="w-7 h-7"></i>
+                    </div>
+                    <h3 class="font-bold text-2xl mb-3" style="font-family:'Space Grotesk',sans-serif; color:var(--rc-navy);">{{ course.name }}</h3>
+                    <p class="text-slate-500 leading-relaxed mb-7">{{ course.description }}</p>
+
+                    <div class="flex flex-wrap gap-2 mb-2">
+                        {% for addon in course.addon_courses.all %}
+                        <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
+                            style="color:var(--rc-green-deep); border-color:rgba(47,167,92,0.3); background:rgba(47,167,92,0.07);">
+                            <i data-lucide="check" class="w-3 h-3"></i> {{ addon.name }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ADMISSION FORM ═══ -->
+    <section class="py-24 px-4 md:px-10" id="apply" style="background:var(--rc-paper);">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-bold tracking-tight mb-5" style="font-family:'Space Grotesk',sans-serif; color:var(--rc-navy); font-size:clamp(2rem,4vw,3rem);">
+                    Start your application
+                </h2>
+                <p class="text-slate-500 text-lg max-w-xl mx-auto">Four short steps &mdash; your details, address,
+                    family information and documents.</p>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-[0_40px_90px_-30px_rgba(28,42,74,0.25)] border border-slate-100 overflow-hidden">
+
+                <!-- Step indicator -->
+                <div class="px-8 py-10 md:px-16" style="background:var(--rc-navy);">
+                    <div class="flex items-center justify-between max-w-3xl mx-auto">
+                        <div id="step-1-btn" class="rc-step active">1<span class="rc-label">Identity</span></div>
+                        <div class="rc-line" id="connector-1"></div>
+                        <div id="step-2-btn" class="rc-step">2<span class="rc-label">Location</span></div>
+                        <div class="rc-line" id="connector-2"></div>
+                        <div id="step-3-btn" class="rc-step">3<span class="rc-label">Family</span></div>
+                        <div class="rc-line" id="connector-3"></div>
+                        <div id="step-4-btn" class="rc-step">4<span class="rc-label">Documents</span></div>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}"
+                    enctype="multipart/form-data" class="p-8 md:p-16" id="royal-form">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                    <div class="space-y-4 mb-10">
+                        {% for message in messages %}
+                        <div class="p-5 rounded-xl border flex items-center gap-4 font-semibold
+                            {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
+                            {% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                            <i data-lucide="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}" class="w-5 h-5 shrink-0"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- STEP 1 -->
+                    <div id="step-1" class="step-content space-y-8">
+                        <div class="grid md:grid-cols-2 gap-7">
+                            <div class="rc-field">
+                                <label class="rc-label-text">Programme</label>
+                                {{ form.course }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Specialization (Add-on)</label>
+                                {{ form.addon_course }}
+                            </div>
+                            <div class="md:col-span-2 rc-field">
+                                <label class="rc-label-text">Reference Source</label>
+                                {{ form.source }}
+                            </div>
+                            <div class="md:col-span-2 rc-field">
+                                <label class="rc-label-text">Full Name (as per certificates)</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Date of Birth</label>
+                                {{ form.dob }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Gender</label>
+                                {{ form.gender }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Aadhar Number</label>
+                                {{ form.aadhar_number }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Mobile Number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Email Address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Blood Group</label>
+                                {{ form.blood_group }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Category</label>
+                                {{ form.category }}
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-6">
+                            <button type="button" onclick="goToStep(2)" class="rc-btn-primary">
+                                Location Details <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="step-2" class="step-content hidden space-y-8">
+                        <div class="space-y-7">
+                            <div class="rc-field">
+                                <label class="rc-label-text">Permanent Address</label>
+                                {{ form.permanent_address }}
+                            </div>
+                            <div class="rc-field">
+                                <label class="rc-label-text">Correspondence Address</label>
+                                {{ form.correspondence_address }}
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-7">
+                                <div class="rc-field">
+                                    <label class="rc-label-text">State</label>
+                                    {{ form.state }}
+                                </div>
+                                <div class="rc-field">
+                                    <label class="rc-label-text">City / Town</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(1)" class="rc-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(3)" class="rc-btn-primary">
+                                Family Details <i data-lucide="users" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div id="step-3" class="step-content hidden space-y-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--rc-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Father's Details
+                                </h4>
+                                {{ form.father_name }}
+                                {{ form.father_mobile }}
+                                {{ form.father_occupation }}
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--rc-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Mother's Details
+                                </h4>
+                                {{ form.mother_name }}
+                                {{ form.mother_mobile }}
+                                {{ form.mother_occupation }}
+                            </div>
+                            <div class="md:col-span-2 rounded-2xl p-7 border-2 border-dashed space-y-5" style="background:rgba(47,167,92,0.05); border-color:rgba(47,167,92,0.3);">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--rc-green-deep);">
+                                    <i data-lucide="shield" class="w-4 h-4"></i> Guardian & Emergency Contact
+                                </h4>
+                                <div class="grid md:grid-cols-3 gap-5">
+                                    {{ form.guardian_name }}
+                                    {{ form.guardian_mobile }}
+                                    {{ form.preferred_contact }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(2)" class="rc-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(4)" class="rc-btn-primary">
+                                Upload Documents <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="step-4" class="step-content hidden space-y-8">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="rc-upload-card" style="border-color:rgba(47,167,92,0.4);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(47,167,92,0.12); color:var(--rc-green-deep);">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--rc-green-deep);">Passport Size Photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-medium text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
+                            <div class="rc-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(28,42,74,0.08); color:var(--rc-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">10th Marksheet</span>
+                                </div>
+                                {{ form.doc_10th }}
+                            </div>
+                            <div class="rc-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(28,42,74,0.08); color:var(--rc-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">11th Marksheet</span>
+                                </div>
+                                {{ form.doc_11th }}
+                            </div>
+                            <div class="rc-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(28,42,74,0.08); color:var(--rc-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">12th Marksheet</span>
+                                </div>
+                                {{ form.doc_12th }}
+                            </div>
+                            <div class="rc-upload-card sm:col-span-2" style="border-color:rgba(47,167,92,0.4);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(47,167,92,0.12); color:var(--rc-green-deep);">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--rc-green-deep);">Aadhar Document</span>
+                                </div>
+                                {{ form.doc_aadhar }}
+                            </div>
+                        </div>
+
+                        <!-- Fee banner -->
+                        <div class="relative rounded-[1.75rem] overflow-hidden p-10 md:p-12" style="background:var(--rc-navy);">
+                            <div class="absolute inset-0 opacity-[0.15]"
+                                style="background-image:linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 28px 28px;"></div>
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div>
+                                    <h4 class="text-white font-bold text-2xl mb-2" style="font-family:'Space Grotesk',sans-serif;">Registration Fee</h4>
+                                    <p class="text-slate-300/80">Non-refundable processing fee &middot; Payable via UPI / Bank Transfer on the next step</p>
+                                </div>
+                                <div class="text-center shrink-0">
+                                    <div class="font-bold tracking-tight text-[#2FA75C]" style="font-size:3.2rem; line-height:1; font-family:'Space Grotesk',sans-serif;">&#8377;1,500</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-6 pt-6">
+                            <button type="button" onclick="goToStep(3)" class="rc-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-3
+                                text-white font-bold py-5 px-12 rounded-xl text-lg transition-all hover:-translate-y-0.5 active:scale-95"
+                                style="background:var(--rc-green); box-shadow:0 18px 36px -12px rgba(47,167,92,0.55);">
+                                Submit Application <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER STRIP ═══ -->
+    <footer class="py-14 px-6" style="background:var(--rc-navy-deep);" id="contact">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+                <div class="text-white font-bold text-lg mb-1" style="font-family:'Space Grotesk',sans-serif;">Royal College of Engineering &amp; Technology</div>
+                <div class="text-slate-400 text-sm">Chiramanangad P.O., Akkikavu, Thrissur, Kerala &ndash; 680604</div>
+            </div>
+            <div class="text-slate-400 text-sm">Approved by AICTE &nbsp;|&nbsp; Affiliated to KTU &nbsp;|&nbsp; NAAC Accredited</div>
+        </div>
+    </footer>
+
+</div><!-- end wrapper -->
+
+<style>
+    #royal-form input, #royal-form select, #royal-form textarea {
+        background: #f8fafc;
+        border: 2px solid #e5e9f0;
+        border-radius: 0.9rem;
+        padding: 0.95rem 1.25rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        width: 100%;
+        outline: none;
+        transition: all .25s ease;
+    }
+    #royal-form input:focus, #royal-form select:focus, #royal-form textarea:focus {
+        border-color: var(--rc-navy);
+        background: white;
+        box-shadow: 0 8px 24px -8px rgba(28,42,74,0.2);
+    }
+    #royal-form textarea { min-height: 110px; }
+
+    .rc-field { display:flex; flex-direction:column; gap:.5rem; }
+    .rc-label-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #64748b; padding-left: .15rem; }
+
+    .rc-step {
+        position: relative; display:flex; align-items:center; justify-content:center;
+        width: 3.25rem; height: 3.25rem; border-radius: 1rem;
+        background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.55);
+        font-weight: 700; font-size: 1.1rem; transition: all .45s cubic-bezier(.34,1.56,.64,1);
+        flex-shrink: 0; z-index: 2;
+    }
+    @media(min-width:768px){ .rc-step{ width:4rem; height:4rem; font-size:1.3rem; } }
+    .rc-step.active { background:white; color:var(--rc-navy); transform:scale(1.12); box-shadow:0 12px 30px -8px rgba(0,0,0,.35); }
+    .rc-step.completed { background:var(--rc-green); color:white; }
+    .rc-label { position:absolute; bottom:-1.9rem; left:50%; transform:translateX(-50%); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:rgba(255,255,255,0.45); white-space:nowrap; }
+    .rc-step.active .rc-label { color:#2FA75C; }
+    @media(max-width:640px){ .rc-label{ display:none; } }
+    .rc-line { flex:1; height:4px; background:rgba(255,255,255,0.15); border-radius:999px; position:relative; overflow:hidden; margin: 0 .5rem; }
+    .rc-line::after { content:''; position:absolute; inset:0; background:var(--rc-green); transform:translateX(-100%); transition:transform .7s ease; }
+    .rc-line.active::after { transform:translateX(0); }
+
+    .rc-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; background:var(--rc-navy); color:white; font-weight:700; padding:1.1rem 2.4rem; border-radius:1rem; font-size:1rem; transition:all .25s; box-shadow:0 10px 24px -8px rgba(28,42,74,0.35); width:100%; }
+    @media(min-width:640px){ .rc-btn-primary{ width:auto; } }
+    .rc-btn-primary:hover { background:#13203a; transform:translateY(-2px); }
+    .rc-btn-back { display:inline-flex; align-items:center; gap:.5rem; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.15em; color:#94a3b8; transition:all .25s; }
+    .rc-btn-back:hover { color:var(--rc-navy); transform:translateX(-4px); }
+
+    .rc-upload-card { padding:1.6rem; border:2px dashed #e2e8f0; border-radius:1.4rem; background:#f8fafc; transition:all .3s; }
+    .rc-upload-card:hover { border-color:var(--rc-navy); background:white; }
+</style>
+
+<script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
+    function goToStep(step) {
+        const currentStepEl = document.querySelector('.step-content:not(.hidden)');
+        let currentStep = 1;
+        if (currentStepEl) {
+            const m = currentStepEl.id.match(/\d+/);
+            if (m) {
+                currentStep = parseInt(m[0]);
+                if (step > currentStep) {
+                    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), select, textarea');
+                    for (let i = 0; i < inputs.length; i++) {
+                        if (!inputs[i].checkValidity()) { inputs[i].reportValidity(); return; }
+                    }
+                }
+            }
+        }
+
+        if (step > currentStep && currentStep === 1) {
+            const aadharInput = document.querySelector('input[name="aadhar_number"]');
+            const courseSelect = document.querySelector('select[name="course"]');
+            const aadhar = aadharInput ? aadharInput.value.trim() : '';
+            const courseId = courseSelect ? courseSelect.value : '';
+
+            if (aadhar && courseId) {
+                const nextBtn = currentStepEl.querySelector('button[onclick="goToStep(2)"]');
+                if (nextBtn) { nextBtn.disabled = true; nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>'; }
+
+                fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location Details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        if (data.exists) {
+                            let alertDiv = document.getElementById('duplicate-alert');
+                            if (!alertDiv) {
+                                alertDiv = document.createElement('div');
+                                alertDiv.id = 'duplicate-alert';
+                                currentStepEl.insertBefore(alertDiv, currentStepEl.firstChild);
+                            }
+                            alertDiv.className = 'p-5 rounded-xl bg-red-50 text-red-800 border-red-200 border-2 mb-8 font-semibold flex items-center gap-4';
+                            alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="flex-1">${data.message}</div>`;
+                            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                        const oldAlert = document.getElementById('duplicate-alert');
+                        if (oldAlert) oldAlert.remove();
+                        executeStepTransition(step);
+                    })
+                    .catch(() => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location Details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        executeStepTransition(step);
+                    });
+                return;
+            }
+        }
+        executeStepTransition(step);
+    }
+
+    function executeStepTransition(step) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step-' + step).classList.remove('hidden');
+        [1, 2, 3, 4].forEach(s => {
+            const btn = document.getElementById('step-' + s + '-btn');
+            const conn = document.getElementById('connector-' + s);
+            btn.classList.remove('active', 'completed');
+            if (conn) conn.classList.remove('active');
+            if (s < step) { btn.classList.add('completed'); if (conn) conn.classList.add('active'); }
+            else if (s === step) btn.classList.add('active');
+        });
+        document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}
