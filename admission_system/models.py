@@ -12,7 +12,16 @@ class College(models.Model):
     website_content = models.TextField(help_text="HTML content for the college static page")
     theme_color = models.CharField(max_length=7, default="#6366f1", help_text="HEX color code for institutional branding")
     logo_url = models.URLField(blank=True, null=True, help_text="URL to the institution's logo")
-    
+
+    # Letterhead details shown on the printable admission application form
+    # (download_application_pdf / pdf_template.html). All optional so the
+    # form still renders cleanly for a college that hasn't filled these in.
+    affiliation = models.CharField(max_length=255, blank=True, null=True, help_text="e.g. 'Affiliated to Mahatma Gandhi University' - shown under the college name on the application form")
+    address = models.TextField(blank=True, null=True, help_text="Full postal address, shown on the application form letterhead")
+    phone = models.CharField(max_length=100, blank=True, null=True, help_text="Contact phone number(s), shown on the application form")
+    email = models.EmailField(blank=True, null=True, help_text="Admissions contact email, shown on the application form")
+    website = models.URLField(blank=True, null=True, help_text="College website, shown on the application form")
+
     # Custom Payment Settings
     upi_id = models.CharField(max_length=255, blank=True, null=True, help_text="Specific UPI ID for this college (e.g., college@sbi)")
     upi_payee_name = models.CharField(max_length=255, blank=True, null=True, help_text="Payee name for UPI (e.g., ABC College)")
@@ -23,6 +32,11 @@ class College(models.Model):
 
     def __str__(self):
         return self.name
+
+    def contact_line(self):
+        """Phone / email / website joined for the application-form letterhead; blank parts are skipped."""
+        parts = [p for p in [self.phone, self.email, self.website] if p]
+        return "   |   ".join(parts)
 
 class Course(models.Model):
     college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='courses')

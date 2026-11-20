@@ -45,8 +45,21 @@ def export_as_csv(modeladmin, request, queryset):
 
 @admin.register(College)
 class CollegeAdmin(admin.ModelAdmin):
-    list_display = ('name', 'theme_color', 'slug', 'created_at')
+    list_display = ('name', 'theme_color', 'slug', 'phone', 'website', 'created_at')
+    search_fields = ('name', 'slug')
     prepopulated_fields = {'slug': ('name',)}
+    fieldsets = (
+        ('Basic Info', {
+            'fields': ('name', 'slug', 'description', 'website_content'),
+        }),
+        ('Application Form Letterhead', {
+            'description': "Shown on the printable admission application form students download: logo, theme color and these contact details, so each college's form looks like its own letterhead.",
+            'fields': ('logo_url', 'theme_color', 'affiliation', 'address', 'phone', 'email', 'website'),
+        }),
+        ('Payment Settings', {
+            'fields': ('upi_id', 'upi_payee_name', 'payment_qr_image', 'bank_details'),
+        }),
+    )
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):

@@ -7,213 +7,293 @@
         @page {
             size: A4;
             margin: 2cm;
-            @frame header_frame {
-                -pdf-frame-content: header_content;
-                left: 50pt; width: 512pt; top: 50pt; height: 40pt;
-            }
             @frame footer_frame {
                 -pdf-frame-content: footer_content;
-                left: 50pt; width: 512pt; top: 772pt; height: 20pt;
+                left: 50pt; width: 512pt; top: 772pt; height: 30pt;
             }
         }
         body {
             font-family: Helvetica, Arial, sans-serif;
-            font-size: 11pt;
+            font-size: 10.5pt;
             color: #333333;
         }
-        h1 {
-            color: {{ app.college.theme_color|default:"#800000" }};
-            text-align: center;
-            font-size: 18pt;
-            margin-bottom: 5px;
-        }
-        h2 {
-            font-size: 14pt;
-            color: #444444;
-            border-bottom: 1px solid #cccccc;
-            padding-bottom: 3px;
-            margin-top: 20px;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .text-right {
-            text-align: right;
-        }
-        table {
+
+        /* ---------- Letterhead ---------- */
+        table.letterhead {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 15px;
+            margin-bottom: 0;
         }
-        th, td {
-            padding: 8px;
-            border: 1px solid #e2e8f0;
-            text-align: left;
+        table.letterhead td {
+            border: none;
+            padding: 12pt 14pt;
+            background-color: {{ app.college.theme_color|default:"#1e3a8a" }};
+            color: #ffffff;
+            vertical-align: middle;
         }
-        th {
-            background-color: #f8fafc;
-            color: #64748b;
-            font-weight: bold;
-            width: 35%;
-        }
-        .header {
+        .logo-cell {
+            width: 72pt;
             text-align: center;
-            margin-bottom: 30px;
+            background-color: #ffffff;
+            padding: 6pt;
         }
-        .meta-info {
-            font-size: 9pt;
-            color: #64748b;
+        .logo-cell img {
+            max-width: 58pt;
+            max-height: 48pt;
         }
+        .college-name {
+            font-size: 18pt;
+            font-weight: bold;
+            color: #ffffff;
+        }
+        .college-affiliation {
+            font-size: 8pt;
+            color: #e2e8f0;
+            margin-top: 2pt;
+        }
+        .form-badge {
+            font-size: 10pt;
+            font-weight: bold;
+            color: #ffffff;
+            text-align: right;
+        }
+        .ref-info {
+            font-size: 8pt;
+            color: #e2e8f0;
+            text-align: right;
+            margin-top: 5pt;
+            line-height: 1.5;
+        }
+        table.contact-strip {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #f1f5f9;
+            margin-bottom: 14pt;
+        }
+        table.contact-strip td {
+            border: none;
+            padding: 6pt 14pt;
+            font-size: 8pt;
+            color: #475569;
+        }
+
+        /* ---------- Section headers ---------- */
+        h2 {
+            font-size: 12pt;
+            color: #ffffff;
+            background-color: {{ app.college.theme_color|default:"#1e3a8a" }};
+            padding: 5pt 10pt;
+            margin: 16pt 0 0 0;
+        }
+
+        /* ---------- Data tables ---------- */
+        table.datatable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 0;
+        }
+        table.datatable th, table.datatable td {
+            padding: 7pt 10pt;
+            border: 1pt solid #e2e8f0;
+            text-align: left;
+            font-size: 10pt;
+        }
+        table.datatable th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: bold;
+            width: 32%;
+        }
+
+        /* ---------- Photo box ---------- */
         .photo-box {
-            width: 90pt;
-            height: 110pt;
-            border: 1pt solid #cccccc;
+            width: 95pt;
+            height: 115pt;
+            border: 1pt dashed #94a3b8;
             text-align: center;
             vertical-align: middle;
-            font-size: 8pt;
+            font-size: 7.5pt;
             color: #94a3b8;
+            background-color: #f8fafc;
         }
         .photo-box img {
-            width: 90pt;
-            height: 110pt;
+            width: 95pt;
+            height: 115pt;
+        }
+
+        /* ---------- Declaration / signatures ---------- */
+        .declaration {
+            font-size: 9pt;
+            color: #475569;
+            margin-top: 16pt;
+            line-height: 1.5;
+        }
+        table.sign-table {
+            width: 100%;
+            margin-top: 30pt;
+        }
+        table.sign-table td {
+            border: none;
+            font-size: 9.5pt;
+            color: #333333;
+            padding-top: 2pt;
+            width: 50%;
+        }
+
+        /* ---------- Office-use box ---------- */
+        .office-use {
+            margin-top: 20pt;
+            border: 1pt solid #cbd5e1;
+        }
+        .office-use .ou-title {
+            background-color: #f1f5f9;
+            color: #475569;
+            font-weight: bold;
+            font-size: 9pt;
+            padding: 5pt 10pt;
+        }
+        .office-use table {
+            width: 100%;
+        }
+        .office-use td {
+            border: none;
+            font-size: 9pt;
+            padding: 10pt 10pt 4pt 10pt;
+            color: #475569;
+            width: 50%;
+        }
+
+        .footer-text {
+            font-size: 8pt;
+            color: #94a3b8;
         }
     </style>
 </head>
 <body>
 
-    <div id="header_content"></div>
-    <div id="footer_content" class="text-right" style="font-size: 8pt; color: #94a3b8;">
-        Page <pdf:pagenumber> of <pdf:pagecount>
+    <div id="footer_content">
+        <table style="width:100%; border:none;">
+            <tr>
+                <td style="border:none; text-align:left;" class="footer-text">{{ app.college.name }}{% if app.college.website %} &nbsp;|&nbsp; {{ app.college.website }}{% endif %}</td>
+                <td style="border:none; text-align:right;" class="footer-text">Page <pdf:pagenumber> of <pdf:pagecount></td>
+            </tr>
+        </table>
     </div>
 
-    <table style="border: none; margin-bottom: 0;">
+    <!-- Letterhead -->
+    <table class="letterhead">
         <tr>
-            <td style="border: none; padding: 0; vertical-align: middle;">
-                <div class="header" style="text-align: left; margin-bottom: 0;">
-                    <h1 style="text-align: left;">{{ app.college.name }}</h1>
-                    <div><strong>ADMISSION APPLICATION FORM</strong></div>
-                    <div class="meta-info">Application Ref: {{ app.id }} | Date: {{ app.applied_at|date:"d M Y, h:i A" }}</div>
-                </div>
+            {% if app.college.logo_url %}
+            <td class="logo-cell"><img src="{{ app.college.logo_url }}" alt="Logo"></td>
+            {% endif %}
+            <td>
+                <div class="college-name">{{ app.college.name }}</div>
+                {% if app.college.affiliation %}<div class="college-affiliation">{{ app.college.affiliation }}</div>{% endif %}
             </td>
-            <td style="border: none; padding: 0; width: 100pt; text-align: right; vertical-align: top;">
-                <div class="photo-box">
-                    {% if app.student.photo %}
-                    <img src="{{ app.student.photo.url }}" alt="Passport Photo">
-                    {% else %}
-                    No Photo<br/>Provided
-                    {% endif %}
-                </div>
+            <td style="width:150pt;">
+                <div class="form-badge">ADMISSION<br/>APPLICATION FORM</div>
+                <div class="ref-info">Ref: APP{{ app.id|stringformat:"06d" }}<br/>Date: {{ app.applied_at|date:"d M Y" }}</div>
             </td>
         </tr>
     </table>
+    {% if app.college.address or app.college.contact_line %}
+    <table class="contact-strip">
+        <tr>
+            <td style="width:60%;">{{ app.college.address|default:"" }}</td>
+            <td style="text-align:right;">{{ app.college.contact_line }}</td>
+        </tr>
+    </table>
+    {% endif %}
 
-    <h2>Program Details</h2>
-    <table>
+    <!-- Program snapshot + photo -->
+    <table style="width:100%; border:none; margin-top:4pt;">
         <tr>
-            <th>College Name</th>
-            <td>{{ app.college.name }}</td>
-        </tr>
-        <tr>
-            <th>Course Applied</th>
-            <td>{{ app.course.name }}</td>
-        </tr>
-        {% if app.addon_course %}
-        <tr>
-            <th>Addon Course</th>
-            <td>{{ app.addon_course }}</td>
-        </tr>
-        {% endif %}
-        <tr>
-            <th>Reference</th>
-            <td>{{ app.source|default:"-" }}</td>
+            <td style="border:none; vertical-align:top; width:70%; padding:0;">
+                <table class="datatable">
+                    <tr><th>Course Applied</th><td>{{ app.course.name }}</td></tr>
+                    {% if app.addon_course %}<tr><th>Addon Course</th><td>{{ app.addon_course }}</td></tr>{% endif %}
+                    <tr><th>Reference Source</th><td>{{ app.source|default:"-" }}</td></tr>
+                </table>
+            </td>
+            <td style="border:none; width:30%; text-align:center; vertical-align:top; padding:0 0 0 14pt;">
+                <div class="photo-box">
+                    {% if app.student.photo %}<img src="{{ app.student.photo.url }}" alt="Photo">{% else %}Affix Recent<br/>Passport Size<br/>Photograph{% endif %}
+                </div>
+            </td>
         </tr>
     </table>
 
     <h2>Personal Details</h2>
-    <table>
-        <tr>
-            <th>Full Name</th>
-            <td>{{ app.student.name }}</td>
-        </tr>
-        <tr>
-            <th>Email Address</th>
-            <td>{{ app.student.email }}</td>
-        </tr>
-        <tr>
-            <th>Date of Birth</th>
-            <td>{{ app.student.dob|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Gender</th>
-            <td>{{ app.student.get_gender_display|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Aadhar Number</th>
-            <td>{{ app.student.aadhar_number|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Blood Group</th>
-            <td>{{ app.student.blood_group|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Category</th>
-            <td>{{ app.student.category|default:"Not Provided" }}</td>
-        </tr>
+    <table class="datatable">
+        <tr><th>Full Name</th><td>{{ app.student.name }}</td></tr>
+        <tr><th>Email Address</th><td>{{ app.student.email }}</td></tr>
+        <tr><th>Phone Number</th><td>{{ app.student.phone }}</td></tr>
+        <tr><th>Date of Birth</th><td>{{ app.student.dob|default:"Not Provided" }}</td></tr>
+        <tr><th>Gender</th><td>{{ app.student.get_gender_display|default:"Not Provided" }}</td></tr>
+        <tr><th>Aadhar Number</th><td>{{ app.student.aadhar_number|default:"Not Provided" }}</td></tr>
+        <tr><th>Blood Group</th><td>{{ app.student.blood_group|default:"Not Provided" }}</td></tr>
+        <tr><th>Category</th><td>{{ app.student.category|default:"Not Provided" }}</td></tr>
     </table>
 
     <h2>Address Details</h2>
-    <table>
-        <tr>
-            <th>Permanent Address</th>
-            <td>{{ app.student.permanent_address|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Correspondence Address</th>
-            <td>{{ app.student.correspondence_address|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>City, State</th>
-            <td>{{ app.student.city|default:"-" }}, {{ app.student.state|default:"-" }}</td>
-        </tr>
+    <table class="datatable">
+        <tr><th>Permanent Address</th><td>{{ app.student.permanent_address|default:"Not Provided" }}</td></tr>
+        <tr><th>Correspondence Address</th><td>{{ app.student.correspondence_address|default:"Not Provided" }}</td></tr>
+        <tr><th>City, State</th><td>{{ app.student.city|default:"-" }}, {{ app.student.state|default:"-" }}</td></tr>
     </table>
 
     <h2>Parent / Guardian Details</h2>
-    <table>
-        <tr>
-            <th>Father's Name</th>
-            <td>{{ app.student.father_name|default:"Not Provided" }}</td>
-        </tr>
-        <tr>
-            <th>Mother's Name</th>
-            <td>{{ app.student.mother_name|default:"Not Provided" }}</td>
-        </tr>
+    <table class="datatable">
+        <tr><th>Father's Name</th><td>{{ app.student.father_name|default:"Not Provided" }}</td></tr>
+        <tr><th>Father's Mobile</th><td>{{ app.student.father_mobile|default:"Not Provided" }}</td></tr>
+        <tr><th>Mother's Name</th><td>{{ app.student.mother_name|default:"Not Provided" }}</td></tr>
+        <tr><th>Mother's Mobile</th><td>{{ app.student.mother_mobile|default:"Not Provided" }}</td></tr>
         {% if app.student.guardian_name %}
-        <tr>
-            <th>Guardian's Name</th>
-            <td>{{ app.student.guardian_name }}</td>
-        </tr>
+        <tr><th>Guardian's Name</th><td>{{ app.student.guardian_name }}</td></tr>
         {% endif %}
     </table>
 
     <h2>Payment Details</h2>
-    <table>
+    <table class="datatable">
+        <tr><th>Payment Status</th><td>{{ app.payment_status }}</td></tr>
+        <tr><th>Transaction ID</th><td>{{ app.transaction_id|default:"-" }}</td></tr>
+        <tr><th>Amount Paid</th><td>Rs. {{ app.amount_paid|default:"0.00" }}</td></tr>
+    </table>
+
+    <div class="declaration">
+        I hereby declare that the information furnished above is true, complete and correct to the best of my
+        knowledge and belief. I understand that providing false information may lead to the cancellation of my
+        admission at any stage of the course.
+    </div>
+
+    <table class="sign-table">
         <tr>
-            <th>Payment Status</th>
-            <td>{{ app.payment_status }}</td>
+            <td>______________________________<br/>Signature of Candidate</td>
+            <td>______________________________<br/>Signature of Parent / Guardian</td>
         </tr>
         <tr>
-            <th>Transaction ID</th>
-            <td>{{ app.transaction_id|default:"-" }}</td>
-        </tr>
-        <tr>
-            <th>Amount Paid</th>
-            <td>₹{{ app.amount_paid|default:"0.00" }}</td>
+            <td style="padding-top:16pt;">Date: ___________________</td>
+            <td style="padding-top:16pt;">Date: ___________________</td>
         </tr>
     </table>
 
-    <div style="margin-top: 50px; font-size: 9pt; color: #64748b; text-align: center;">
-        <p>This is a computer-generated document and does not require a signature.</p>
-        <p>Processed through AdmissionPro Network.</p>
+    <div class="office-use">
+        <div class="ou-title">FOR OFFICE USE ONLY</div>
+        <table>
+            <tr>
+                <td>Documents Verified: &nbsp; [ ] Yes &nbsp;&nbsp; [ ] No</td>
+                <td>Fee Collected: Rs. _______________</td>
+            </tr>
+            <tr>
+                <td style="padding-top:16pt;">Verified By: ___________________</td>
+                <td style="padding-top:16pt;">Admission Officer Signature: ___________________</td>
+            </tr>
+        </table>
+    </div>
+
+    <div style="margin-top:16pt; font-size:8pt; color:#94a3b8; text-align:center;">
+        This is a computer-generated document and does not require a signature from AdmissionPro.<br/>
+        Processed through AdmissionPro Network.
     </div>
 
 </body>
