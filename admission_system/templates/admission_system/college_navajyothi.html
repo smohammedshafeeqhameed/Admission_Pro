@@ -1,0 +1,604 @@
+{% extends 'admission_system/college_base.html' %}
+{% load static %}
+
+{% block footer_contact %}
+<a href="tel:+914985240540" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#F2730F]"></i> (+91) 4985 240540
+</a>
+{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@600;700;800&family=Mulish:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="bg-white dark:bg-slate-950 selection:bg-[#F2730F] selection:text-white" style="--nj-blue:#0B4DA8;--nj-blue-deep:#063875;--nj-teal:#12818F;--nj-orange:#F2730F;--nj-orange-deep:#9A4607;--nj-paper:#F6F8FA;--nj-ink:#16202B;font-family:'Mulish',sans-serif;">
+
+    <!-- Rebrand the shared header for Navajyothi's blue / flame-orange identity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+                header.style.background = '#0B4DA8';
+                header.style.borderBottom = '1px solid #1A5FC2';
+                header.querySelectorAll('h2').forEach(el => { el.style.color = '#FFFFFF'; });
+                header.querySelectorAll('nav a').forEach(el => { el.style.color = '#CFE0F2'; });
+                const navApply = header.querySelector('a[href="#apply"]');
+                if (navApply) {
+                    navApply.style.background = '#F2730F';
+                    navApply.style.color = '#3D1A02';
+                    navApply.style.boxShadow = '0 10px 24px -8px rgba(242,115,15,0.5)';
+                }
+            }
+        });
+    </script>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="relative overflow-hidden pt-20 pb-24" id="about" style="background:var(--nj-blue-deep);">
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 grid lg:grid-cols-[1.05fr_0.95fr] gap-16 items-center">
+
+            <!-- Left: copy -->
+            <div>
+                <div class="bg-white rounded-2xl inline-block p-4 mb-9">
+                    <img src="{% static 'admission_system/images/logos/navajyothi_logo_color.png' %}" alt="Navajyothi College Cherupuzha"
+                        class="h-12 md:h-14 w-auto object-contain">
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F2730F]"></span> NAAC accredited &middot; Grade B++
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        Affiliated to Kannur University
+                    </span>
+                </div>
+
+                <h1 class="font-extrabold leading-[1.05] tracking-tight mb-7" style="font-family:'Libre Franklin',sans-serif; font-weight:800; color:#FFFFFF; font-size:clamp(2.4rem,4.4vw,3.8rem);">
+                    Lighted to enlighten
+                </h1>
+
+                <p class="text-[#B9CBE3] text-lg leading-relaxed mb-10 max-w-xl">
+                    Nestled in Cherupuzha, Kannur, Navajyothi College is an academic initiative of the CST Fathers of
+                    the Little Flower Congregation &mdash; begun in the early 2000s and blossoming, in 2010, into a
+                    self-financed college affiliated to Kannur University.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 mb-14">
+                    <a href="#apply"
+                        class="inline-flex items-center gap-3 font-bold py-4 px-9 rounded-xl text-base transition-all hover:-translate-y-0.5"
+                        style="background:var(--nj-orange); color:#3D1A02; box-shadow:0 18px 36px -12px rgba(242,115,15,0.5);">
+                        Apply now <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#programs"
+                        class="inline-flex items-center gap-3 font-semibold py-4 px-8 rounded-xl text-base transition-all border border-white/25 text-white">
+                        View programmes
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-3 gap-px rounded-2xl overflow-hidden border border-white/10 max-w-xl bg-white/10">
+                    <div class="bg-[#063875] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Libre Franklin',sans-serif;">2010</div>
+                        <div class="text-[11px] text-[#9BB4D6] font-medium mt-1">Est. as a college</div>
+                    </div>
+                    <div class="bg-[#063875] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Libre Franklin',sans-serif;">5</div>
+                        <div class="text-[11px] text-[#9BB4D6] font-medium mt-1">Degree programmes</div>
+                    </div>
+                    <div class="bg-[#063875] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Libre Franklin',sans-serif;">B++</div>
+                        <div class="text-[11px] text-[#9BB4D6] font-medium mt-1">NAAC grade</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: original flame-over-book illustration, echoing the "Lighted to Enlighten" motto -->
+            <div class="relative hidden lg:block">
+                <svg viewBox="0 0 520 520" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="260" cy="245" r="190" fill="none" stroke="#1A5FC2" stroke-width="1.5"/>
+                    <!-- rays -->
+                    <g stroke="#F2730F" stroke-width="3" stroke-linecap="round" opacity="0.55">
+                        <line x1="260" y1="60" x2="260" y2="95"/>
+                        <line x1="150" y1="95" x2="172" y2="118"/>
+                        <line x1="370" y1="95" x2="348" y2="118"/>
+                        <line x1="110" y1="190" x2="140" y2="195"/>
+                        <line x1="410" y1="190" x2="380" y2="195"/>
+                    </g>
+                    <!-- laurel sprigs -->
+                    <g fill="#1F7A3D">
+                        <ellipse cx="140" cy="340" rx="11" ry="20" transform="rotate(-20 140 340)"/>
+                        <ellipse cx="128" cy="375" rx="11" ry="20" transform="rotate(-5 128 375)"/>
+                        <ellipse cx="135" cy="410" rx="11" ry="20" transform="rotate(15 135 410)"/>
+                        <ellipse cx="380" cy="340" rx="11" ry="20" transform="rotate(20 380 340)"/>
+                        <ellipse cx="392" cy="375" rx="11" ry="20" transform="rotate(5 392 375)"/>
+                        <ellipse cx="385" cy="410" rx="11" ry="20" transform="rotate(-15 385 410)"/>
+                    </g>
+                    <g stroke="#1F7A3D" stroke-width="4" fill="none" stroke-linecap="round">
+                        <path d="M150 330 Q130 370 145 420"/>
+                        <path d="M370 330 Q390 370 375 420"/>
+                    </g>
+                    <!-- open book -->
+                    <path d="M160 360 L260 330 L360 360 L360 382 L260 352 L160 382 Z" fill="#0B4DA8"/>
+                    <path d="M160 360 L260 330 L260 352 L160 382 Z" fill="#063875"/>
+                    <!-- flame rising from the book -->
+                    <path d="M260 210 Q244 250 254 280 Q260 295 266 280 Q276 250 260 210 Z" fill="#F2730F"/>
+                    <path d="M260 235 Q252 258 258 275 Q260 282 264 275 Q270 258 260 235 Z" fill="#FBC23C"/>
+                    <line x1="260" y1="295" x2="260" y2="330" stroke="#063875" stroke-width="6"/>
+                    <text x="148" y="480" fill="#9BB4D6" font-size="11" font-family="monospace" letter-spacing="1">LIGHTED TO ENLIGHTEN &middot; CHERUPUZHA</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ HIGHLIGHTS STRIP ═══ -->
+    <section class="py-20 px-6 md:px-10">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="rounded-2xl p-9 border" style="border-color:rgba(11,77,168,0.12);">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(11,77,168,0.08);">
+                    <i data-lucide="book-open" class="w-5 h-5" style="color:var(--nj-blue);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Libre Franklin',sans-serif; color:var(--nj-blue);">A campus built for growth</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    A well-stocked library, a computer lab, a reprographic center and a career training center sit
+                    alongside the college canteen &mdash; a campus built for both study and placement readiness.
+                </p>
+            </div>
+            <div class="rounded-2xl p-9 border" style="border-color:rgba(11,77,168,0.12);">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(242,115,15,0.12);">
+                    <i data-lucide="flame" class="w-5 h-5" style="color:var(--nj-orange-deep);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Libre Franklin',sans-serif; color:var(--nj-blue);">Run by the CST Fathers</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    An academic initiative of the Little Flower Congregation's CST Fathers, recognising a
+                    community's yearning for higher education and answering it with a values-driven campus.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROGRAMMES ═══ -->
+    <section class="py-24 px-6 md:px-10" id="programs" style="background:var(--nj-paper);">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+                <div>
+                    <h2 class="font-extrabold tracking-tight mb-3" style="font-family:'Libre Franklin',sans-serif; color:var(--nj-blue); font-size:clamp(2.1rem,4.2vw,3.1rem);">
+                        Five degree programmes
+                    </h2>
+                    <p class="text-slate-500 text-lg max-w-xl">Commerce, computing, social work and psychology
+                        degrees under Kannur University, each paired with industry-relevant add-ons.</p>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7" id="courses">
+                {% for course in courses %}
+                <div class="nj-course-card" data-course="{% if 'BBA' in course.name %}bba{% elif 'BCA' in course.name %}bca{% elif 'BSW' in course.name %}bsw{% elif 'Psychology' in course.name %}psych{% else %}bcom{% endif %}">
+                    <div class="p-7">
+                        <div class="nj-course-icon">
+                            <i data-lucide="{% if 'BBA' in course.name %}briefcase{% elif 'BCA' in course.name %}laptop{% elif 'BSW' in course.name %}heart-handshake{% elif 'Psychology' in course.name %}brain{% else %}landmark{% endif %}" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="font-family:'Libre Franklin',sans-serif; color:var(--nj-blue);">{{ course.name }}</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-5">{{ course.description }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% for addon in course.addon_courses.all %}
+                            <span class="nj-addon-pill">
+                                <i data-lucide="check" class="w-3 h-3"></i> {{ addon.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ADMISSION FORM ═══ -->
+    <section class="py-24 px-4 md:px-10" id="apply">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-extrabold tracking-tight mb-5" style="font-family:'Libre Franklin',sans-serif; color:var(--nj-blue); font-size:clamp(2.1rem,4.2vw,3.1rem);">
+                    Start your application
+                </h2>
+                <p class="text-slate-500 text-lg max-w-xl mx-auto">Four short steps &mdash; your details, address,
+                    family information and documents.</p>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-[0_40px_90px_-30px_rgba(11,77,168,0.22)] border border-slate-100 overflow-hidden">
+
+                <!-- Step indicator -->
+                <div class="px-8 py-10 md:px-16" style="background:var(--nj-blue-deep);">
+                    <div class="flex items-center justify-between max-w-3xl mx-auto">
+                        <div id="step-1-btn" class="nj-step active">1<span class="nj-step-label">Identity</span></div>
+                        <div class="nj-line" id="connector-1"></div>
+                        <div id="step-2-btn" class="nj-step">2<span class="nj-step-label">Location</span></div>
+                        <div class="nj-line" id="connector-2"></div>
+                        <div id="step-3-btn" class="nj-step">3<span class="nj-step-label">Family</span></div>
+                        <div class="nj-line" id="connector-3"></div>
+                        <div id="step-4-btn" class="nj-step">4<span class="nj-step-label">Documents</span></div>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}"
+                    enctype="multipart/form-data" class="p-8 md:p-16" id="navajyothi-form">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                    <div class="space-y-4 mb-10">
+                        {% for message in messages %}
+                        <div class="p-5 rounded-xl border flex items-center gap-4 font-semibold
+                            {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
+                            {% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                            <i data-lucide="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}" class="w-5 h-5 shrink-0"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- STEP 1 -->
+                    <div id="step-1" class="step-content space-y-8">
+                        <div class="grid md:grid-cols-2 gap-7">
+                            <div class="nj-field">
+                                <label class="nj-label-text">Programme</label>
+                                {{ form.course }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Specialization (add-on)</label>
+                                {{ form.addon_course }}
+                            </div>
+                            <div class="md:col-span-2 nj-field">
+                                <label class="nj-label-text">Reference source</label>
+                                {{ form.source }}
+                            </div>
+                            <div class="md:col-span-2 nj-field">
+                                <label class="nj-label-text">Full name (as per certificates)</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Date of birth</label>
+                                {{ form.dob }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Gender</label>
+                                {{ form.gender }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Aadhar number</label>
+                                {{ form.aadhar_number }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Mobile number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Email address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Blood group</label>
+                                {{ form.blood_group }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Category</label>
+                                {{ form.category }}
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-6">
+                            <button type="button" onclick="goToStep(2)" class="nj-btn-primary">
+                                Location details <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="step-2" class="step-content hidden space-y-8">
+                        <div class="space-y-7">
+                            <div class="nj-field">
+                                <label class="nj-label-text">Permanent address</label>
+                                {{ form.permanent_address }}
+                            </div>
+                            <div class="nj-field">
+                                <label class="nj-label-text">Correspondence address</label>
+                                {{ form.correspondence_address }}
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-7">
+                                <div class="nj-field">
+                                    <label class="nj-label-text">State</label>
+                                    {{ form.state }}
+                                </div>
+                                <div class="nj-field">
+                                    <label class="nj-label-text">City / town</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(1)" class="nj-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(3)" class="nj-btn-primary">
+                                Family details <i data-lucide="users" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div id="step-3" class="step-content hidden space-y-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--nj-blue);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Father's details
+                                </h4>
+                                {{ form.father_name }}
+                                {{ form.father_mobile }}
+                                {{ form.father_occupation }}
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--nj-blue);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Mother's details
+                                </h4>
+                                {{ form.mother_name }}
+                                {{ form.mother_mobile }}
+                                {{ form.mother_occupation }}
+                            </div>
+                            <div class="md:col-span-2 rounded-2xl p-7 border-2 border-dashed space-y-5" style="background:rgba(242,115,15,0.06); border-color:rgba(242,115,15,0.35);">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--nj-orange-deep);">
+                                    <i data-lucide="shield" class="w-4 h-4"></i> Guardian &amp; emergency contact
+                                </h4>
+                                <div class="grid md:grid-cols-3 gap-5">
+                                    {{ form.guardian_name }}
+                                    {{ form.guardian_mobile }}
+                                    {{ form.preferred_contact }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(2)" class="nj-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(4)" class="nj-btn-primary">
+                                Upload documents <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="step-4" class="step-content hidden space-y-8">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="nj-upload-card" style="border-color:rgba(242,115,15,0.45);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(242,115,15,0.14); color:var(--nj-orange-deep);">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--nj-orange-deep);">Passport size photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-medium text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
+                            <div class="nj-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(11,77,168,0.08); color:var(--nj-blue);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">10th marksheet</span>
+                                </div>
+                                {{ form.doc_10th }}
+                            </div>
+                            <div class="nj-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(11,77,168,0.08); color:var(--nj-blue);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">11th marksheet</span>
+                                </div>
+                                {{ form.doc_11th }}
+                            </div>
+                            <div class="nj-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(11,77,168,0.08); color:var(--nj-blue);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">12th marksheet</span>
+                                </div>
+                                {{ form.doc_12th }}
+                            </div>
+                            <div class="nj-upload-card sm:col-span-2" style="border-color:rgba(242,115,15,0.45);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(242,115,15,0.14); color:var(--nj-orange-deep);">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--nj-orange-deep);">Aadhar document</span>
+                                </div>
+                                {{ form.doc_aadhar }}
+                            </div>
+                        </div>
+
+                        <!-- Fee banner -->
+                        <div class="relative rounded-[1.75rem] overflow-hidden p-10 md:p-12" style="background:var(--nj-blue-deep);">
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div>
+                                    <h4 class="text-white font-bold text-2xl mb-2" style="font-family:'Libre Franklin',sans-serif;">Registration fee</h4>
+                                    <p class="text-[#9BB4D6]">Non-refundable processing fee &middot; payable via UPI / bank transfer on the next step</p>
+                                </div>
+                                <div class="text-center shrink-0">
+                                    <div class="font-extrabold tracking-tight" style="font-size:3.2rem; line-height:1; font-family:'Libre Franklin',sans-serif; color:var(--nj-orange);">&#8377;1,500</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-6 pt-6">
+                            <button type="button" onclick="goToStep(3)" class="nj-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-3
+                                font-bold py-5 px-12 rounded-xl text-lg transition-all hover:-translate-y-0.5 active:scale-95"
+                                style="background:var(--nj-orange); color:#3D1A02; box-shadow:0 18px 36px -12px rgba(242,115,15,0.5);">
+                                Submit application <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER STRIP ═══ -->
+    <footer class="py-14 px-6" style="background:var(--nj-blue-deep);" id="contact">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+                <div class="text-white font-bold text-lg mb-1" style="font-family:'Libre Franklin',sans-serif;">Navajyothi College Cherupuzha</div>
+                <div class="text-[#9BB4D6] text-sm">P.B No. 5, Cherupuzha P.O, Kannur - 670511</div>
+            </div>
+            <div class="text-[#9BB4D6] text-sm">Affiliated to Kannur University &nbsp;|&nbsp; Run by the CST Fathers of the Little Flower Congregation</div>
+        </div>
+    </footer>
+
+</div><!-- end wrapper -->
+
+<style>
+    #navajyothi-form input, #navajyothi-form select, #navajyothi-form textarea {
+        background: #f7f8fa;
+        border: 2px solid #e2e7ec;
+        border-radius: 0.9rem;
+        padding: 0.95rem 1.25rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        width: 100%;
+        outline: none;
+        transition: all .25s ease;
+    }
+    #navajyothi-form input:focus, #navajyothi-form select:focus, #navajyothi-form textarea:focus {
+        border-color: var(--nj-blue);
+        background: white;
+        box-shadow: 0 8px 24px -8px rgba(11,77,168,0.2);
+    }
+    #navajyothi-form textarea { min-height: 110px; }
+
+    .nj-field { display:flex; flex-direction:column; gap:.5rem; }
+    .nj-label-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #64717d; padding-left: .15rem; }
+
+    .nj-course-card { position:relative; background:#fff; border:1px solid #e2e7ec; border-top:4px solid var(--nj-blue); border-radius:1.1rem; overflow:hidden; transition:all .3s; }
+    .nj-course-card:hover { transform:translateY(-3px); box-shadow:0 26px 54px -26px rgba(11,77,168,0.28); }
+    .nj-course-card[data-course="bba"] { border-top-color:var(--nj-orange); }
+    .nj-course-card[data-course="bca"] { border-top-color:var(--nj-teal); }
+    .nj-course-card[data-course="bsw"] { border-top-color:#1F7A3D; }
+    .nj-course-card[data-course="psych"] { border-top-color:#8E6FE0; }
+    .nj-course-icon { width:2.75rem; height:2.75rem; border-radius:0.85rem; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; background:rgba(11,77,168,0.08); color:var(--nj-blue); }
+    .nj-course-card[data-course="bba"] .nj-course-icon { background:rgba(242,115,15,0.14); color:var(--nj-orange-deep); }
+    .nj-course-card[data-course="bca"] .nj-course-icon { background:rgba(18,129,143,0.12); color:var(--nj-teal); }
+    .nj-course-card[data-course="bsw"] .nj-course-icon { background:rgba(31,122,61,0.12); color:#1F7A3D; }
+    .nj-course-card[data-course="psych"] .nj-course-icon { background:rgba(142,111,224,0.14); color:#6A4FC2; }
+    .nj-addon-pill { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px; color:var(--nj-orange-deep); border:1px solid rgba(242,115,15,0.35); background:rgba(242,115,15,0.08); }
+
+    .nj-step {
+        position: relative; display:flex; align-items:center; justify-content:center;
+        width: 3.25rem; height: 3.25rem; border-radius: 1rem;
+        background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+        font-weight: 700; font-size: 1.1rem; transition: all .45s cubic-bezier(.34,1.56,.64,1);
+        flex-shrink: 0; z-index: 2;
+    }
+    @media(min-width:768px){ .nj-step{ width:4rem; height:4rem; font-size:1.3rem; } }
+    .nj-step.active { background:white; color:var(--nj-blue); transform:scale(1.12); box-shadow:0 12px 30px -8px rgba(0,0,0,.35); }
+    .nj-step.completed { background:var(--nj-orange); color:#3D1A02; }
+    .nj-step-label { position:absolute; bottom:-1.9rem; left:50%; transform:translateX(-50%); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:rgba(255,255,255,0.4); white-space:nowrap; }
+    .nj-step.active .nj-step-label { color:#F2730F; }
+    @media(max-width:640px){ .nj-step-label{ display:none; } }
+    .nj-line { flex:1; height:4px; background:rgba(255,255,255,0.12); border-radius:999px; position:relative; overflow:hidden; margin: 0 .5rem; }
+    .nj-line::after { content:''; position:absolute; inset:0; background:var(--nj-orange); transform:translateX(-100%); transition:transform .7s ease; }
+    .nj-line.active::after { transform:translateX(0); }
+
+    .nj-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; background:var(--nj-blue); color:white; font-weight:700; padding:1.1rem 2.4rem; border-radius:1rem; font-size:1rem; transition:all .25s; box-shadow:0 10px 24px -8px rgba(11,77,168,0.35); width:100%; }
+    @media(min-width:640px){ .nj-btn-primary{ width:auto; } }
+    .nj-btn-primary:hover { background:var(--nj-blue-deep); transform:translateY(-2px); }
+    .nj-btn-back { display:inline-flex; align-items:center; gap:.5rem; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.15em; color:#94a3b8; transition:all .25s; }
+    .nj-btn-back:hover { color:var(--nj-blue); transform:translateX(-4px); }
+
+    .nj-upload-card { padding:1.6rem; border:2px dashed #e0e5ea; border-radius:1.4rem; background:#f7f8fa; transition:all .3s; }
+    .nj-upload-card:hover { border-color:var(--nj-blue); background:white; }
+</style>
+
+<script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
+    function goToStep(step) {
+        const currentStepEl = document.querySelector('.step-content:not(.hidden)');
+        let currentStep = 1;
+        if (currentStepEl) {
+            const m = currentStepEl.id.match(/\d+/);
+            if (m) {
+                currentStep = parseInt(m[0]);
+                if (step > currentStep) {
+                    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), select, textarea');
+                    for (let i = 0; i < inputs.length; i++) {
+                        if (!inputs[i].checkValidity()) { inputs[i].reportValidity(); return; }
+                    }
+                }
+            }
+        }
+
+        if (step > currentStep && currentStep === 1) {
+            const aadharInput = document.querySelector('input[name="aadhar_number"]');
+            const courseSelect = document.querySelector('select[name="course"]');
+            const aadhar = aadharInput ? aadharInput.value.trim() : '';
+            const courseId = courseSelect ? courseSelect.value : '';
+
+            if (aadhar && courseId) {
+                const nextBtn = currentStepEl.querySelector('button[onclick="goToStep(2)"]');
+                if (nextBtn) { nextBtn.disabled = true; nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>'; }
+
+                fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        if (data.exists) {
+                            let alertDiv = document.getElementById('duplicate-alert');
+                            if (!alertDiv) {
+                                alertDiv = document.createElement('div');
+                                alertDiv.id = 'duplicate-alert';
+                                currentStepEl.insertBefore(alertDiv, currentStepEl.firstChild);
+                            }
+                            alertDiv.className = 'p-5 rounded-xl bg-red-50 text-red-800 border-red-200 border-2 mb-8 font-semibold flex items-center gap-4';
+                            alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="flex-1">${data.message}</div>`;
+                            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                        const oldAlert = document.getElementById('duplicate-alert');
+                        if (oldAlert) oldAlert.remove();
+                        executeStepTransition(step);
+                    })
+                    .catch(() => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        executeStepTransition(step);
+                    });
+                return;
+            }
+        }
+        executeStepTransition(step);
+    }
+
+    function executeStepTransition(step) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step-' + step).classList.remove('hidden');
+        [1, 2, 3, 4].forEach(s => {
+            const btn = document.getElementById('step-' + s + '-btn');
+            const conn = document.getElementById('connector-' + s);
+            btn.classList.remove('active', 'completed');
+            if (conn) conn.classList.remove('active');
+            if (s < step) { btn.classList.add('completed'); if (conn) conn.classList.add('active'); }
+            else if (s === step) btn.classList.add('active');
+        });
+        document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}
