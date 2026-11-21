@@ -1,0 +1,626 @@
+{% extends 'admission_system/college_base.html' %}
+{% load static %}
+
+{% block footer_contact %}
+<a href="tel:+918606802255" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#E8793A]"></i> +91 86068 02255
+</a>
+{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="bg-white dark:bg-slate-950 selection:bg-[#E8793A] selection:text-white" style="--np-teal:#0B6E66;--np-teal-deep:#063F3B;--np-navy:#1B2E63;--np-coral:#E8793A;--np-gold:#C88A2E;--np-paper:#F5F7F6;">
+
+    <!-- Rebrand the shared header for Naipunnya's own teal / navy identity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+                header.style.background = '#FFFFFF';
+                header.style.borderBottom = '1px solid #e2e8e7';
+                header.querySelectorAll('h2').forEach(el => { el.style.color = 'var(--np-navy)'; });
+                header.querySelectorAll('nav a').forEach(el => { el.style.color = '#3f4b4a'; });
+                const navApply = header.querySelector('a[href="#apply"]');
+                if (navApply) {
+                    navApply.style.background = 'var(--np-coral)';
+                    navApply.style.boxShadow = '0 10px 24px -8px rgba(232,121,58,0.5)';
+                }
+            }
+        });
+    </script>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="relative overflow-hidden pt-16 pb-20 md:pb-28" id="about">
+
+        <!-- White masthead strip: the real logo at full, true-color visibility -->
+        <div class="relative z-10 flex flex-col items-center text-center px-6 pb-10 pt-4">
+            <div class="inline-flex items-center gap-4 bg-white rounded-[1.75rem] px-8 py-5 shadow-[0_20px_50px_-20px_rgba(27,46,99,0.25)] border border-slate-100">
+                <img src="{% static 'admission_system/images/logos/naipunnya_logo_navy.png' %}" alt="Naipunnya School of Management, Cherthala"
+                    class="h-14 md:h-16 w-auto object-contain">
+            </div>
+        </div>
+
+        <div class="relative" style="background:radial-gradient(ellipse 120% 100% at 50% 0%, #0E8178 0%, var(--np-teal) 45%, var(--np-teal-deep) 100%);">
+            <!-- Confetti-dot texture, echoing the real site's hero treatment -->
+            <div class="absolute inset-0 opacity-[0.16]" aria-hidden="true">
+                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="6%" cy="18%" r="4" fill="#E8793A"/>
+                    <circle cx="14%" cy="62%" r="3" fill="#C88A2E"/>
+                    <circle cx="22%" cy="30%" r="5" fill="#ffffff"/>
+                    <circle cx="33%" cy="78%" r="3" fill="#E8793A"/>
+                    <circle cx="48%" cy="14%" r="4" fill="#ffffff"/>
+                    <circle cx="58%" cy="55%" r="3" fill="#C88A2E"/>
+                    <circle cx="68%" cy="24%" r="5" fill="#E8793A"/>
+                    <circle cx="77%" cy="70%" r="4" fill="#ffffff"/>
+                    <circle cx="86%" cy="40%" r="3" fill="#C88A2E"/>
+                    <circle cx="93%" cy="80%" r="4" fill="#ffffff"/>
+                    <circle cx="90%" cy="12%" r="3" fill="#E8793A"/>
+                    <circle cx="40%" cy="42%" r="3" fill="#ffffff"/>
+                </svg>
+            </div>
+
+            <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 pt-16 pb-20 grid lg:grid-cols-[1.08fr_0.92fr] gap-16 items-center">
+
+                <!-- Left: copy -->
+                <div>
+                    <div class="flex flex-wrap items-center gap-3 mb-9">
+                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[#E8793A]"></span> 2027 batch admissions open
+                        </span>
+                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                            NAAC A grade
+                        </span>
+                        <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C88A2E]/40 bg-[#C88A2E]/10 text-[#f1d9a8] text-xs font-semibold tracking-wide">
+                            AICTE &middot; ISO 21001:2018
+                        </span>
+                    </div>
+
+                    <h1 class="font-semibold text-white leading-[1.08] tracking-tight mb-7"
+                        style="font-family:'Fraunces',serif; font-size:clamp(2.2rem,4.2vw,3.5rem);">
+                        Business leadership, built for the ones education hasn&rsquo;t reached yet
+                    </h1>
+
+                    <p class="text-slate-100/85 text-lg leading-relaxed mb-10 max-w-xl">
+                        Naipunnya School of Management, Cherthala, is NAAC-accredited with an A grade and affiliated
+                        to the University of Kerala &mdash; a project of the Archdiocese of Ernakulam&ndash;Angamaly
+                        built on excellence, community engagement and personal development.
+                    </p>
+
+                    <div class="flex flex-wrap items-center gap-4 mb-14">
+                        <a href="#apply"
+                            class="inline-flex items-center gap-3 bg-[#E8793A] hover:bg-[#d66a2f] text-white font-bold py-4 px-9 rounded-xl text-base transition-all hover:-translate-y-0.5 shadow-[0_18px_36px_-12px_rgba(232,121,58,0.55)]">
+                            Apply for 2027 batch <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#programs"
+                            class="inline-flex items-center gap-3 text-white/90 border border-white/25 hover:bg-white/10 font-semibold py-4 px-8 rounded-xl text-base transition-all">
+                            View programmes
+                        </a>
+                    </div>
+
+                    <div class="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/10 rounded-2xl overflow-hidden border border-white/10 max-w-xl">
+                        <div class="bg-[#0a4e49] px-4 py-5 text-center">
+                            <div class="text-2xl font-bold text-white" style="font-family:'Fraunces',serif;">A</div>
+                            <div class="text-[11px] text-slate-300 font-medium mt-1">NAAC grade</div>
+                        </div>
+                        <div class="bg-[#0a4e49] px-4 py-5 text-center">
+                            <div class="text-2xl font-bold text-white" style="font-family:'Fraunces',serif;">7</div>
+                            <div class="text-[11px] text-slate-300 font-medium mt-1">Programmes</div>
+                        </div>
+                        <div class="bg-[#0a4e49] px-4 py-5 text-center">
+                            <div class="text-2xl font-bold text-white" style="font-family:'Fraunces',serif;">4</div>
+                            <div class="text-[11px] text-slate-300 font-medium mt-1">Academic streams</div>
+                        </div>
+                        <div class="bg-[#0a4e49] px-4 py-5 text-center">
+                            <div class="text-2xl font-bold text-white" style="font-family:'Fraunces',serif;">UoK</div>
+                            <div class="text-[11px] text-slate-300 font-medium mt-1">Affiliated</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: ascent illustration, echoing the logo's leap-toward-a-star mark -->
+                <div class="relative hidden lg:block">
+                    <svg viewBox="0 0 520 480" class="w-full h-auto" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="40" y1="420" x2="480" y2="420" stroke="#ffffff" stroke-opacity="0.2" stroke-width="1.5"/>
+                        <rect x="70" y="330" width="52" height="90" rx="6" fill="#ffffff" fill-opacity="0.12"/>
+                        <rect x="152" y="280" width="52" height="140" rx="6" fill="#ffffff" fill-opacity="0.16"/>
+                        <rect x="234" y="210" width="52" height="210" rx="6" fill="#C88A2E" fill-opacity="0.55"/>
+                        <rect x="316" y="150" width="52" height="270" rx="6" fill="#ffffff" fill-opacity="0.2"/>
+                        <rect x="398" y="90" width="52" height="330" rx="6" fill="#E8793A" fill-opacity="0.85"/>
+                        <path d="M96 325 L178 272 L260 198 L342 138 L424 78" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="2 10"/>
+                        <circle cx="424" cy="78" r="8" fill="#E8793A"/>
+                        <path d="M424 78 L460 44 M424 78 L402 50" stroke="#ffffff" stroke-opacity="0.6" stroke-width="2"/>
+                        <g>
+                            <path d="M460 40 L464 50 L475 51 L466 58 L469 68 L460 62 L451 68 L454 58 L445 51 L456 50 Z" fill="#ffffff" fill-opacity="0.8"/>
+                        </g>
+                        <text x="42" y="445" fill="#ffffff" fill-opacity="0.35" font-size="11" font-family="monospace">NSM &middot; CHERTHALA</text>
+                        <text x="330" y="60" fill="#ffffff" fill-opacity="0.35" font-size="11" font-family="monospace">EST. BATCH 2027</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ MISSION / VISION STRIP ═══ -->
+    <section class="py-20 px-6 md:px-10" style="background:var(--np-paper);">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="bg-white rounded-2xl p-9 border border-slate-200/80 shadow-sm">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(27,46,99,0.08);">
+                    <i data-lucide="target" class="w-5 h-5" style="color:var(--np-navy);"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-3" style="font-family:'Fraunces',serif; color:var(--np-navy);">What &ldquo;Naipunnya&rdquo; means</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    Naipunnya is Sanskrit for expertise and mastery &mdash; the institution's guiding idea that
+                    professionalism, discipline and holistic student development shape every programme.
+                </p>
+            </div>
+            <div class="bg-white rounded-2xl p-9 border border-slate-200/80 shadow-sm">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(232,121,58,0.1);">
+                    <i data-lucide="compass" class="w-5 h-5" style="color:var(--np-coral);"></i>
+                </div>
+                <h3 class="font-semibold text-xl mb-3" style="font-family:'Fraunces',serif; color:var(--np-navy);">To reach the unreached</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    A transformative learning environment that shapes mind, character and intellect &mdash;
+                    empowering students to become socially committed, industry-ready graduates.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROGRAMMES ═══ -->
+    <section class="py-24 px-6 md:px-10" id="programs">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+                <div>
+                    <h2 class="font-semibold tracking-tight mb-3" style="font-family:'Fraunces',serif; color:var(--np-navy); font-size:clamp(2rem,4vw,3rem);">
+                        2027 batch programmes
+                    </h2>
+                    <p class="text-slate-500 text-lg max-w-xl">Seven undergraduate degrees across four academic
+                        streams, several with an industry add-on.</p>
+                </div>
+                <div class="flex flex-wrap gap-4 text-xs font-semibold">
+                    <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--np-coral);"></span> Arts</span>
+                    <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--np-navy);"></span> Business</span>
+                    <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--np-teal);"></span> Computing</span>
+                    <span class="inline-flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full" style="background:var(--np-gold);"></span> Commerce</span>
+                </div>
+            </div>
+
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7" id="courses">
+                {% for course in courses %}
+                <div class="np-course-card" data-stream="{% if 'English' in course.name %}arts{% elif 'Business Administration' in course.name %}business{% elif 'Computer Applications' in course.name or 'Computer Science' in course.name %}computing{% else %}commerce{% endif %}">
+                    <div class="np-stream-bar"></div>
+                    <div class="p-8">
+                        <div class="np-stream-icon">
+                            <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                        </div>
+                        <h3 class="font-semibold text-lg mb-2.5" style="font-family:'Fraunces',serif; color:var(--np-navy);">{{ course.name }}</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-5">{{ course.description }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% for addon in course.addon_courses.all %}
+                            <span class="np-addon-pill">
+                                <i data-lucide="check" class="w-3 h-3"></i> {{ addon.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ADMISSION FORM ═══ -->
+    <section class="py-24 px-4 md:px-10" id="apply" style="background:var(--np-paper);">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-semibold tracking-tight mb-5" style="font-family:'Fraunces',serif; color:var(--np-navy); font-size:clamp(2rem,4vw,3rem);">
+                    Start your application
+                </h2>
+                <p class="text-slate-500 text-lg max-w-xl mx-auto">Four short steps &mdash; your details, address,
+                    family information and documents.</p>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-[0_40px_90px_-30px_rgba(27,46,99,0.22)] border border-slate-100 overflow-hidden">
+
+                <!-- Step indicator -->
+                <div class="px-8 py-10 md:px-16" style="background:var(--np-navy);">
+                    <div class="flex items-center justify-between max-w-3xl mx-auto">
+                        <div id="step-1-btn" class="np-step active">1<span class="np-step-label">Identity</span></div>
+                        <div class="np-line" id="connector-1"></div>
+                        <div id="step-2-btn" class="np-step">2<span class="np-step-label">Location</span></div>
+                        <div class="np-line" id="connector-2"></div>
+                        <div id="step-3-btn" class="np-step">3<span class="np-step-label">Family</span></div>
+                        <div class="np-line" id="connector-3"></div>
+                        <div id="step-4-btn" class="np-step">4<span class="np-step-label">Documents</span></div>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}"
+                    enctype="multipart/form-data" class="p-8 md:p-16" id="naipunnya-form">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                    <div class="space-y-4 mb-10">
+                        {% for message in messages %}
+                        <div class="p-5 rounded-xl border flex items-center gap-4 font-semibold
+                            {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
+                            {% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                            <i data-lucide="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}" class="w-5 h-5 shrink-0"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- STEP 1 -->
+                    <div id="step-1" class="step-content space-y-8">
+                        <div class="grid md:grid-cols-2 gap-7">
+                            <div class="np-field">
+                                <label class="np-label-text">Programme</label>
+                                {{ form.course }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Specialization (add-on)</label>
+                                {{ form.addon_course }}
+                            </div>
+                            <div class="md:col-span-2 np-field">
+                                <label class="np-label-text">Reference source</label>
+                                {{ form.source }}
+                            </div>
+                            <div class="md:col-span-2 np-field">
+                                <label class="np-label-text">Full name (as per certificates)</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Date of birth</label>
+                                {{ form.dob }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Gender</label>
+                                {{ form.gender }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Aadhar number</label>
+                                {{ form.aadhar_number }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Mobile number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Email address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Blood group</label>
+                                {{ form.blood_group }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Category</label>
+                                {{ form.category }}
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-6">
+                            <button type="button" onclick="goToStep(2)" class="np-btn-primary">
+                                Location details <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="step-2" class="step-content hidden space-y-8">
+                        <div class="space-y-7">
+                            <div class="np-field">
+                                <label class="np-label-text">Permanent address</label>
+                                {{ form.permanent_address }}
+                            </div>
+                            <div class="np-field">
+                                <label class="np-label-text">Correspondence address</label>
+                                {{ form.correspondence_address }}
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-7">
+                                <div class="np-field">
+                                    <label class="np-label-text">State</label>
+                                    {{ form.state }}
+                                </div>
+                                <div class="np-field">
+                                    <label class="np-label-text">City / town</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(1)" class="np-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(3)" class="np-btn-primary">
+                                Family details <i data-lucide="users" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div id="step-3" class="step-content hidden space-y-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--np-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Father's details
+                                </h4>
+                                {{ form.father_name }}
+                                {{ form.father_mobile }}
+                                {{ form.father_occupation }}
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--np-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Mother's details
+                                </h4>
+                                {{ form.mother_name }}
+                                {{ form.mother_mobile }}
+                                {{ form.mother_occupation }}
+                            </div>
+                            <div class="md:col-span-2 rounded-2xl p-7 border-2 border-dashed space-y-5" style="background:rgba(232,121,58,0.05); border-color:rgba(232,121,58,0.3);">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:#b85f22;">
+                                    <i data-lucide="shield" class="w-4 h-4"></i> Guardian &amp; emergency contact
+                                </h4>
+                                <div class="grid md:grid-cols-3 gap-5">
+                                    {{ form.guardian_name }}
+                                    {{ form.guardian_mobile }}
+                                    {{ form.preferred_contact }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(2)" class="np-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(4)" class="np-btn-primary">
+                                Upload documents <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="step-4" class="step-content hidden space-y-8">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="np-upload-card" style="border-color:rgba(232,121,58,0.4);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(232,121,58,0.12); color:#b85f22;">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:#b85f22;">Passport size photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-medium text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
+                            <div class="np-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(27,46,99,0.08); color:var(--np-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">10th marksheet</span>
+                                </div>
+                                {{ form.doc_10th }}
+                            </div>
+                            <div class="np-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(27,46,99,0.08); color:var(--np-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">11th marksheet</span>
+                                </div>
+                                {{ form.doc_11th }}
+                            </div>
+                            <div class="np-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(27,46,99,0.08); color:var(--np-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">12th marksheet</span>
+                                </div>
+                                {{ form.doc_12th }}
+                            </div>
+                            <div class="np-upload-card sm:col-span-2" style="border-color:rgba(232,121,58,0.4);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(232,121,58,0.12); color:#b85f22;">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:#b85f22;">Aadhar document</span>
+                                </div>
+                                {{ form.doc_aadhar }}
+                            </div>
+                        </div>
+
+                        <!-- Fee banner -->
+                        <div class="relative rounded-[1.75rem] overflow-hidden p-10 md:p-12" style="background:var(--np-navy);">
+                            <div class="absolute inset-0 opacity-[0.12]"
+                                style="background-image:linear-gradient(#ffffff 1px, transparent 1px), linear-gradient(90deg, #ffffff 1px, transparent 1px); background-size: 28px 28px;"></div>
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div>
+                                    <h4 class="text-white font-semibold text-2xl mb-2" style="font-family:'Fraunces',serif;">Registration fee</h4>
+                                    <p class="text-slate-300/80">Non-refundable processing fee &middot; payable via UPI / bank transfer on the next step</p>
+                                </div>
+                                <div class="text-center shrink-0">
+                                    <div class="font-bold tracking-tight text-[#E8793A]" style="font-size:3.2rem; line-height:1; font-family:'Fraunces',serif;">&#8377;1,500</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-6 pt-6">
+                            <button type="button" onclick="goToStep(3)" class="np-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-3
+                                text-white font-bold py-5 px-12 rounded-xl text-lg transition-all hover:-translate-y-0.5 active:scale-95"
+                                style="background:var(--np-coral); box-shadow:0 18px 36px -12px rgba(232,121,58,0.55);">
+                                Submit application <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER STRIP ═══ -->
+    <footer class="py-14 px-6" style="background:var(--np-teal-deep);" id="contact">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+                <div class="text-white font-semibold text-lg mb-1" style="font-family:'Fraunces',serif;">Naipunnya School of Management, Cherthala</div>
+                <div class="text-slate-300 text-sm">Near Manorama Junction, Cherthala, Alappuzha, Kerala &ndash; 688524</div>
+            </div>
+            <div class="text-slate-300 text-sm">NAAC A Grade &nbsp;|&nbsp; Affiliated to University of Kerala &nbsp;|&nbsp; AICTE &amp; ISO 21001:2018</div>
+        </div>
+    </footer>
+
+</div><!-- end wrapper -->
+
+<style>
+    #naipunnya-form input, #naipunnya-form select, #naipunnya-form textarea {
+        background: #f8faf9;
+        border: 2px solid #e4e9e8;
+        border-radius: 0.9rem;
+        padding: 0.95rem 1.25rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        width: 100%;
+        outline: none;
+        transition: all .25s ease;
+    }
+    #naipunnya-form input:focus, #naipunnya-form select:focus, #naipunnya-form textarea:focus {
+        border-color: var(--np-navy);
+        background: white;
+        box-shadow: 0 8px 24px -8px rgba(27,46,99,0.2);
+    }
+    #naipunnya-form textarea { min-height: 110px; }
+
+    .np-field { display:flex; flex-direction:column; gap:.5rem; }
+    .np-label-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #64756f; padding-left: .15rem; }
+
+    .np-course-card { position:relative; background:#fff; border:1px solid #e5eae8; border-radius:1.5rem; overflow:hidden; transition:all .3s; }
+    .np-course-card:hover { transform:translateY(-3px); box-shadow:0 30px 60px -28px rgba(27,46,99,0.28); }
+    .np-stream-bar { height:6px; width:100%; background:var(--np-gold); }
+    .np-course-card[data-stream="arts"] .np-stream-bar { background:var(--np-coral); }
+    .np-course-card[data-stream="business"] .np-stream-bar { background:var(--np-navy); }
+    .np-course-card[data-stream="computing"] .np-stream-bar { background:var(--np-teal); }
+    .np-stream-icon { width:3rem; height:3rem; border-radius:0.9rem; display:flex; align-items:center; justify-content:center; margin-bottom:1.1rem; background:rgba(200,138,46,0.12); color:var(--np-gold); }
+    .np-course-card[data-stream="arts"] .np-stream-icon { background:rgba(232,121,58,0.1); color:var(--np-coral); }
+    .np-course-card[data-stream="business"] .np-stream-icon { background:rgba(27,46,99,0.08); color:var(--np-navy); }
+    .np-course-card[data-stream="computing"] .np-stream-icon { background:rgba(11,110,102,0.1); color:var(--np-teal); }
+    .np-addon-pill { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px; color:#1a6b63; border:1px solid rgba(11,110,102,0.3); background:rgba(11,110,102,0.07); }
+
+    .np-step {
+        position: relative; display:flex; align-items:center; justify-content:center;
+        width: 3.25rem; height: 3.25rem; border-radius: 1rem;
+        background: rgba(255,255,255,0.12); color: rgba(255,255,255,0.55);
+        font-weight: 700; font-size: 1.1rem; transition: all .45s cubic-bezier(.34,1.56,.64,1);
+        flex-shrink: 0; z-index: 2;
+    }
+    @media(min-width:768px){ .np-step{ width:4rem; height:4rem; font-size:1.3rem; } }
+    .np-step.active { background:white; color:var(--np-navy); transform:scale(1.12); box-shadow:0 12px 30px -8px rgba(0,0,0,.35); }
+    .np-step.completed { background:var(--np-coral); color:white; }
+    .np-step-label { position:absolute; bottom:-1.9rem; left:50%; transform:translateX(-50%); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:rgba(255,255,255,0.45); white-space:nowrap; }
+    .np-step.active .np-step-label { color:#E8793A; }
+    @media(max-width:640px){ .np-step-label{ display:none; } }
+    .np-line { flex:1; height:4px; background:rgba(255,255,255,0.15); border-radius:999px; position:relative; overflow:hidden; margin: 0 .5rem; }
+    .np-line::after { content:''; position:absolute; inset:0; background:var(--np-coral); transform:translateX(-100%); transition:transform .7s ease; }
+    .np-line.active::after { transform:translateX(0); }
+
+    .np-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; background:var(--np-navy); color:white; font-weight:700; padding:1.1rem 2.4rem; border-radius:1rem; font-size:1rem; transition:all .25s; box-shadow:0 10px 24px -8px rgba(27,46,99,0.35); width:100%; }
+    @media(min-width:640px){ .np-btn-primary{ width:auto; } }
+    .np-btn-primary:hover { background:#142350; transform:translateY(-2px); }
+    .np-btn-back { display:inline-flex; align-items:center; gap:.5rem; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.15em; color:#94a3b8; transition:all .25s; }
+    .np-btn-back:hover { color:var(--np-navy); transform:translateX(-4px); }
+
+    .np-upload-card { padding:1.6rem; border:2px dashed #e2e8e6; border-radius:1.4rem; background:#f8faf9; transition:all .3s; }
+    .np-upload-card:hover { border-color:var(--np-navy); background:white; }
+</style>
+
+<script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
+    function goToStep(step) {
+        const currentStepEl = document.querySelector('.step-content:not(.hidden)');
+        let currentStep = 1;
+        if (currentStepEl) {
+            const m = currentStepEl.id.match(/\d+/);
+            if (m) {
+                currentStep = parseInt(m[0]);
+                if (step > currentStep) {
+                    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), select, textarea');
+                    for (let i = 0; i < inputs.length; i++) {
+                        if (!inputs[i].checkValidity()) { inputs[i].reportValidity(); return; }
+                    }
+                }
+            }
+        }
+
+        if (step > currentStep && currentStep === 1) {
+            const aadharInput = document.querySelector('input[name="aadhar_number"]');
+            const courseSelect = document.querySelector('select[name="course"]');
+            const aadhar = aadharInput ? aadharInput.value.trim() : '';
+            const courseId = courseSelect ? courseSelect.value : '';
+
+            if (aadhar && courseId) {
+                const nextBtn = currentStepEl.querySelector('button[onclick="goToStep(2)"]');
+                if (nextBtn) { nextBtn.disabled = true; nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>'; }
+
+                fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        if (data.exists) {
+                            let alertDiv = document.getElementById('duplicate-alert');
+                            if (!alertDiv) {
+                                alertDiv = document.createElement('div');
+                                alertDiv.id = 'duplicate-alert';
+                                currentStepEl.insertBefore(alertDiv, currentStepEl.firstChild);
+                            }
+                            alertDiv.className = 'p-5 rounded-xl bg-red-50 text-red-800 border-red-200 border-2 mb-8 font-semibold flex items-center gap-4';
+                            alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="flex-1">${data.message}</div>`;
+                            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                        const oldAlert = document.getElementById('duplicate-alert');
+                        if (oldAlert) oldAlert.remove();
+                        executeStepTransition(step);
+                    })
+                    .catch(() => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        executeStepTransition(step);
+                    });
+                return;
+            }
+        }
+        executeStepTransition(step);
+    }
+
+    function executeStepTransition(step) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step-' + step).classList.remove('hidden');
+        [1, 2, 3, 4].forEach(s => {
+            const btn = document.getElementById('step-' + s + '-btn');
+            const conn = document.getElementById('connector-' + s);
+            btn.classList.remove('active', 'completed');
+            if (conn) conn.classList.remove('active');
+            if (s < step) { btn.classList.add('completed'); if (conn) conn.classList.add('active'); }
+            else if (s === step) btn.classList.add('active');
+        });
+        document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}
