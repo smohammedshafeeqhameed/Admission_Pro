@@ -1,0 +1,642 @@
+{% extends 'admission_system/college_base.html' %}
+{% load static %}
+
+{% block footer_contact %}
+<a href="tel:+919946106370" class="flex items-center gap-2 text-white font-bold hover:text-primary transition-colors">
+    <i data-lucide="phone" class="w-4 h-4 text-[#F0900A]"></i> +91 99461 06370
+</a>
+{% endblock %}
+
+{% block content %}
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<div class="bg-white dark:bg-slate-950 selection:bg-[#F0900A] selection:text-white" style="--aa-navy:#0A3A59;--aa-navy-deep:#052840;--aa-sky:#1C8FCB;--aa-gold:#F0900A;--aa-amber-deep:#9A5A06;--aa-paper:#F6F7F4;--aa-ink:#122530;font-family:'Source Sans 3',sans-serif;">
+
+    <!-- Rebrand the shared header for Al-Ameen's navy / gold identity -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('header');
+            if (header) {
+                header.classList.remove('bg-white/80', 'dark:bg-background-dark/80');
+                header.style.background = '#0A3A59';
+                header.style.borderBottom = '1px solid #164A6C';
+                header.querySelectorAll('h2').forEach(el => { el.style.color = '#FFFFFF'; });
+                header.querySelectorAll('nav a').forEach(el => { el.style.color = '#BFD7E6'; });
+                const navApply = header.querySelector('a[href="#apply"]');
+                if (navApply) {
+                    navApply.style.background = '#F0900A';
+                    navApply.style.color = '#2E1A02';
+                    navApply.style.boxShadow = '0 10px 24px -8px rgba(240,144,10,0.5)';
+                }
+            }
+        });
+    </script>
+
+    <!-- ═══ HERO ═══ -->
+    <section class="relative overflow-hidden pt-20 pb-24" id="about" style="background:var(--aa-navy);">
+        <div class="relative z-10 max-w-7xl mx-auto px-6 md:px-10 grid lg:grid-cols-[1.05fr_0.95fr] gap-16 items-center">
+
+            <!-- Left: copy -->
+            <div>
+                <div class="bg-white rounded-2xl inline-block p-4 mb-9">
+                    <img src="{% static 'admission_system/images/logos/alameen_logo_color.png' %}" alt="Al-Ameen Engineering College"
+                        class="h-12 md:h-14 w-auto object-contain">
+                </div>
+
+                <div class="flex flex-wrap items-center gap-3 mb-8">
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        <span class="w-1.5 h-1.5 rounded-full bg-[#F0900A]"></span> AICTE approved
+                    </span>
+                    <span class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 text-white text-xs font-semibold tracking-wide">
+                        Affiliated to APJ Abdul Kalam Technological University
+                    </span>
+                </div>
+
+                <h1 class="font-extrabold leading-[0.98] tracking-tight mb-7" style="font-family:'Big Shoulders Display',sans-serif; font-weight:800; color:#FFFFFF; font-size:clamp(2.6rem,4.8vw,4.1rem);">
+                    Twenty-one years of<br>precision engineering
+                </h1>
+
+                <p class="text-[#BFD7E6] text-lg leading-relaxed mb-10 max-w-xl">
+                    Al-Ameen Engineering College, run by Al-Ameen Educational Trust in Kulappully, Shornur, has grown
+                    into one of the fastest-growing engineering colleges in Palakkad district &mdash; seven B.Tech
+                    branches, two postgraduate programmes and a campus built around hands-on fieldwork.
+                </p>
+
+                <div class="flex flex-wrap items-center gap-4 mb-14">
+                    <a href="#apply"
+                        class="inline-flex items-center gap-3 font-bold py-4 px-9 rounded-xl text-base transition-all hover:-translate-y-0.5"
+                        style="background:var(--aa-gold); color:#2E1A02; box-shadow:0 18px 36px -12px rgba(240,144,10,0.5);">
+                        Apply now <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </a>
+                    <a href="#programs"
+                        class="inline-flex items-center gap-3 font-semibold py-4 px-8 rounded-xl text-base transition-all border border-white/25 text-white">
+                        View programmes
+                    </a>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/10 max-w-xl bg-white/10">
+                    <div class="bg-[#0A3A59] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Big Shoulders Display',sans-serif;">21</div>
+                        <div class="text-[11px] text-[#8FB2C7] font-medium mt-1">Years young</div>
+                    </div>
+                    <div class="bg-[#0A3A59] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Big Shoulders Display',sans-serif;">7</div>
+                        <div class="text-[11px] text-[#8FB2C7] font-medium mt-1">B.Tech branches</div>
+                    </div>
+                    <div class="bg-[#0A3A59] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Big Shoulders Display',sans-serif;">2</div>
+                        <div class="text-[11px] text-[#8FB2C7] font-medium mt-1">M.Tech programmes</div>
+                    </div>
+                    <div class="bg-[#0A3A59] px-4 py-5 text-center">
+                        <div class="text-2xl font-extrabold text-white" style="font-family:'Big Shoulders Display',sans-serif;">11</div>
+                        <div class="text-[11px] text-[#8FB2C7] font-medium mt-1">Total programmes</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: precision-dial motif, echoing the gear-and-instrument identity and the campus's own fieldwork photo -->
+            <div class="relative hidden lg:block">
+                <svg viewBox="0 0 520 520" class="w-full h-auto" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="260" cy="260" r="230" fill="none" stroke="#164A6C" stroke-width="1.5"/>
+                    <circle cx="260" cy="260" r="190" fill="none" stroke="#164A6C" stroke-width="1"/>
+                    <g stroke="#2E6A8F" stroke-width="2">
+                        <line x1="260" y1="30" x2="260" y2="60"/>
+                        <line x1="260" y1="460" x2="260" y2="490"/>
+                        <line x1="30" y1="260" x2="60" y2="260"/>
+                        <line x1="460" y1="260" x2="490" y2="260"/>
+                    </g>
+                    <g stroke="#2E6A8F" stroke-width="1" opacity="0.6">
+                        <line x1="113" y1="113" x2="134" y2="134"/>
+                        <line x1="407" y1="113" x2="386" y2="134"/>
+                        <line x1="113" y1="407" x2="134" y2="386"/>
+                        <line x1="407" y1="407" x2="386" y2="386"/>
+                    </g>
+                    <!-- tripod -->
+                    <g stroke="#1C8FCB" stroke-width="6" stroke-linecap="round" opacity="0.9">
+                        <line x1="260" y1="330" x2="180" y2="480"/>
+                        <line x1="260" y1="330" x2="260" y2="490"/>
+                        <line x1="260" y1="330" x2="340" y2="480"/>
+                    </g>
+                    <!-- instrument head -->
+                    <circle cx="260" cy="260" r="80" fill="#F0900A"/>
+                    <circle cx="260" cy="260" r="80" fill="none" stroke="#0A3A59" stroke-width="4"/>
+                    <circle cx="260" cy="260" r="46" fill="#0A3A59"/>
+                    <rect x="236" y="178" width="48" height="60" rx="8" fill="#0A3A59"/>
+                    <circle cx="260" cy="200" r="14" fill="#F0900A"/>
+                    <g stroke="#FFFFFF" stroke-width="2" opacity="0.5">
+                        <line x1="260" y1="220" x2="260" y2="300"/>
+                        <line x1="220" y1="260" x2="300" y2="260"/>
+                    </g>
+                    <text x="130" y="505" fill="#8FB2C7" font-size="11" font-family="monospace" letter-spacing="1">AEC &middot; SHORNUR, PALAKKAD</text>
+                </svg>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ VISION / MISSION STRIP ═══ -->
+    <section class="py-20 px-6 md:px-10">
+        <div class="max-w-7xl mx-auto grid md:grid-cols-2 gap-8">
+            <div class="rounded-2xl p-9 border" style="border-color:rgba(10,58,89,0.12);">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(10,58,89,0.08);">
+                    <i data-lucide="target" class="w-5 h-5" style="color:var(--aa-navy);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy);">Vision</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    To be the most dynamic engineering college in Palakkad district, empowering students to become
+                    contributing affiliates of a technological society through rigorous, hands-on education.
+                </p>
+            </div>
+            <div class="rounded-2xl p-9 border" style="border-color:rgba(10,58,89,0.12);">
+                <div class="w-11 h-11 rounded-xl flex items-center justify-center mb-6" style="background:rgba(240,144,10,0.1);">
+                    <i data-lucide="compass" class="w-5 h-5" style="color:var(--aa-gold);"></i>
+                </div>
+                <h3 class="font-bold text-xl mb-3" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy);">Mission</h3>
+                <p class="text-slate-600 leading-relaxed">
+                    Quality education and benevolent service for the blooming generation &mdash; an intellectually
+                    diverse campus, state-of-the-art facilities and guidance that prepares students for multifaceted
+                    career opportunities.
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ PROGRAMMES ═══ -->
+    <section class="py-24 px-6 md:px-10" id="programs" style="background:var(--aa-paper);">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
+                <div>
+                    <h2 class="font-extrabold tracking-tight mb-3" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy); font-size:clamp(2.1rem,4.2vw,3.1rem);">
+                        Programmes on offer
+                    </h2>
+                    <p class="text-slate-500 text-lg max-w-xl">Eleven programmes across engineering, computing and
+                        business &mdash; two of them with a choice of industry specializations.</p>
+                </div>
+            </div>
+
+            <h3 class="font-bold text-sm uppercase tracking-[0.18em] mb-5" style="color:var(--aa-amber-deep);">B.Tech programmes</h3>
+            <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-16" id="btech-courses">
+                {% for course in courses %}
+                {% if 'B.Tech' in course.name %}
+                <div class="aa-course-card">
+                    <div class="p-7">
+                        <div class="aa-course-icon">
+                            <i data-lucide="{% if 'Electronics & Communication' in course.name %}radio{% elif 'Electrical & Electronics' in course.name %}zap{% elif 'Mechanical' in course.name %}cog{% elif 'Civil' in course.name %}building-2{% elif 'Cyber Security' in course.name %}shield{% elif 'Artificial Intelligence' in course.name %}brain{% else %}cpu{% endif %}" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy);">{{ course.name }}</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">{{ course.description }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <h3 class="font-bold text-sm uppercase tracking-[0.18em] mb-5" style="color:var(--aa-amber-deep);">Undergraduate programmes &middot; with specializations</h3>
+            <div class="grid sm:grid-cols-2 gap-7 mb-16" id="ug-courses">
+                {% for course in courses %}
+                {% if 'BCA' in course.name or 'BBA' in course.name %}
+                <div class="aa-course-card aa-course-card--gold">
+                    <div class="p-8">
+                        <div class="aa-course-icon aa-course-icon--gold">
+                            <i data-lucide="{% if 'BCA' in course.name %}laptop{% else %}briefcase{% endif %}" class="w-6 h-6"></i>
+                        </div>
+                        <h4 class="font-bold text-xl mb-2.5" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy);">{{ course.name }}</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed mb-5">{{ course.description }}</p>
+                        <div class="flex flex-wrap gap-2">
+                            {% for addon in course.addon_courses.all %}
+                            <span class="aa-addon-pill">
+                                <i data-lucide="check" class="w-3 h-3"></i> {{ addon.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <h3 class="font-bold text-sm uppercase tracking-[0.18em] mb-5" style="color:var(--aa-amber-deep);">M.Tech programmes</h3>
+            <div class="grid sm:grid-cols-2 gap-6" id="mtech-courses">
+                {% for course in courses %}
+                {% if 'M.Tech' in course.name %}
+                <div class="aa-course-card aa-course-card--outline">
+                    <div class="p-7">
+                        <div class="aa-course-icon">
+                            <i data-lucide="{% if 'Electronics' in course.name %}radio-tower{% else %}zap{% endif %}" class="w-5 h-5"></i>
+                        </div>
+                        <h4 class="font-bold text-lg mb-2" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy);">{{ course.name }}</h4>
+                        <p class="text-slate-500 text-sm leading-relaxed">{{ course.description }}</p>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ ADMISSION FORM ═══ -->
+    <section class="py-24 px-4 md:px-10" id="apply">
+        <div class="max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="font-extrabold tracking-tight mb-5" style="font-family:'Big Shoulders Display',sans-serif; color:var(--aa-navy); font-size:clamp(2.1rem,4.2vw,3.1rem);">
+                    Start your application
+                </h2>
+                <p class="text-slate-500 text-lg max-w-xl mx-auto">Four short steps &mdash; your details, address,
+                    family information and documents.</p>
+            </div>
+
+            <div class="bg-white rounded-[2.5rem] shadow-[0_40px_90px_-30px_rgba(10,58,89,0.22)] border border-slate-100 overflow-hidden">
+
+                <!-- Step indicator -->
+                <div class="px-8 py-10 md:px-16" style="background:var(--aa-navy-deep);">
+                    <div class="flex items-center justify-between max-w-3xl mx-auto">
+                        <div id="step-1-btn" class="aa-step active">1<span class="aa-step-label">Identity</span></div>
+                        <div class="aa-line" id="connector-1"></div>
+                        <div id="step-2-btn" class="aa-step">2<span class="aa-step-label">Location</span></div>
+                        <div class="aa-line" id="connector-2"></div>
+                        <div id="step-3-btn" class="aa-step">3<span class="aa-step-label">Family</span></div>
+                        <div class="aa-line" id="connector-3"></div>
+                        <div id="step-4-btn" class="aa-step">4<span class="aa-step-label">Documents</span></div>
+                    </div>
+                </div>
+
+                <form method="post" action="{% url 'apply_admission' college.slug username cre_id %}"
+                    enctype="multipart/form-data" class="p-8 md:p-16" id="alameen-form">
+                    {% csrf_token %}
+
+                    {% if messages %}
+                    <div class="space-y-4 mb-10">
+                        {% for message in messages %}
+                        <div class="p-5 rounded-xl border flex items-center gap-4 font-semibold
+                            {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
+                            {% else %}bg-red-50 border-red-200 text-red-800{% endif %}">
+                            <i data-lucide="{% if message.tags == 'success' %}check-circle{% else %}alert-circle{% endif %}" class="w-5 h-5 shrink-0"></i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <!-- STEP 1 -->
+                    <div id="step-1" class="step-content space-y-8">
+                        <div class="grid md:grid-cols-2 gap-7">
+                            <div class="aa-field">
+                                <label class="aa-label-text">Programme</label>
+                                {{ form.course }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Specialization (add-on)</label>
+                                {{ form.addon_course }}
+                            </div>
+                            <div class="md:col-span-2 aa-field">
+                                <label class="aa-label-text">Reference source</label>
+                                {{ form.source }}
+                            </div>
+                            <div class="md:col-span-2 aa-field">
+                                <label class="aa-label-text">Full name (as per certificates)</label>
+                                {{ form.name }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Date of birth</label>
+                                {{ form.dob }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Gender</label>
+                                {{ form.gender }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Aadhar number</label>
+                                {{ form.aadhar_number }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Mobile number</label>
+                                {{ form.phone }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Email address</label>
+                                {{ form.email }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Blood group</label>
+                                {{ form.blood_group }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Category</label>
+                                {{ form.category }}
+                            </div>
+                        </div>
+                        <div class="flex justify-end pt-6">
+                            <button type="button" onclick="goToStep(2)" class="aa-btn-primary">
+                                Location details <i data-lucide="map-pin" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2 -->
+                    <div id="step-2" class="step-content hidden space-y-8">
+                        <div class="space-y-7">
+                            <div class="aa-field">
+                                <label class="aa-label-text">Permanent address</label>
+                                {{ form.permanent_address }}
+                            </div>
+                            <div class="aa-field">
+                                <label class="aa-label-text">Correspondence address</label>
+                                {{ form.correspondence_address }}
+                            </div>
+                            <div class="grid md:grid-cols-2 gap-7">
+                                <div class="aa-field">
+                                    <label class="aa-label-text">State</label>
+                                    {{ form.state }}
+                                </div>
+                                <div class="aa-field">
+                                    <label class="aa-label-text">City / town</label>
+                                    {{ form.city }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(1)" class="aa-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(3)" class="aa-btn-primary">
+                                Family details <i data-lucide="users" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 3 -->
+                    <div id="step-3" class="step-content hidden space-y-8">
+                        <div class="grid md:grid-cols-2 gap-8">
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--aa-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Father's details
+                                </h4>
+                                {{ form.father_name }}
+                                {{ form.father_mobile }}
+                                {{ form.father_occupation }}
+                            </div>
+                            <div class="bg-slate-50 rounded-2xl p-7 space-y-5 border border-slate-100">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--aa-navy);">
+                                    <i data-lucide="user" class="w-4 h-4"></i> Mother's details
+                                </h4>
+                                {{ form.mother_name }}
+                                {{ form.mother_mobile }}
+                                {{ form.mother_occupation }}
+                            </div>
+                            <div class="md:col-span-2 rounded-2xl p-7 border-2 border-dashed space-y-5" style="background:rgba(240,144,10,0.06); border-color:rgba(240,144,10,0.35);">
+                                <h4 class="font-bold text-sm uppercase tracking-wider flex items-center gap-2" style="color:var(--aa-amber-deep);">
+                                    <i data-lucide="shield" class="w-4 h-4"></i> Guardian &amp; emergency contact
+                                </h4>
+                                <div class="grid md:grid-cols-3 gap-5">
+                                    {{ form.guardian_name }}
+                                    {{ form.guardian_mobile }}
+                                    {{ form.preferred_contact }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between items-center pt-6">
+                            <button type="button" onclick="goToStep(2)" class="aa-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="button" onclick="goToStep(4)" class="aa-btn-primary">
+                                Upload documents <i data-lucide="paperclip" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- STEP 4 -->
+                    <div id="step-4" class="step-content hidden space-y-8">
+                        <div class="grid sm:grid-cols-2 gap-6">
+                            <div class="aa-upload-card" style="border-color:rgba(240,144,10,0.45);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(240,144,10,0.14); color:var(--aa-amber-deep);">
+                                        <i data-lucide="user-square" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--aa-amber-deep);">Passport size photo</span>
+                                </div>
+                                {{ form.photo }}
+                                <p class="text-[11px] font-medium text-slate-400 mt-3">JPEG/PNG only, max 2MB, passport-style portrait photo.</p>
+                            </div>
+                            <div class="aa-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(10,58,89,0.08); color:var(--aa-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">10th marksheet</span>
+                                </div>
+                                {{ form.doc_10th }}
+                            </div>
+                            <div class="aa-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(10,58,89,0.08); color:var(--aa-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">11th marksheet</span>
+                                </div>
+                                {{ form.doc_11th }}
+                            </div>
+                            <div class="aa-upload-card">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(10,58,89,0.08); color:var(--aa-navy);">
+                                        <i data-lucide="file" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider text-slate-500">12th marksheet</span>
+                                </div>
+                                {{ form.doc_12th }}
+                            </div>
+                            <div class="aa-upload-card sm:col-span-2" style="border-color:rgba(240,144,10,0.45);">
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(240,144,10,0.14); color:var(--aa-amber-deep);">
+                                        <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                    </div>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--aa-amber-deep);">Aadhar document</span>
+                                </div>
+                                {{ form.doc_aadhar }}
+                            </div>
+                        </div>
+
+                        <!-- Fee banner -->
+                        <div class="relative rounded-[1.75rem] overflow-hidden p-10 md:p-12" style="background:var(--aa-navy-deep);">
+                            <div class="relative z-10 flex flex-col md:flex-row items-center justify-between gap-8">
+                                <div>
+                                    <h4 class="text-white font-bold text-2xl mb-2" style="font-family:'Big Shoulders Display',sans-serif;">Registration fee</h4>
+                                    <p class="text-[#8FB2C7]">Non-refundable processing fee &middot; payable via UPI / bank transfer on the next step</p>
+                                </div>
+                                <div class="text-center shrink-0">
+                                    <div class="font-extrabold tracking-tight" style="font-size:3.2rem; line-height:1; font-family:'Big Shoulders Display',sans-serif; color:var(--aa-gold);">&#8377;1,500</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col-reverse sm:flex-row justify-between items-center gap-6 pt-6">
+                            <button type="button" onclick="goToStep(3)" class="aa-btn-back">
+                                <i data-lucide="arrow-left" class="w-5 h-5"></i> Back
+                            </button>
+                            <button type="submit" id="submit-btn" class="hidden w-full sm:w-auto inline-flex items-center justify-center gap-3
+                                font-bold py-5 px-12 rounded-xl text-lg transition-all hover:-translate-y-0.5 active:scale-95"
+                                style="background:var(--aa-gold); color:#2E1A02; box-shadow:0 18px 36px -12px rgba(240,144,10,0.5);">
+                                Submit application <i data-lucide="send" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ═══ FOOTER STRIP ═══ -->
+    <footer class="py-14 px-6" style="background:var(--aa-navy-deep);" id="contact">
+        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
+            <div>
+                <div class="text-white font-bold text-lg mb-1" style="font-family:'Big Shoulders Display',sans-serif;">Al-Ameen Engineering College</div>
+                <div class="text-[#8FB2C7] text-sm">Kulappully, Shornur, Palakkad, Kerala &middot; managed by Al-Ameen Educational Trust</div>
+            </div>
+            <div class="text-[#8FB2C7] text-sm">AICTE approved &nbsp;|&nbsp; Affiliated to APJ Abdul Kalam Technological University</div>
+        </div>
+    </footer>
+
+</div><!-- end wrapper -->
+
+<style>
+    #alameen-form input, #alameen-form select, #alameen-form textarea {
+        background: #f7f8f7;
+        border: 2px solid #e6e9ec;
+        border-radius: 0.9rem;
+        padding: 0.95rem 1.25rem;
+        font-weight: 500;
+        font-size: 0.95rem;
+        width: 100%;
+        outline: none;
+        transition: all .25s ease;
+    }
+    #alameen-form input:focus, #alameen-form select:focus, #alameen-form textarea:focus {
+        border-color: var(--aa-sky);
+        background: white;
+        box-shadow: 0 8px 24px -8px rgba(28,143,203,0.25);
+    }
+    #alameen-form textarea { min-height: 110px; }
+
+    .aa-field { display:flex; flex-direction:column; gap:.5rem; }
+    .aa-label-text { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .12em; color: #6b7681; padding-left: .15rem; }
+
+    .aa-course-card { position:relative; background:#fff; border:1px solid #e6e9ec; border-top:4px solid var(--aa-navy); border-radius:1.1rem; overflow:hidden; transition:all .3s; }
+    .aa-course-card:hover { transform:translateY(-3px); box-shadow:0 26px 54px -26px rgba(10,58,89,0.28); }
+    .aa-course-card--gold { border-top-color:var(--aa-gold); }
+    .aa-course-card--outline { border-top-color:var(--aa-sky); }
+    .aa-course-icon { width:2.75rem; height:2.75rem; border-radius:0.85rem; display:flex; align-items:center; justify-content:center; margin-bottom:1rem; background:rgba(10,58,89,0.08); color:var(--aa-navy); }
+    .aa-course-icon--gold { background:rgba(240,144,10,0.12); color:var(--aa-amber-deep); }
+    .aa-addon-pill { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; padding:5px 11px; border-radius:999px; color:var(--aa-amber-deep); border:1px solid rgba(240,144,10,0.35); background:rgba(240,144,10,0.08); }
+
+    .aa-step {
+        position: relative; display:flex; align-items:center; justify-content:center;
+        width: 3.25rem; height: 3.25rem; border-radius: 1rem;
+        background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.5);
+        font-weight: 700; font-size: 1.1rem; transition: all .45s cubic-bezier(.34,1.56,.64,1);
+        flex-shrink: 0; z-index: 2;
+    }
+    @media(min-width:768px){ .aa-step{ width:4rem; height:4rem; font-size:1.3rem; } }
+    .aa-step.active { background:white; color:var(--aa-navy); transform:scale(1.12); box-shadow:0 12px 30px -8px rgba(0,0,0,.35); }
+    .aa-step.completed { background:var(--aa-gold); color:#2E1A02; }
+    .aa-step-label { position:absolute; bottom:-1.9rem; left:50%; transform:translateX(-50%); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.2em; color:rgba(255,255,255,0.4); white-space:nowrap; }
+    .aa-step.active .aa-step-label { color:#F0900A; }
+    @media(max-width:640px){ .aa-step-label{ display:none; } }
+    .aa-line { flex:1; height:4px; background:rgba(255,255,255,0.12); border-radius:999px; position:relative; overflow:hidden; margin: 0 .5rem; }
+    .aa-line::after { content:''; position:absolute; inset:0; background:var(--aa-gold); transform:translateX(-100%); transition:transform .7s ease; }
+    .aa-line.active::after { transform:translateX(0); }
+
+    .aa-btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:.65rem; background:var(--aa-navy); color:white; font-weight:700; padding:1.1rem 2.4rem; border-radius:1rem; font-size:1rem; transition:all .25s; box-shadow:0 10px 24px -8px rgba(10,58,89,0.35); width:100%; }
+    @media(min-width:640px){ .aa-btn-primary{ width:auto; } }
+    .aa-btn-primary:hover { background:var(--aa-navy-deep); transform:translateY(-2px); }
+    .aa-btn-back { display:inline-flex; align-items:center; gap:.5rem; font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.15em; color:#94a3b8; transition:all .25s; }
+    .aa-btn-back:hover { color:var(--aa-navy); transform:translateX(-4px); }
+
+    .aa-upload-card { padding:1.6rem; border:2px dashed #e3e7ea; border-radius:1.4rem; background:#f7f8f7; transition:all .3s; }
+    .aa-upload-card:hover { border-color:var(--aa-navy); background:white; }
+</style>
+
+<script>
+    const COLLEGE_SLUG = '{{ college.slug }}';
+
+    function goToStep(step) {
+        const currentStepEl = document.querySelector('.step-content:not(.hidden)');
+        let currentStep = 1;
+        if (currentStepEl) {
+            const m = currentStepEl.id.match(/\d+/);
+            if (m) {
+                currentStep = parseInt(m[0]);
+                if (step > currentStep) {
+                    const inputs = currentStepEl.querySelectorAll('input:not([type="hidden"]), select, textarea');
+                    for (let i = 0; i < inputs.length; i++) {
+                        if (!inputs[i].checkValidity()) { inputs[i].reportValidity(); return; }
+                    }
+                }
+            }
+        }
+
+        if (step > currentStep && currentStep === 1) {
+            const aadharInput = document.querySelector('input[name="aadhar_number"]');
+            const courseSelect = document.querySelector('select[name="course"]');
+            const aadhar = aadharInput ? aadharInput.value.trim() : '';
+            const courseId = courseSelect ? courseSelect.value : '';
+
+            if (aadhar && courseId) {
+                const nextBtn = currentStepEl.querySelector('button[onclick="goToStep(2)"]');
+                if (nextBtn) { nextBtn.disabled = true; nextBtn.innerHTML = '<span class="animate-pulse">Checking...</span>'; }
+
+                fetch(`/api/check-duplicate/?aadhar_number=${encodeURIComponent(aadhar)}&course_id=${encodeURIComponent(courseId)}&college_slug=${encodeURIComponent(COLLEGE_SLUG)}`)
+                    .then(r => r.json())
+                    .then(data => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        if (data.exists) {
+                            let alertDiv = document.getElementById('duplicate-alert');
+                            if (!alertDiv) {
+                                alertDiv = document.createElement('div');
+                                alertDiv.id = 'duplicate-alert';
+                                currentStepEl.insertBefore(alertDiv, currentStepEl.firstChild);
+                            }
+                            alertDiv.className = 'p-5 rounded-xl bg-red-50 text-red-800 border-red-200 border-2 mb-8 font-semibold flex items-center gap-4';
+                            alertDiv.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7 shrink-0 text-red-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><div class="flex-1">${data.message}</div>`;
+                            document.getElementById('apply').scrollIntoView({ behavior: 'smooth' });
+                            return;
+                        }
+                        const oldAlert = document.getElementById('duplicate-alert');
+                        if (oldAlert) oldAlert.remove();
+                        executeStepTransition(step);
+                    })
+                    .catch(() => {
+                        if (nextBtn) {
+                            nextBtn.disabled = false;
+                            nextBtn.innerHTML = 'Location details <i data-lucide="map-pin" class="w-5 h-5"></i>';
+                            if (typeof lucide !== 'undefined') lucide.createIcons();
+                        }
+                        executeStepTransition(step);
+                    });
+                return;
+            }
+        }
+        executeStepTransition(step);
+    }
+
+    function executeStepTransition(step) {
+        document.querySelectorAll('.step-content').forEach(el => el.classList.add('hidden'));
+        document.getElementById('step-' + step).classList.remove('hidden');
+        [1, 2, 3, 4].forEach(s => {
+            const btn = document.getElementById('step-' + s + '-btn');
+            const conn = document.getElementById('connector-' + s);
+            btn.classList.remove('active', 'completed');
+            if (conn) conn.classList.remove('active');
+            if (s < step) { btn.classList.add('completed'); if (conn) conn.classList.add('active'); }
+            else if (s === step) btn.classList.add('active');
+        });
+        document.getElementById('apply').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    });
+</script>
+{% endblock %}
