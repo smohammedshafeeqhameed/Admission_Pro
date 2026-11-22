@@ -41,6 +41,7 @@ urlpatterns = [
     path('cre/applications/<int:app_id>/apply-commission/', views.CREApplyCommissionView.as_view(), name='cre_apply_commission'),
     path('finance-dashboard/commissions/', views.FinanceCommissionDashboardView.as_view(), name='finance_commission_dashboard'),
     path('finance-dashboard/commissions/<int:app_id>/action/', views.FinanceCommissionActionView.as_view(), name='finance_commission_action'),
+    path('finance-dashboard/commissions/<int:app_id>/settle/', views.FinanceCommissionSettleView.as_view(), name='finance_commission_settle'),
     path('api/get-addon-courses/', views.get_addon_courses, name='get_addon_courses'),
     path('api/check-duplicate/', views.check_duplicate_application, name='check_duplicate_application'),
     path('api/check-username/', views.check_username, name='check_username'),

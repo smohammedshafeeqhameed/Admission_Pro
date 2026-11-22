@@ -296,8 +296,8 @@ class Application(models.Model):
     payment_screenshot = models.ImageField(upload_to='payments/screenshots/', null=True, blank=True, help_text="Screenshot of the successful payment")
     amount_paid = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
-    # Commission workflow (two sign-offs required before a payout is
-    # final - Finance's own approval is no longer the last word):
+    # Commission workflow (three gates before a payout is truly done -
+    # Finance's own approval is never the last word on its own):
     #   1. Campus Manager marks an Admitted application "Eligible for
     #      Commission" (mark_eligible_for_commission below). This is what
     #      makes the "Apply for Commission" button appear for the
@@ -315,14 +315,21 @@ class Application(models.Model):
     #   4. The Executive gives (or withholds) the final sign-off
     #      (executive_approve_commission / executive_reject_commission
     #      below). Only executive_approve_commission moves it to
-    #      'Approved' - the terminal, payable state - which is what
+    #      'Approved' - payable, but not yet paid - which is what
     #      surfaces back on the Finance Manager's own Commission
-    #      Applications dashboard as fully approved.
+    #      Applications dashboard, in a "Ready to Settle" queue.
+    #   5. The Finance Manager actually pays the CRE out-of-band, then
+    #      uploads the payment receipt/bill as proof
+    #      (settle_commission below), moving commission_status to
+    #      'Settled' - the true terminal state. This is what shows the
+    #      transaction as fully completed to the CRE, the Executive and
+    #      the Finance Manager alike.
     COMMISSION_STATUS_CHOICES = [
         ('Not Applied', 'Not Applied'),
         ('Pending', 'Pending Finance Review'),
         ('Finance Approved', 'Pending Executive Approval'),
         ('Approved', 'Approved'),
+        ('Settled', 'Settled'),
         ('Rejected', 'Rejected'),
     ]
 
@@ -355,6 +362,16 @@ class Application(models.Model):
         help_text="Executive who gave the final approval/rejection, after Finance's own approval. Only set once the application has reached 'Finance Approved'."
     )
     commission_executive_reviewed_at = models.DateTimeField(null=True, blank=True)
+    commission_receipt = models.FileField(
+        upload_to='commission/receipts/', null=True, blank=True,
+        help_text="Payment receipt / bill uploaded by the Finance Manager as proof the CRE has actually been paid. Set when the commission is settled."
+    )
+    commission_settled_by = models.ForeignKey(
+        User, on_delete=models.SET_NULL, null=True, blank=True,
+        related_name='commission_settlements',
+        help_text="Finance Manager who uploaded the payment receipt and marked this commission as settled."
+    )
+    commission_settled_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         unique_together = ('student', 'college', 'course')
@@ -467,10 +484,14 @@ class Application(models.Model):
         self.commission_reviewed_at = None
         self.commission_executive_reviewed_by = None
         self.commission_executive_reviewed_at = None
+        self.commission_receipt = None
+        self.commission_settled_by = None
+        self.commission_settled_at = None
         self.save(update_fields=[
             'commission_status', 'commission_applied_at',
             'commission_reviewed_by', 'commission_reviewed_at',
             'commission_executive_reviewed_by', 'commission_executive_reviewed_at',
+            'commission_receipt', 'commission_settled_by', 'commission_settled_at',
         ])
         return True
 
@@ -535,6 +556,29 @@ class Application(models.Model):
         self.commission_executive_reviewed_by = user
         self.commission_executive_reviewed_at = timezone.now()
         self.save(update_fields=['commission_status', 'commission_executive_reviewed_by', 'commission_executive_reviewed_at'])
+        return True
+
+    def settle_commission(self, user=None, receipt=None):
+        """
+        Finance Manager action: the final step. Uploads the payment
+        receipt/bill proving the CRE has actually been paid out, for a
+        commission application the Executive has already given final
+        sign-off to (commission_status == 'Approved'). Moves it to
+        'Settled' - the true terminal state - which is what shows the
+        transaction as completed consistently to the CRE (their own
+        dashboard), the Executive (Commission Desk history) and the
+        Finance Manager (Commission Applications history) alike.
+        """
+        if self.commission_status != 'Approved':
+            return False
+        self.commission_status = 'Settled'
+        self.commission_settled_by = user
+        self.commission_settled_at = timezone.now()
+        if receipt is not None:
+            self.commission_receipt = receipt
+        self.save(update_fields=[
+            'commission_status', 'commission_settled_by', 'commission_settled_at', 'commission_receipt',
+        ])
         return True
 
 

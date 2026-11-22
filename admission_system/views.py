@@ -431,8 +431,13 @@ class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMix
     'Finance Approved' and sit in a read-only "Awaiting Executive
     Approval" section - Finance's own approval is a recommendation, not
     the final word (see Application.finance_approve_commission in
-    models.py) - and only reach History below, as 'Approved', once the
-    Executive gives the final sign-off from their own Commission Desk.
+    models.py). Once the Executive gives the final sign-off from their
+    own Commission Desk, an application lands back here as 'Approved'
+    in the actionable "Ready to Settle" section, where the Finance
+    Manager uploads the payment receipt/bill once the CRE has actually
+    been paid (see Application.settle_commission in models.py). Only
+    'Settled' and 'Rejected' applications - the truly terminal states -
+    reach History below.
     """
     template_name = 'admission_system/finance_commission_dashboard.html'
 
@@ -442,26 +447,30 @@ class FinanceCommissionDashboardView(AcademicYearFilterMixin, FinanceRequiredMix
 
         base_apps = Application.objects.select_related(
             'student', 'college', 'course', 'referred_by__user',
-            'commission_reviewed_by', 'commission_executive_reviewed_by',
+            'commission_reviewed_by', 'commission_executive_reviewed_by', 'commission_settled_by',
         ).exclude(commission_status='Not Applied')
 
         pending_apps = base_apps.filter(commission_status='Pending').order_by('commission_applied_at')
         awaiting_executive_apps = base_apps.filter(commission_status='Finance Approved').order_by('commission_reviewed_at')
-        reviewed_apps = base_apps.filter(commission_status__in=['Approved', 'Rejected']).order_by('-commission_reviewed_at')
+        ready_to_settle_apps = base_apps.filter(commission_status='Approved').order_by('commission_executive_reviewed_at')
+        reviewed_apps = base_apps.filter(commission_status__in=['Settled', 'Rejected']).order_by('-commission_reviewed_at')
 
         if college_id:
             pending_apps = pending_apps.filter(college_id=college_id)
             awaiting_executive_apps = awaiting_executive_apps.filter(college_id=college_id)
+            ready_to_settle_apps = ready_to_settle_apps.filter(college_id=college_id)
             reviewed_apps = reviewed_apps.filter(college_id=college_id)
             context['active_college'] = get_object_or_404(College, id=college_id)
 
         context.update({
             'pending_commission_apps': pending_apps,
             'awaiting_executive_apps': awaiting_executive_apps,
+            'ready_to_settle_apps': ready_to_settle_apps,
             'reviewed_commission_apps': reviewed_apps[:50],
             'pending_commission_count': pending_apps.count(),
             'awaiting_executive_count': awaiting_executive_apps.count(),
             'approved_commission_count': base_apps.filter(commission_status='Approved').count(),
+            'settled_commission_count': base_apps.filter(commission_status='Settled').count(),
             'rejected_commission_count': base_apps.filter(commission_status='Rejected').count(),
             'all_colleges': College.objects.all().order_by('name'),
             'is_dashboard': True,
@@ -504,6 +513,35 @@ class FinanceCommissionActionView(FinanceRequiredMixin, View):
         elif action == 'reject':
             application.reject_commission(user=request.user)
             messages.warning(request, f"Commission rejected for {application.student.name}.")
+
+        return redirect('finance_commission_dashboard')
+
+
+class FinanceCommissionSettleView(FinanceRequiredMixin, View):
+    """
+    Handles the "Upload Receipt & Settle" action in the "Ready to
+    Settle" section of the Commission Applications dashboard - the
+    final step of the commission workflow. Only acts on an application
+    the Executive has already given final sign-off to
+    (commission_status == 'Approved'; see
+    Application.executive_approve_commission in models.py), and
+    requires a receipt/bill file in the request, which is what proves
+    the CRE has actually been paid. Delegates the state change to
+    Application.settle_commission() (models.py), which moves it to the
+    truly terminal 'Settled' state - shown consistently from here on
+    to the CRE, the Executive and the Finance Manager alike.
+    """
+    def post(self, request, *args, **kwargs):
+        application = get_object_or_404(Application.objects.select_related('student'), id=kwargs.get('app_id'))
+        receipt = request.FILES.get('receipt')
+
+        if application.commission_status != 'Approved':
+            messages.info(request, f"The commission application for {application.student.name} has already moved on.")
+        elif not receipt:
+            messages.error(request, "Attach the payment receipt or bill before settling this commission.")
+        else:
+            application.settle_commission(user=request.user, receipt=receipt)
+            messages.success(request, f"Commission for {application.student.name} marked as settled. The transaction is now complete.")
 
         return redirect('finance_commission_dashboard')
 
@@ -998,6 +1036,8 @@ class CREApplyCommissionView(LoginRequiredMixin, View):
             messages.info(request, f"Your commission application for {application.student.name} has been approved by Finance and is awaiting the Executive's final sign-off.")
         elif application.commission_status == 'Approved':
             messages.info(request, f"Your commission application for {application.student.name} has already been approved.")
+        elif application.commission_status == 'Settled':
+            messages.info(request, f"The commission for {application.student.name} has already been settled - the transaction is complete.")
         else:
             application.apply_for_commission()
             messages.success(request, f"Commission application for {application.student.name} submitted. The finance team will review it.")
@@ -1324,7 +1364,10 @@ class ExecutiveCommissionCREDetailView(AcademicYearFilterMixin, ExecutiveRequire
     application from one specific CRE, split into the ones awaiting the
     Executive's final sign-off (commission_status == 'Finance Approved'
     - actionable, with Approve/Reject buttons) and that CRE's own past
-    commission history (Approved/Rejected - read-only context).
+    commission history (Approved/Settled/Rejected - read-only context;
+    'Approved' here just means the Finance Manager hasn't uploaded the
+    payment receipt and settled it yet - see
+    Application.settle_commission in models.py).
 
     Deliberately not scoped by the globally-selected Academic Year, for
     the same reason as ExecutiveCommissionDashboardView above.
@@ -1340,9 +1383,10 @@ class ExecutiveCommissionCREDetailView(AcademicYearFilterMixin, ExecutiveRequire
         ).select_related('student', 'college', 'course', 'commission_reviewed_by').order_by('commission_reviewed_at')
 
         history_apps = Application.objects.filter(
-            referred_by=cre_profile, commission_status__in=['Approved', 'Rejected']
+            referred_by=cre_profile, commission_status__in=['Approved', 'Settled', 'Rejected']
         ).select_related(
             'student', 'college', 'course', 'commission_reviewed_by', 'commission_executive_reviewed_by',
+            'commission_settled_by',
         ).order_by('-commission_reviewed_at')[:25]
 
         context.update({

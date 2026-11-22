@@ -321,6 +321,18 @@
                                         <span class="rd-status bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400">
                                             <span class="rd-status-dot bg-emerald-500"></span> Approved
                                         </span>
+                                        {% elif referral.commission_status == 'Settled' %}
+                                        <div class="inline-flex items-center gap-2">
+                                            <span class="rd-status bg-violet-50 text-violet-700 dark:bg-violet-500/10 dark:text-violet-400">
+                                                <span class="rd-status-dot bg-violet-500"></span> Settled
+                                            </span>
+                                            {% if referral.commission_receipt %}
+                                            <a href="{{ referral.commission_receipt.url }}" target="_blank"
+                                                class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="View payment receipt">
+                                                <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                                            </a>
+                                            {% endif %}
+                                        </div>
                                         {% elif referral.commission_status == 'Rejected' %}
                                         <div class="inline-flex items-center gap-2">
                                             <span class="rd-status bg-rose-50 text-rose-700 dark:bg-rose-500/10 dark:text-rose-400">
