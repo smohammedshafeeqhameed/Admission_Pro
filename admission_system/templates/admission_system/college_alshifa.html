@@ -165,7 +165,7 @@
                 class="bg-white dark:bg-slate-900 rounded-[4rem] shadow-[0_80px_150px_-30px_rgba(75,54,124,0.2)] border border-slate-100 dark:border-slate-800 overflow-hidden">
                 <!-- Step Indicator -->
                 <div
-                    class="px-10 py-12 md:px-16 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
+                    class="px-10 pt-12 pb-16 md:px-16 bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800">
                     <div class="flex items-center justify-between max-w-4xl mx-auto gap-3 md:gap-8">
                         <div id="step-1-btn" class="acas-step active">1<span class="acas-label">Identity</span></div>
                         <div class="acas-line" id="connector-1"></div>
@@ -223,7 +223,7 @@
                                 {{ form.gender }}
                             </div>
                             <div class="space-y-4">
-                                <label class="label-heading">Aadhar Identification</label>
+                                <label class="label-heading">Aadhaar Identification</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="space-y-4">
@@ -384,7 +384,7 @@
                                         class="w-12 h-12 rounded-2xl bg-secondary/10 text-secondary flex items-center justify-center shadow-inner">
                                         <i data-lucide="fingerprint" class="w-6 h-6"></i>
                                     </div>
-                                    <span class="font-black text-xs uppercase tracking-widest">Aadhar Document</span>
+                                    <span class="font-black text-xs uppercase tracking-widest">Aadhaar Document</span>
                                 </div>
                                 {{ form.doc_aadhar }}
                             </div>
@@ -472,7 +472,12 @@
     .acas-step.active {
         background: var(--acas-purple) !important;
         color: white !important;
-        transform: scale(1.2) rotate(4deg);
+        /* P3 fix: same root cause as the identical stepper component on
+           Nirmala/MES - the rotate() read as a rendering glitch ("number and
+           text appear misaligned/tilted"), and scaling this element also
+           scaled its child label's bottom offset, pushing it past this
+           card's overflow-hidden. Dropped the rotation and reduced the scale. */
+        transform: scale(1.1);
         box-shadow: 0 25px 50px -10px rgba(75, 54, 124, 0.4);
     }
 

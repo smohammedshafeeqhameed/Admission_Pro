@@ -219,7 +219,7 @@
                 class="bg-white dark:bg-slate-900 rounded-[3rem] shadow-[0_50px_120px_-30px_rgba(27,94,32,0.2)] border border-slate-100 dark:border-slate-800 overflow-hidden">
 
                 <!-- Step bar -->
-                <div class="bg-gradient-to-r from-[#1B5E20] to-[#0a2e0d] px-10 py-10 md:px-20">
+                <div class="bg-gradient-to-r from-[#1B5E20] to-[#0a2e0d] px-10 pt-10 pb-14 md:px-20">
                     <div class="flex items-center justify-between max-w-2xl mx-auto">
                         <div id="step-1-btn" class="mes-step active">1<span class="mes-lbl">Identity</span></div>
                         <div class="mes-line" id="connector-1"></div>
@@ -277,7 +277,7 @@
                                 {{ form.gender }}
                             </div>
                             <div class="mes-field">
-                                <label class="mes-label">Aadhar Number</label>
+                                <label class="mes-label">Aadhaar Number</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="mes-field">
@@ -541,7 +541,12 @@
     .mes-step.active {
         background: var(--mes-gold);
         color: var(--mes-green);
-        transform: scale(1.2) rotate(-4deg);
+        /* P3 fix: same root cause as Nirmala's identical stepper component -
+           the rotate() read as a rendering glitch, and scaling this element
+           also scaled its child label's bottom:-2.5rem offset, clipping it
+           against the card's overflow-hidden. Dropped the rotation and
+           reduced the scale to leave room. */
+        transform: scale(1.1);
         box-shadow: 0 12px 35px -8px rgba(255, 215, 0, 0.6);
     }
 

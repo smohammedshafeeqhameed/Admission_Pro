@@ -62,7 +62,7 @@
 <div class="bg-[#2b6eb5] text-white py-2.5 px-6 md:px-20 lg:px-40 text-[10px] font-bold overflow-hidden border-b border-white/5">
     <div class="flex flex-col md:flex-row items-center justify-between gap-2 max-w-7xl mx-auto">
         <div class="flex items-center gap-6">
-            <span class="hidden md:flex items-center gap-2"><i data-lucide="mail" class="w-3 h-3 text-[#f19e12]"></i> info@elims.edu.in</span>
+            <a href="mailto:info@elims.edu.in" class="hidden md:flex items-center gap-2 hover:underline"><i data-lucide="mail" class="w-3 h-3 text-[#f19e12]"></i> info@elims.edu.in</a>
         </div>
         <div class="flex items-center gap-4">
             <span class="bg-[#f19e12] text-white px-2 py-0.5 rounded text-[8px] uppercase animate-pulse">Update</span>
@@ -132,8 +132,13 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 space-y-6">
                 <h2 class="text-primary font-black tracking-[0.4em] uppercase text-xs">Excellence Pillars</h2>
+                {# P3 fix: "ELIMS" was styled at 30% opacity of the brand
+                   color against a white background - far too light to read
+                   next to the surrounding full-opacity slate-900 text.
+                   Kept the brand-color accent and italic styling, just at
+                   full opacity so it actually meets contrast. #}
                 <h3 class="text-4xl md:text-7xl font-black text-slate-900 dark:text-white leading-tight tracking-tighter">
-                    The <span class="text-primary/30 italic font-medium">ELIMS</span> Advantage
+                    The <span class="text-primary italic font-medium">ELIMS</span> Advantage
                 </h3>
             </div>
 
@@ -307,35 +312,35 @@
                     <div id="step-1" class="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                         <div class="grid md:grid-cols-2 gap-8 md:gap-10">
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Proposed Academic Track</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Proposed Academic Track</label>
                                 {{ form.course }}
                             </div>
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Professional Certification</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Professional Certification</label>
                                 {{ form.addon_course }}
                             </div>
                             <div class="md:col-span-2 space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Reference Source</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Reference Source</label>
                                 {{ form.source }}
                             </div>
                             <div class="md:col-span-2 space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Full Legal Name</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Full Legal Name</label>
                                 {{ form.name }}
                             </div>
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Date of Birth</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Date of Birth</label>
                                 {{ form.dob }}
                             </div>
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Gender</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Gender</label>
                                 {{ form.gender }}
                             </div>
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Aadhar Identification</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Aadhaar Identification</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="space-y-3">
-                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary/60 ml-1">Personal Contact Number</label>
+                                <label class="block text-[10px] font-black uppercase tracking-[0.2em] text-primary ml-1">Personal Contact Number</label>
                                 {{ form.phone }}
                             </div>
                             <div class="space-y-3">
@@ -542,7 +547,10 @@
                                 </div>
                                 <div class="text-center md:text-left">
                                     <h4 class="text-3xl font-black text-white mb-2 leading-none">Assessment Fee</h4>
-                                    <p class="text-white/70 font-medium text-lg">Electronic settlement of **₹1,500** is
+                                    {# P3 fix: literal markdown-style asterisks were hardcoded in plain
+                                       HTML, which isn't run through a markdown renderer, so they printed
+                                       as literal "**₹1,500**" instead of bold text. #}
+                                    <p class="text-white/70 font-medium text-lg">Electronic settlement of <strong class="text-white font-black">₹1,500</strong> is
                                         required to initialize the file processing.</p>
                                 </div>
                                 <div class="md:ml-auto text-center">
@@ -624,7 +632,7 @@
                         </li>
                         <li class="flex items-center gap-3">
                             <i data-lucide="mail" class="w-5 h-5 text-[#f19e12]"></i>
-                            <span class="text-slate-200">info@elims.edu.in</span>
+                            <a href="mailto:info@elims.edu.in" class="text-slate-200 hover:text-white transition-colors">info@elims.edu.in</a>
                         </li>
                     </ul>
                 </div>

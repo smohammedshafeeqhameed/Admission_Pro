@@ -85,8 +85,15 @@
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em]">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> APPROVED BY AICTE
                 </span>
+                {# P3 fix: this badge's text/border used the same brand blue
+                   (#2b4ba1) as its own background tint, over a dark blue
+                   hero - unlike the two sibling badges above (white text on
+                   a neutral white/10 background), it had almost no contrast
+                   against the backdrop. Switched the text to white, matching
+                   the sibling badges, while keeping the blue accent on the
+                   icon and border for distinction. #}
                 <span
-                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#2b4ba1]/20 backdrop-blur-xl border border-[#2b4ba1]/40 text-[#2b4ba1] text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
+                    class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#2b4ba1]/20 backdrop-blur-xl border border-[#2b4ba1]/40 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
                     <i data-lucide="zap" class="w-3.5 h-3.5 fill-[#2b4ba1]"></i> Admissions Open 2026
                 </span>
             </div>
@@ -277,7 +284,7 @@
                                 {{ form.gender }}
                             </div>
                             <div class="jbc-field">
-                                <label class="jbc-label">Aadhar Number</label>
+                                <label class="jbc-label">Aadhaar Number</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="jbc-field">

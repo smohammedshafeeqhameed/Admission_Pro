@@ -47,11 +47,30 @@
                 
                 <div class="mt-6 flex flex-col items-center gap-2">
                     <div class="flex items-center gap-3 py-2 px-4 bg-slate-100 rounded-full">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/UPI-Logo.png" alt="UPI" class="h-4">
+                        {# P2 fix: this hotlinked a Wikimedia Commons file path
+                           (upload.wikimedia.org/.../UPI-Logo.png) directly -
+                           Commons paths are hash-based and break whenever the
+                           file is renamed or replaced, which is exactly what
+                           happened here (the URL now 404s), showing a broken-
+                           image icon next to a working QR code. Replaced the
+                           external hotlink with a small self-contained badge
+                           so this can't rot again. #}
+                        <span class="flex items-center justify-center h-4 px-1.5 rounded-sm bg-[#097939] text-white text-[9px] font-black tracking-wide leading-none">UPI</span>
                         <span class="h-4 w-[1px] bg-slate-300"></span>
                         <span class="text-[10px] font-black uppercase tracking-wider text-slate-500">Scan & Pay</span>
                     </div>
                     <p class="text-xs font-bold text-slate-400">Accepted on all UPI Apps</p>
+                    {% if upi_id %}
+                    <!-- P4 enhancement: copyable UPI ID next to the QR code, for
+                         users who'd rather type the ID into their UPI app than
+                         scan (e.g. scanning isn't convenient, or they're paying
+                         from a different device than the one showing this page). -->
+                    <button type="button" onclick="copyUpiId(this)" data-upi-id="{{ upi_id }}"
+                        class="mt-1 flex items-center gap-2 py-1.5 px-3 rounded-full border border-slate-200 hover:border-slate-300 hover:bg-slate-50 transition-colors">
+                        <span class="text-xs font-bold text-slate-600 font-mono">{{ upi_id }}</span>
+                        <i data-lucide="copy" class="w-3.5 h-3.5 text-slate-400"></i>
+                    </button>
+                    {% endif %}
                 </div>
             </div>
 
@@ -82,6 +101,7 @@
                 <div class="space-y-2">
                     <label class="block text-sm font-black text-slate-700">UPI Transaction ID <span class="text-red-500">*</span></label>
                     <input type="text" name="transaction_id" required placeholder="e.g. 301234567890"
+                        pattern="\d{12}" maxlength="12" inputmode="numeric" title="Enter the 12-digit numeric UPI Transaction ID"
                         class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-primary focus:border-primary transition-all font-bold text-slate-900 tracking-wide">
                     <p class="text-[10px] font-bold uppercase tracking-widest text-slate-400">12-digit numeric code received after payment</p>
                 </div>

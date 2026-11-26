@@ -51,19 +51,41 @@
                         {% if college.logo_url %}
                         <img src="{{ college.logo_url }}" alt="{{ college.name }} Logo" class="h-10 w-auto object-contain">
                         {% else %}
-                        <span class="material-symbols-outlined text-4xl">school</span>
+                        <!-- P3 fix: the Material Symbols ligature font rendered its literal
+                             text ("school") instead of the graduation-cap glyph whenever the
+                             Google Fonts stylesheet was slow/failed to load, which read as
+                             stray lowercase text next to the college name. Swapped for a
+                             Lucide SVG icon (already used everywhere else in this codebase),
+                             which has no such font-load dependency. -->
+                        <i data-lucide="graduation-cap" class="w-7 h-7"></i>
                         {% endif %}
                     </div>
                     <h2 class="text-xl font-bold tracking-tight">{{ college.name }}</h2>
                 </a>
+                {# P1 fix: these nav links used to be bare "#about"/"#courses"/etc.
+                   anchors, which only resolve on pages that actually define
+                   those section ids (the college landing/application page).
+                   On success.html and manual_payment.html - which also
+                   extend this base template but have no #about/#courses/etc.
+                   sections - clicking them did nothing (matches bug reports
+                   of unresponsive top navigation on those pages). Building
+                   the same apply_admission URL the logo link already uses,
+                   once, and appending the anchor to it means every nav link
+                   now first takes the visitor back to the page that has
+                   these sections, then jumps to the right one. #}
+                {% if app %}
+                    {% url 'apply_admission' college.slug app.referred_by.user.username app.referred_by.cre_id as nav_base_url %}
+                {% else %}
+                    {% url 'apply_admission' college.slug username cre_id as nav_base_url %}
+                {% endif %}
                 <div class="hidden md:flex items-center gap-8">
                     <nav class="flex gap-6">
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#about">About</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#courses">Courses</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#apply">Admissions</a>
-                        <a class="text-sm font-medium hover:text-primary transition-colors" href="#contact">Contact</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="{{ nav_base_url }}#about">About</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="{{ nav_base_url }}#courses">Courses</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="{{ nav_base_url }}#apply">Admissions</a>
+                        <a class="text-sm font-medium hover:text-primary transition-colors" href="{{ nav_base_url }}#contact">Contact</a>
                     </nav>
-                    <a href="#apply"
+                    <a href="{{ nav_base_url }}#apply"
                         class="bg-primary text-white text-sm font-bold px-5 py-2.5 rounded-lg hover:opacity-90 transition-all">
                         Apply Now
                     </a>
@@ -76,11 +98,11 @@
             <!-- Mobile Menu Overlay -->
             <div id="mobile-menu" class="hidden md:hidden fixed inset-x-0 top-[65px] bg-white dark:bg-background-dark border-b border-slate-200 dark:border-slate-800 shadow-xl z-50 animate-in slide-in-from-top duration-300">
                 <nav class="flex flex-col p-6 gap-4">
-                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#about" onclick="toggleMobileMenu()">About</a>
-                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#courses" onclick="toggleMobileMenu()">Courses</a>
-                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#apply" onclick="toggleMobileMenu()">Admissions</a>
-                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="#contact" onclick="toggleMobileMenu()">Contact</a>
-                    <a href="#apply" onclick="toggleMobileMenu()"
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="{{ nav_base_url }}#about" onclick="toggleMobileMenu()">About</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="{{ nav_base_url }}#courses" onclick="toggleMobileMenu()">Courses</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="{{ nav_base_url }}#apply" onclick="toggleMobileMenu()">Admissions</a>
+                    <a class="text-lg font-bold py-3 border-b border-slate-50 dark:border-slate-800/50" href="{{ nav_base_url }}#contact" onclick="toggleMobileMenu()">Contact</a>
+                    <a href="{{ nav_base_url }}#apply" onclick="toggleMobileMenu()"
                         class="bg-primary text-white text-center font-bold py-4 rounded-xl mt-4 shadow-lg shadow-primary/20">
                         Apply Now
                     </a>
@@ -102,7 +124,9 @@
                     </div>
                     {% else %}
                     <div class="flex items-center justify-center w-12 h-12 bg-white/10 rounded-xl p-2 shrink-0">
-                        <span class="material-symbols-outlined text-primary text-3xl">school</span>
+                        <!-- P3 fix: same ligature-font fragility as the header logo above,
+                             swapped for a Lucide SVG icon. -->
+                        <i data-lucide="graduation-cap" class="text-primary w-6 h-6"></i>
                     </div>
                     {% endif %}
                     <span class="text-white font-bold text-xl tracking-tight leading-tight">{{ college.name }}</span>
@@ -139,24 +163,74 @@
             if (window.lucide) lucide.createIcons();
         }
 
+        // P4 enhancement: copy-to-clipboard for the UPI ID shown next to the
+        // payment QR code (manual_payment.html). Shared here so any page
+        // extending this base template can use the same button pattern.
+        function copyUpiId(button) {
+            const upiId = button.getAttribute('data-upi-id');
+            if (!upiId || !navigator.clipboard) return;
+            navigator.clipboard.writeText(upiId).then(function() {
+                const label = button.querySelector('span');
+                const original = label.textContent;
+                label.textContent = 'Copied!';
+                setTimeout(function() { label.textContent = original; }, 1500);
+            });
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             if (window.lucide) lucide.createIcons();
-            
+
+            // "Already uploaded" indicator (P0 fix): a browser file input can
+            // never show a previously-selected file, so a student who
+            // uploaded a document earlier and then comes back to this step
+            // (e.g. via "Go Back and Edit Application") sees an empty-looking
+            // field and assumes their upload was lost, even though it's
+            // still attached server-side. StudentAdmissionForm marks any
+            // field that already has a file saved with a data-pending-file
+            // attribute (see forms.py) - surface that here as a small note
+            // under the field instead of leaving it looking blank.
+            document.querySelectorAll('input[type="file"][data-pending-file]').forEach(function(input) {
+                var existingName = input.getAttribute('data-pending-file');
+                if (!existingName) return;
+                var note = document.createElement('p');
+                note.className = 'pending-file-note text-[11px] font-bold text-emerald-600 mt-2';
+                note.textContent = '✓ Already uploaded: ' + existingName + ' (choose a new file only if you want to replace it)';
+                input.insertAdjacentElement('afterend', note);
+            });
+
             // File Size Restriction
             var fileInputs = document.querySelectorAll('input[type="file"]');
-            var maxSize = 1 * 1024 * 1024; // 1 MB
-            
+            // P1 fix: every file input used to share one hardcoded 1 MB cap,
+            // regardless of what the page itself told the applicant. The
+            // photo field is documented (here and in validators.py's
+            // validate_photo) as allowing up to 2 MB, and the payment
+            // screenshot page explicitly says "up to 5MB" - both were
+            // silently rejected at 1 MB before the alert could explain why,
+            // and scanned marksheet/Aadhaar documents routinely exceed 1 MB
+            // too. Limits now match what each field actually promises.
+            var maxSizeByField = {
+                'photo': 2 * 1024 * 1024,               // 2 MB - matches validate_photo
+                'payment_screenshot': 5 * 1024 * 1024,  // 5 MB - matches manual_payment.html copy
+                'doc_10th': 5 * 1024 * 1024,
+                'doc_11th': 5 * 1024 * 1024,
+                'doc_12th': 5 * 1024 * 1024,
+                'doc_aadhar': 5 * 1024 * 1024
+            };
+            var defaultMaxSize = 2 * 1024 * 1024; // 2 MB fallback for any other/unlisted file field
+
             // Dynamic Submit Button Visibility
             const submitBtn = document.getElementById('submit-btn');
-            
+
             fileInputs.forEach(function(input) {
                 input.addEventListener('change', function() {
                     if (this.files && this.files.length > 0) {
+                        var maxSize = maxSizeByField[this.name] || defaultMaxSize;
+                        var maxSizeLabel = Math.round(maxSize / (1024 * 1024)) + ' MB';
                         // Check if file size is okay
                         let allSmaller = true;
                         for (let i = 0; i < this.files.length; i++) {
                             if (this.files[i].size > maxSize) {
-                                alert('Maximum file size allowed is 1 MB. Please select a smaller file.');
+                                alert('Maximum file size allowed is ' + maxSizeLabel + '. Please select a smaller file.');
                                 this.value = ''; // clear the input
                                 allSmaller = false;
                                 break;

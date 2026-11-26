@@ -7,6 +7,16 @@
         @page {
             size: A4;
             margin: 2cm;
+            /* P2 fix: the footer frame starts at top:772pt, but with a flat
+               2cm (~56.7pt) margin on every side the body content area's own
+               bottom edge sits at ~785pt on an A4 page (841.9pt tall) - that's
+               BELOW the footer's top edge, so whenever content (e.g. the
+               Aadhaar row, or the declaration paragraph) naturally flows near
+               the bottom of a page, it visually collides with the footer
+               text (bug report: "footer overlapping Aadhaar/declaration
+               content"). Giving the bottom margin extra room keeps body
+               content clear of the footer frame on every page. */
+            margin-bottom: 3cm;
             @frame footer_frame {
                 -pdf-frame-content: footer_content;
                 left: 50pt; width: 512pt; top: 772pt; height: 30pt;
@@ -32,14 +42,20 @@
             vertical-align: middle;
         }
         .logo-cell {
-            width: 72pt;
+            width: 84pt;
             text-align: center;
             background-color: #ffffff;
             padding: 6pt;
         }
         .logo-cell img {
-            max-width: 58pt;
-            max-height: 48pt;
+            /* P2 fix: 58x48pt was small enough next to the 18pt college-name
+               text that testers reported the logo as rendered too small
+               (reported against Ernad, but this is the one shared PDF
+               template used for every college, so it affected all of them).
+               Enlarged the bounding box; actual rendered size still depends
+               on each college's own logo image resolution. */
+            max-width: 72pt;
+            max-height: 72pt;
         }
         .college-name {
             font-size: 18pt;
@@ -228,9 +244,14 @@
         <tr><th>Full Name</th><td>{{ app.student.name }}</td></tr>
         <tr><th>Email Address</th><td>{{ app.student.email }}</td></tr>
         <tr><th>Phone Number</th><td>{{ app.student.phone }}</td></tr>
-        <tr><th>Date of Birth</th><td>{{ app.student.dob|default:"Not Provided" }}</td></tr>
+        {# P2 fix: with no date filter, Django falls back to the locale
+           default format ("Nov. 25, 2004"), which doesn't match the
+           explicit "d M Y" format already used for the Date field above
+           (e.g. "25 Nov 2026") - bug report: inconsistent date punctuation
+           on the downloaded form. Matching the same format here. #}
+        <tr><th>Date of Birth</th><td>{{ app.student.dob|date:"d M Y"|default:"Not Provided" }}</td></tr>
         <tr><th>Gender</th><td>{{ app.student.get_gender_display|default:"Not Provided" }}</td></tr>
-        <tr><th>Aadhar Number</th><td>{{ app.student.aadhar_number|default:"Not Provided" }}</td></tr>
+        <tr><th>Aadhaar Number</th><td>{{ app.student.aadhar_number|default:"Not Provided" }}</td></tr>
         <tr><th>Blood Group</th><td>{{ app.student.blood_group|default:"Not Provided" }}</td></tr>
         <tr><th>Category</th><td>{{ app.student.category|default:"Not Provided" }}</td></tr>
     </table>

@@ -1,4 +1,5 @@
 import os
+import re
 from django.shortcuts import render, redirect, get_object_or_404
 from django.db.models import Q, Count, Sum, Min
 from django.db.models.functions import TruncMonth
@@ -1448,10 +1449,12 @@ def apply_admission(request, college_slug, username, cre_id):
 
     # Retrieve pending data from session
     pending_student_data = request.session.get('pending_student_data')
-    has_files_in_session = bool(request.session.get('pending_files'))
+    # Per-field map (doc_field -> stored path), not just a boolean - see the
+    # P0 fix note on StudentAdmissionForm.__init__ for why this matters.
+    pending_files_in_session = request.session.get('pending_files') or {}
 
     if request.method == 'POST':
-        form = StudentAdmissionForm(request.POST, request.FILES, college=college, has_files_in_session=has_files_in_session)
+        form = StudentAdmissionForm(request.POST, request.FILES, college=college, pending_files=pending_files_in_session)
         if form.is_valid():
             # Save student data to session
             student_data = {
@@ -1554,7 +1557,7 @@ def apply_admission(request, college_slug, username, cre_id):
             initial_data['addon_course'] = pending_app_data.get('addon_course')
             initial_data['source'] = pending_app_data.get('source')
             
-        form = StudentAdmissionForm(college=college, initial=initial_data, has_files_in_session=has_files_in_session)
+        form = StudentAdmissionForm(college=college, initial=initial_data, pending_files=pending_files_in_session)
 
     courses = college.courses.all()
     
@@ -1595,9 +1598,27 @@ def manual_payment(request):
     course = get_object_or_404(Course, id=pending_application_data['course'])
 
     if request.method == "POST":
-        transaction_id = request.POST.get('transaction_id')
+        transaction_id = (request.POST.get('transaction_id') or '').strip()
         payment_screenshot = request.FILES.get('payment_screenshot')
-        
+
+        # P1 fix: the field was described to users as "a 12-digit numeric
+        # code received after payment" but nothing enforced that - any
+        # length or characters (including letters/special characters) was
+        # accepted and saved as the payment's transaction reference,
+        # defeating the whole point of being able to match it against the
+        # actual UPI/bank statement during verification.
+        if transaction_id and payment_screenshot and not re.fullmatch(r'\d{12}', transaction_id):
+            messages.error(request, "Enter a valid 12-digit UPI Transaction ID (numbers only).")
+            return render(request, 'admission_system/manual_payment.html', {
+                'college': college,
+                'course': course,
+                'college_slug': college_slug,
+                'username': username,
+                'cre_id': cre_id,
+                'upi_id': college.upi_id or settings.UPI_ID,
+                'upi_payee_name': college.upi_payee_name or settings.UPI_PAYEE_NAME
+            })
+
         if transaction_id and payment_screenshot:
             if Application.objects.filter(transaction_id=transaction_id).exists():
                 messages.error(request, "This Transaction ID has already been used. Please provide the unique ID for this payment.")

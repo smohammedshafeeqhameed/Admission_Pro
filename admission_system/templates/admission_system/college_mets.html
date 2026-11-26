@@ -258,7 +258,7 @@
                                 {{ form.gender }}
                             </div>
                             <div class="mets-field">
-                                <label class="mets-label-text">Aadhar number</label>
+                                <label class="mets-label-text">Aadhaar number</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="mets-field">
@@ -402,7 +402,7 @@
                                     <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:rgba(242,183,5,0.14); color:var(--mets-gold-deep);">
                                         <i data-lucide="credit-card" class="w-5 h-5"></i>
                                     </div>
-                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--mets-gold-deep);">Aadhar document</span>
+                                    <span class="font-bold text-xs uppercase tracking-wider" style="color:var(--mets-gold-deep);">Aadhaar document</span>
                                 </div>
                                 {{ form.doc_aadhar }}
                             </div>
@@ -438,16 +438,18 @@
         </div>
     </section>
 
-    <!-- ═══ FOOTER STRIP ═══ -->
-    <footer class="py-14 px-6" style="background:var(--mets-indigo-deep);" id="contact">
-        <div class="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
-            <div>
-                <div class="text-white font-bold text-lg mb-1" style="font-family:'Outfit',sans-serif;">MET'S College of Advanced Studies</div>
-                <div class="text-[#A99EDC] text-sm">Kuruvilassery P.O., Mala, Thrissur, Kerala &ndash; 680735</div>
-            </div>
-            <div class="text-[#A99EDC] text-sm">Affiliated to University of Calicut &nbsp;|&nbsp; Mala Educational Trust, est. 2001</div>
-        </div>
-    </footer>
+    <!-- P3 fix: this used to be a second full <footer> (its own dark
+         background, its own copy of the college name) sitting immediately
+         above the shared base template's real footer - which already shows
+         the college's logo/name on every page. Two dark footer-styled bars
+         stacked back to back, each naming the college, is what testers saw
+         as "logo and name overlap". Kept the id="contact" anchor (the
+         shared header's Contact nav link points here) and the genuinely
+         extra info (address/affiliation), dropped the duplicate name and
+         the second footer styling. -->
+    <div class="py-10 px-6 text-center" id="contact" style="background:var(--mets-indigo-deep);">
+        <p class="text-[#A99EDC] text-sm">Kuruvilassery P.O., Mala, Thrissur, Kerala &ndash; 680735 &nbsp;|&nbsp; Affiliated to University of Calicut &nbsp;|&nbsp; Mala Educational Trust, est. 2001</p>
+    </div>
 
 </div><!-- end wrapper -->
 

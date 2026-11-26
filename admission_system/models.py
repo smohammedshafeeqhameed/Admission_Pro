@@ -73,6 +73,13 @@ class AddonCourse(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='addon_courses')
     name = models.CharField(max_length=255)
 
+    class Meta:
+        # P0 hardening: bug reports found the same add-on duplicated under
+        # one course (e.g. BCA KTU at Al Azhar). No duplicates exist in the
+        # data today, but nothing stopped it from happening again - this
+        # constraint matches the one Course already has on (college, name).
+        unique_together = ('course', 'name')
+
     def __str__(self):
         return f"{self.name} (Addon for {self.course.name})"
 
@@ -129,7 +136,14 @@ class ExecutiveProfile(models.Model):
 class Student(models.Model):
     GENDER_CHOICES = [('', '----------'), ('M', 'Male'), ('F', 'Female'), ('O', 'Other')]
     BLOOD_GROUP_CHOICES = [('', '----------'), ('A+', 'A+'), ('A-', 'A-'), ('B+', 'B+'), ('B-', 'B-'), ('O+', 'O+'), ('O-', 'O-'), ('AB+', 'AB+'), ('AB-', 'AB-')]
-    
+    # P2 fix: "Category"/"Social Category" was a bare free-text field with no
+    # dropdown, label help, or placeholder (bug report: users "don't know
+    # what to enter") - the live data showed exactly that confusion, with
+    # students submitting values like "Good" instead of an actual category.
+    # These are the standard Indian admission/reservation categories; swap
+    # this list if the institution uses different terminology.
+    CATEGORY_CHOICES = [('', '----------'), ('General', 'General / OC'), ('OBC', 'OBC'), ('SC', 'SC'), ('ST', 'ST'), ('EWS', 'EWS'), ('Other', 'Other')]
+
     name = models.CharField(max_length=255)
     email = models.EmailField()
     phone = models.CharField(max_length=15)
@@ -137,7 +151,7 @@ class Student(models.Model):
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES, null=True, blank=True)
     aadhar_number = models.CharField(max_length=12, null=True, blank=True)
     blood_group = models.CharField(max_length=3, choices=BLOOD_GROUP_CHOICES, null=True, blank=True)
-    category = models.CharField(max_length=50, null=True, blank=True)
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, null=True, blank=True)
     
     permanent_address = models.TextField(null=True, blank=True)
     correspondence_address = models.TextField(null=True, blank=True)
@@ -435,6 +449,19 @@ class Application(models.Model):
         visible as history even after removal; removed_by/removed_at
         record who performed the removal and when, for a "Removed By"
         column alongside it.
+
+        BUGFIX (P0): removal used to leave eligible_for_commission=True and
+        commission_status untouched, so a referring CRE could still click
+        "Apply for Commission" (or an already-Pending one would keep moving
+        through Finance/Executive review) for a student who had in fact been
+        removed from the course. We now revoke eligibility immediately and
+        reset an in-flight (not-yet-Settled) commission application back to
+        'Not Applied'. A commission that has already reached 'Settled' (the
+        CRE has actually been paid) is left alone - that is a completed
+        financial record, and any clawback for it is a manual Finance/
+        Executive decision, not something a removal silently triggers.
+        apply_for_commission() below also re-checks status == 'Admitted' as
+        a second line of defense.
         """
         if self.status != 'Admitted':
             return False
@@ -442,7 +469,14 @@ class Application(models.Model):
             self.status = 'Removed'
             self.removed_by = user
             self.removed_at = timezone.now()
-            self.save(update_fields=['status', 'removed_by', 'removed_at'])
+            update_fields = ['status', 'removed_by', 'removed_at']
+            if self.eligible_for_commission:
+                self.eligible_for_commission = False
+                update_fields.append('eligible_for_commission')
+            if self.commission_status not in ('Not Applied', 'Settled'):
+                self.commission_status = 'Not Applied'
+                update_fields.append('commission_status')
+            self.save(update_fields=update_fields)
             Course.objects.filter(pk=self.course_id, occupied_seats__gt=0).update(occupied_seats=F('occupied_seats') - 1)
         return True
 
@@ -475,8 +509,15 @@ class Application(models.Model):
         Also clears any stale executive review fields from a previous,
         since-rejected cycle, so a re-submission starts the two-stage
         approval clean.
+
+        Re-checks status == 'Admitted' (P0 defense-in-depth, alongside the
+        eligible_for_commission reset in unadmit() above): eligibility is
+        normally only set while Admitted and is cleared on removal, but this
+        guard means even a stale/cached eligible_for_commission=True can
+        never be used to start a commission application for a student who
+        isn't currently Admitted.
         """
-        if not self.eligible_for_commission or self.commission_status not in ('Not Applied', 'Rejected'):
+        if self.status != 'Admitted' or not self.eligible_for_commission or self.commission_status not in ('Not Applied', 'Rejected'):
             return False
         self.commission_status = 'Pending'
         self.commission_applied_at = timezone.now()

@@ -73,7 +73,10 @@
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-4 bg-white text-[#253E7D] font-black py-6 px-14 rounded-[2rem] text-xl hover:bg-[#B6E3D4] hover:shadow-[0_25px_60px_-10px_rgba(182,227,212,0.6)] transition-all hover:-translate-y-2 active:scale-95">
                     Apply Now <i data-lucide="arrow-right" class="w-6 h-6"></i>
                 </a>
-                <a href="#programs"
+                {# P1 fix: this pointed at "#programs", but the section on
+                   this page is actually id="courses" (see below) - the ids
+                   never matched, so clicking the button did nothing. #}
+                <a href="#courses"
                     class="w-full sm:w-auto inline-flex items-center justify-center gap-4 bg-white/10 backdrop-blur-xl text-white border border-white/25 font-bold py-6 px-14 rounded-[2rem] text-xl hover:bg-white/20 transition-all">
                     Explore Programs <i data-lucide="layout-grid" class="w-6 h-6"></i>
                 </a>
@@ -176,7 +179,7 @@
                 class="bg-white dark:bg-slate-900 rounded-[3.5rem] shadow-[0_60px_120px_-30px_rgba(37,62,125,0.18)] border border-slate-100 dark:border-slate-800 overflow-hidden">
 
                 <!-- Step indicator -->
-                <div class="bg-[#253E7D] px-10 py-12 md:px-20">
+                <div class="bg-[#253E7D] px-10 pt-12 pb-16 md:px-20">
                     <div class="flex items-center justify-between max-w-3xl mx-auto">
 
                         <div id="step-1-btn" class="nmc-step active">1<span class="nmc-label">Identity</span></div>
@@ -236,7 +239,7 @@
                                 {{ form.gender }}
                             </div>
                             <div class="nmc-field">
-                                <label class="nmc-label-text">Aadhar Number</label>
+                                <label class="nmc-label-text">Aadhaar Number</label>
                                 {{ form.aadhar_number }}
                             </div>
                             <div class="nmc-field">
@@ -492,7 +495,14 @@
     .nmc-step.active {
         background: white;
         color: var(--nmc-blue);
-        transform: scale(1.2) rotate(-4deg);
+        /* P3 fix: the rotate(-4deg) read as a rendering glitch rather than a
+           design flourish (bug report: "appears tilted/rotated"). Also, since
+           .nmc-label is a child of this scaled element, scale(1.2) was
+           scaling its bottom:-2.5rem offset right along with it, pushing the
+           active step's label low enough to clip against this card's
+           overflow-hidden (bug report: "label is clipped at the bottom").
+           Dropped the rotation and reduced the scale to leave enough room. */
+        transform: scale(1.1);
         box-shadow: 0 15px 40px -10px rgba(0, 0, 0, 0.3);
     }
 
