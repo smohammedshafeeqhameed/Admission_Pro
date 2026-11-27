@@ -4,7 +4,7 @@ from django.db import migrations
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('admission_system', '0023_commission_settlement'),
+        ('admission_system', '0024_dedupe_addoncourse_duplicates'),
     ]
 
     operations = [
