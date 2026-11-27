@@ -85,13 +85,13 @@
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em]">
                     <i data-lucide="shield-check" class="w-3.5 h-3.5 text-[#2b4ba1]"></i> APPROVED BY AICTE
                 </span>
-                {# P3 fix: this badge's text/border used the same brand blue
+                {% comment %} P3 fix: this badge's text/border used the same brand blue
                    (#2b4ba1) as its own background tint, over a dark blue
                    hero - unlike the two sibling badges above (white text on
                    a neutral white/10 background), it had almost no contrast
                    against the backdrop. Switched the text to white, matching
                    the sibling badges, while keeping the blue accent on the
-                   icon and border for distinction. #}
+                   icon and border for distinction. {% endcomment %}
                 <span
                     class="inline-flex items-center gap-2 px-5 py-2 rounded-full bg-[#2b4ba1]/20 backdrop-blur-xl border border-[#2b4ba1]/40 text-white text-[9px] md:text-[10px] font-black uppercase tracking-[0.35em] animate-pulse">
                     <i data-lucide="zap" class="w-3.5 h-3.5 fill-[#2b4ba1]"></i> Admissions Open 2026
@@ -187,13 +187,13 @@
             <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-7" id="course-grid">
                 {% for course in courses %}
                 <div class="course-card group bg-slate-50 dark:bg-slate-900 rounded-[2rem] p-8 border-2 border-transparent hover:border-[#2b4ba1]/20 hover:-translate-y-3 hover:shadow-xl transition-all duration-500 relative overflow-hidden"
-                     {# P1 fix: this used to be course.name|slice:'1:6' - a
+                     {% comment %} P1 fix: this used to be course.name|slice:'1:6' - a
                         fake category key sliced out of the course name,
                         which essentially never matched the real tab keys
                         below (btech/diploma/mgmt), so every filter but "All
                         Programs" showed a blank grid. Reads the real
                         Course.category field now; assign it per-course in
-                        Django admin (Course list, 'category' column). #}
+                        Django admin (Course list, 'category' column). {% endcomment %}
                      data-cat="{{ course.category }}">
                     <div class="absolute -right-8 -top-8 w-28 h-28 rounded-full bg-[#2b4ba1]/5 group-hover:scale-150 transition-transform duration-700"></div>
                     <div class="w-12 h-12 bg-[#2b4ba1] text-white rounded-xl flex items-center justify-center mb-6 shadow-md shadow-[#2b4ba1]/30 group-hover:rotate-6 transition-transform">

@@ -244,11 +244,11 @@
         <tr><th>Full Name</th><td>{{ app.student.name }}</td></tr>
         <tr><th>Email Address</th><td>{{ app.student.email }}</td></tr>
         <tr><th>Phone Number</th><td>{{ app.student.phone }}</td></tr>
-        {# P2 fix: with no date filter, Django falls back to the locale
+        {% comment %} P2 fix: with no date filter, Django falls back to the locale
            default format ("Nov. 25, 2004"), which doesn't match the
            explicit "d M Y" format already used for the Date field above
            (e.g. "25 Nov 2026") - bug report: inconsistent date punctuation
-           on the downloaded form. Matching the same format here. #}
+           on the downloaded form. Matching the same format here. {% endcomment %}
         <tr><th>Date of Birth</th><td>{{ app.student.dob|date:"d M Y"|default:"Not Provided" }}</td></tr>
         <tr><th>Gender</th><td>{{ app.student.get_gender_display|default:"Not Provided" }}</td></tr>
         <tr><th>Aadhaar Number</th><td>{{ app.student.aadhar_number|default:"Not Provided" }}</td></tr>

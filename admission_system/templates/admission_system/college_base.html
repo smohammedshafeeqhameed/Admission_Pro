@@ -62,7 +62,7 @@
                     </div>
                     <h2 class="text-xl font-bold tracking-tight">{{ college.name }}</h2>
                 </a>
-                {# P1 fix: these nav links used to be bare "#about"/"#courses"/etc.
+                {% comment %} P1 fix: these nav links used to be bare "#about"/"#courses"/etc.
                    anchors, which only resolve on pages that actually define
                    those section ids (the college landing/application page).
                    On success.html and manual_payment.html - which also
@@ -72,7 +72,7 @@
                    the same apply_admission URL the logo link already uses,
                    once, and appending the anchor to it means every nav link
                    now first takes the visitor back to the page that has
-                   these sections, then jumps to the right one. #}
+                   these sections, then jumps to the right one. {% endcomment %}
                 {% if app %}
                     {% url 'apply_admission' college.slug app.referred_by.user.username app.referred_by.cre_id as nav_base_url %}
                 {% else %}

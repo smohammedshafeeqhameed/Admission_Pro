@@ -47,14 +47,14 @@
                 
                 <div class="mt-6 flex flex-col items-center gap-2">
                     <div class="flex items-center gap-3 py-2 px-4 bg-slate-100 rounded-full">
-                        {# P2 fix: this hotlinked a Wikimedia Commons file path
+                        {% comment %} P2 fix: this hotlinked a Wikimedia Commons file path
                            (upload.wikimedia.org/.../UPI-Logo.png) directly -
                            Commons paths are hash-based and break whenever the
                            file is renamed or replaced, which is exactly what
                            happened here (the URL now 404s), showing a broken-
                            image icon next to a working QR code. Replaced the
                            external hotlink with a small self-contained badge
-                           so this can't rot again. #}
+                           so this can't rot again. {% endcomment %}
                         <span class="flex items-center justify-center h-4 px-1.5 rounded-sm bg-[#097939] text-white text-[9px] font-black tracking-wide leading-none">UPI</span>
                         <span class="h-4 w-[1px] bg-slate-300"></span>
                         <span class="text-[10px] font-black uppercase tracking-wider text-slate-500">Scan & Pay</span>

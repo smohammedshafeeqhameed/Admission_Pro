@@ -1,16 +1,18 @@
-<!--{# Global Academic Year filter, shown at the top of every portal/dashboard-->
-<!--   page (included from base.html whenever is_dashboard is set). Selecting a-->
-<!--   year navigates to the current URL with ?academic_year=<id>; the view's-->
-<!--   AcademicYearFilterMixin stores that choice in the session, so every-->
-<!--   other portal page the user visits afterwards stays on the same year-->
-<!--   without needing the query param repeated.-->
-<!---->
-<!--   Two colour variants share the same markup/ids/script below, switched by-->
-<!--   `is_executive` (set by Executive-portal views only): the default uses the-->
-<!--   site's light glass-card chrome; the is_executive one uses the Executive-->
-<!--   Portal's own dark command-center palette (.exec-surface/.exec-muted/-->
-<!--   .exec-secondary, defined in each is_executive page's own extra_css block),-->
-<!--   so this bar never again sits as a bright white strip on a black page. #}-->
+{% comment %}
+   Global Academic Year filter, shown at the top of every portal/dashboard
+   page (included from base.html whenever is_dashboard is set). Selecting a
+   year navigates to the current URL with ?academic_year=<id>; the view's
+   AcademicYearFilterMixin stores that choice in the session, so every
+   other portal page the user visits afterwards stays on the same year
+   without needing the query param repeated.
+
+   Two colour variants share the same markup/ids/script below, switched by
+   `is_executive` (set by Executive-portal views only): the default uses the
+   site's light glass-card chrome; the is_executive one uses the Executive
+   Portal's own dark command-center palette (.exec-surface/.exec-muted/
+   .exec-secondary, defined in each is_executive page's own extra_css block),
+   so this bar never again sits as a bright white strip on a black page.
+{% endcomment %}
 {% if is_executive %}
 <div class="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-8">
     <div class="flex flex-wrap items-center justify-between gap-3 exec-surface rounded-2xl px-5 py-3">

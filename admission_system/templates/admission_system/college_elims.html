@@ -132,11 +132,11 @@
         <div class="max-w-7xl mx-auto">
             <div class="text-center mb-20 space-y-6">
                 <h2 class="text-primary font-black tracking-[0.4em] uppercase text-xs">Excellence Pillars</h2>
-                {# P3 fix: "ELIMS" was styled at 30% opacity of the brand
+                {% comment %} P3 fix: "ELIMS" was styled at 30% opacity of the brand
                    color against a white background - far too light to read
                    next to the surrounding full-opacity slate-900 text.
                    Kept the brand-color accent and italic styling, just at
-                   full opacity so it actually meets contrast. #}
+                   full opacity so it actually meets contrast. {% endcomment %}
                 <h3 class="text-4xl md:text-7xl font-black text-slate-900 dark:text-white leading-tight tracking-tighter">
                     The <span class="text-primary italic font-medium">ELIMS</span> Advantage
                 </h3>
@@ -549,9 +549,9 @@
                                 </div>
                                 <div class="text-center md:text-left">
                                     <h4 class="text-3xl font-black text-white mb-2 leading-none">Assessment Fee</h4>
-                                    {# P3 fix: literal markdown-style asterisks were hardcoded in plain
+                                    {% comment %} P3 fix: literal markdown-style asterisks were hardcoded in plain
                                        HTML, which isn't run through a markdown renderer, so they printed
-                                       as literal "**₹1,500**" instead of bold text. #}
+                                       as literal "**₹1,500**" instead of bold text. {% endcomment %}
                                     <p class="text-white/70 font-medium text-lg">Electronic settlement of <strong class="text-white font-black">₹1,500</strong> is
                                         required to initialize the file processing.</p>
                                 </div>
