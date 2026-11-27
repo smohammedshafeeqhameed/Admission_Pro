@@ -221,7 +221,7 @@
                     {% csrf_token %}
 
                     {% if messages %}
-                    <div class="space-y-4 mb-10">
+                    <div class="space-y-4 mb-10" id="form-messages">
                         {% for message in messages %}
                         <div class="p-5 rounded-xl border flex items-center gap-4 font-semibold
                             {% if message.tags == 'success' %}bg-emerald-50 border-emerald-200 text-emerald-800
@@ -601,4 +601,51 @@
         if (typeof lucide !== 'undefined') lucide.createIcons();
     });
 </script>
+
+{% if first_error_field %}
+<script>
+(function() {
+    // P1 fix: a validation error from any step used to always visually
+    // appear attached to Step 1, because nothing read which step the
+    // failing field actually belongs to. Finds the failing field in the
+    // rendered (bound) form and jumps the wizard to whichever step
+    // actually contains it. Entirely defensive: if the field or step
+    // markup doesn't match what's expected here, this silently does
+    // nothing rather than risk breaking the page.
+    try {
+        var errField = document.getElementById('id_{{ first_error_field }}');
+        if (!errField) return;
+        var el = errField;
+        var stepNum = null;
+        while (el && el !== document.body) {
+            if (el.id && /^step-\d+$/.test(el.id)) {
+                stepNum = parseInt(el.id.match(/\d+/)[0], 10);
+                break;
+            }
+            el = el.parentElement;
+        }
+        if (!stepNum) return;
+        if (typeof executeStepTransition === 'function') {
+            executeStepTransition(stepNum);
+        } else if (typeof goToStep === 'function') {
+            goToStep(stepNum);
+        }
+    } catch (e) { /* no-op - leave the page exactly as it was */ }
+})();
+</script>
+{% endif %}
+<script>
+    // P1 fix: the validation-error banner above the step wizard used to
+    // stay visible forever once rendered, so after a user fixed the
+    // problem and navigated on, the stale message kept showing no matter
+    // which step they were viewing. Hide it as soon as they interact with
+    // the step navigation. Defensive/no-op if the markup isn't found.
+    document.addEventListener('click', function(e) {
+        var navEl = e.target.closest('[onclick*="goToStep"], [onclick*="executeStepTransition"], [id$="-btn"]');
+        if (!navEl) return;
+        var msgBox = document.getElementById('form-messages');
+        if (msgBox) msgBox.style.display = 'none';
+    }, true);
+</script>
+
 {% endblock %}

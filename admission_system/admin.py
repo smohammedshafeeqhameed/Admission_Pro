@@ -63,9 +63,13 @@ class CollegeAdmin(admin.ModelAdmin):
 
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('name', 'college', 'total_seats', 'occupied_seats', 'available_seats_display')
-    list_filter = ('college',)
-    list_editable = ('total_seats',)
+    # 'category' added for the Jai Bharath "Programs We Offer" filter tabs
+    # (P1 fix) - editable right here in the list so categories can be
+    # assigned to every Jai Bharath course in one pass without opening each
+    # course's own edit page.
+    list_display = ('name', 'college', 'category', 'total_seats', 'occupied_seats', 'available_seats_display')
+    list_filter = ('college', 'category')
+    list_editable = ('total_seats', 'category')
     readonly_fields = ('occupied_seats',)
 
     @admin.display(description='Available Seats')

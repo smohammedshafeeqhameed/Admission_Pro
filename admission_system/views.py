@@ -1447,6 +1447,15 @@ def apply_admission(request, college_slug, username, cre_id):
     if not referrer.user.is_superuser and not referrer.allocated_colleges.filter(pk=college.pk).exists():
         raise Http404("This referral link is no longer active.")
 
+    # P1 fix: a validation error used to always visually appear attached to
+    # Step 1 of the wizard, whichever step the failing field actually lives
+    # on, because nothing told the template which step to show. Each college
+    # template's own JS now reads this field name, finds it in the rendered
+    # (bound) form, and jumps to whichever step actually contains it -
+    # entirely in the DOM, so it works regardless of how a given template
+    # groups fields into steps (they're not identical across all 14).
+    first_error_field = ''
+
     # Retrieve pending data from session
     pending_student_data = request.session.get('pending_student_data')
     # Per-field map (doc_field -> stored path), not just a boolean - see the
@@ -1545,6 +1554,8 @@ def apply_admission(request, college_slug, username, cre_id):
             for field, errors in form.errors.items():
                 for error in errors:
                     messages.error(request, f"{form.fields[field].label}: {error}")
+            if form.errors:
+                first_error_field = next(iter(form.errors))
     else:
         # Pre-fill form if session data exists
         initial_data = {}
@@ -1577,7 +1588,8 @@ def apply_admission(request, college_slug, username, cre_id):
         'courses': courses,
         'username': username,
         'cre_id': cre_id,
-        'form': form
+        'form': form,
+        'first_error_field': first_error_field,
     })
 
 from django.db import transaction

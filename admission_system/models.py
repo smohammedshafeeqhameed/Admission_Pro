@@ -39,9 +39,29 @@ class College(models.Model):
         return "   |   ".join(parts)
 
 class Course(models.Model):
+    # P1 fix: Jai Bharath's "Programs We Offer" page has category filter tabs
+    # (B.Tech Engineering / Diploma / Management) that used to match against
+    # `course.name|slice:'1:6'` - a fake category key sliced from the course
+    # name, which essentially never matched the real tab keys (btech/diploma/
+    # mgmt), so every filter but "All Programs" showed a blank grid. This is
+    # the real field that filter now reads. Only Jai Bharath's template
+    # (college_jbcmet.html) currently has a category-filter UI, so every
+    # other college's courses are expected to stay blank - add more choices
+    # here first if another college's template grows the same kind of filter.
+    CATEGORY_CHOICES = [
+        ('', '— No category —'),
+        ('btech', 'B.Tech Engineering'),
+        ('diploma', 'Diploma'),
+        ('mgmt', 'Management'),
+    ]
+
     college = models.ForeignKey(College, on_delete=models.CASCADE, related_name='courses')
     name = models.CharField(max_length=255)
     description = models.TextField()
+    category = models.CharField(
+        max_length=20, blank=True, default='', choices=CATEGORY_CHOICES,
+        help_text="Used by Jai Bharath's 'Programs We Offer' filter tabs (B.Tech/Diploma/Management). Leave blank for colleges that don't have this filter."
+    )
 
     # Seat tracking for the Campus Manager portal's Admit action. These
     # live directly on Course (not per academic year) - set/reset
